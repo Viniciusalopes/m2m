@@ -6,7 +6,7 @@ Gerado automaticamente por `scripts/gerar-third-party-notices.sh`. O m2m não co
 
 ```
 
-Lists of 138 third-party dependencies.
+Lists of 141 third-party dependencies.
      (EPL-2.0) (LGPL-2.1-only) Logback Classic Module (ch.qos.logback:logback-classic:1.5.38 - http://logback.qos.ch/logback-classic)
      (EPL-2.0) (LGPL-2.1-only) Logback Core Module (ch.qos.logback:logback-core:1.5.38 - http://logback.qos.ch/logback-core)
      (Apache-2.0) ClassMate (com.fasterxml:classmate:1.7.3 - https://github.com/FasterXML/java-classmate)
@@ -61,6 +61,9 @@ Lists of 138 third-party dependencies.
      (Apache-2.0) tomcat-embed-el (org.apache.tomcat.embed:tomcat-embed-el:11.0.24 - https://tomcat.apache.org/)
      (Apache-2.0) tomcat-embed-websocket (org.apache.tomcat.embed:tomcat-embed-websocket:11.0.24 - https://tomcat.apache.org/)
      (EPL-2.0) AspectJ Weaver (org.aspectj:aspectjweaver:1.9.25.1 - https://www.eclipse.org/aspectj/)
+     (MIT) Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs (org.bouncycastle:bcpkix-jdk18on:1.86 - https://www.bouncycastle.org/download/bouncy-castle-java/)
+     (MIT) Bouncy Castle Provider (org.bouncycastle:bcprov-jdk18on:1.86 - https://www.bouncycastle.org/download/bouncy-castle-java/)
+     (MIT) Bouncy Castle ASN.1 Extension and Utility APIs (org.bouncycastle:bcutil-jdk18on:1.86 - https://www.bouncycastle.org/download/bouncy-castle-java/)
      (MIT) Checker Qual (org.checkerframework:checker-qual:3.55.1 - https://checkerframework.org/)
      (BSD) Angus Activation Registries (org.eclipse.angus:angus-activation:2.0.3 - https://github.com/eclipse-ee4j/angus-activation/angus-activation)
      (BSD) (EPL-2.0) (GPL2 w/ CPE) Angus Mail Provider (org.eclipse.angus:angus-mail:2.0.5 - http://eclipse-ee4j.github.io/angus-mail/angus-mail)

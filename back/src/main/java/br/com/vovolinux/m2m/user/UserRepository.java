@@ -38,6 +38,11 @@ public class UserRepository {
                 .query(UserRepository::map).optional();
     }
 
+    /** O administrador mais antigo: dono dos dados iniciais. */
+    public Optional<String> firstUsername() {
+        return jdbc.sql("select username from app_user order by id limit 1").query(String.class).optional();
+    }
+
     public long count() {
         return jdbc.sql("select count(*) from app_user").query(Long.class).single();
     }

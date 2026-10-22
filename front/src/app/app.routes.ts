@@ -4,6 +4,7 @@ import { About } from './pages/about/about';
 import { Audit } from './pages/audit/audit';
 import { Home } from './pages/home/home';
 import { Layout } from './pages/layout/layout';
+import { Machines } from './machines/machines';
 import { Login } from './pages/login/login';
 import { Password } from './pages/password/password';
 
@@ -15,6 +16,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: Home },
+      { path: 'maquinas', component: Machines },
       { path: 'auditoria', component: Audit },
       { path: 'senha', component: Password },
       { path: 'sobre', component: About },

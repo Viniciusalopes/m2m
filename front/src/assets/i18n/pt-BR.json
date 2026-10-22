@@ -21,7 +21,8 @@
     "auditoria": "Auditoria",
     "sobre": "Sobre",
     "senha": "Alterar senha / e-mail",
-    "sair": "Sair"
+    "sair": "Sair",
+    "maquinas": "Máquinas"
   },
   "layout": {
     "menu": "Abrir ou fechar o menu",
@@ -97,6 +98,160 @@
     },
     "validacao": {
       "invalida": "Há campos inválidos no formulário."
+    },
+    "maquina": {
+      "nome-duplicado": "Já existe uma máquina chamada {{ nome }}.",
+      "em-uso": "A máquina está em uso e não pode ser removida:",
+      "nao-encontrada": "Máquina não encontrada.",
+      "local-ja-existe": "Já existe uma máquina LOCAL.",
+      "local-desativado": "O acesso à máquina LOCAL está desativado nesta instalação.",
+      "host-obrigatorio": "Informe o host.",
+      "usuario-obrigatorio": "Informe o usuário.",
+      "senha-obrigatoria": "Informe a senha.",
+      "protocolo-imutavel": "O protocolo não pode ser alterado; crie outra máquina.",
+      "modo-ftps-invalido": "Modo FTPS inválido.",
+      "autenticacao-invalida": "Tipo de autenticação inválido."
+    },
+    "conexao": {
+      "inalcancavel": "Sem resposta de {{ host }}:{{ porta }}. Verifique se a máquina está ligada e o endereço correto.",
+      "rede-privada-inalcancavel": "{{ host }} é um endereço de rede privada e o host do m2m não o alcançou. O m2m precisa estar na mesma rede, numa VPN com a máquina ou usar redirecionamento de porta até ela.",
+      "host-desconhecido": "Não foi possível resolver o nome {{ host }}.",
+      "autenticacao-falhou": "Usuário, senha ou chave recusados por {{ host }}.",
+      "falha": "Falha ao conectar em {{ host }}.",
+      "sem-vaga": "Todas as conexões com a máquina estão em uso."
+    },
+    "identidade": {
+      "confirmacao-necessaria": "Confirme a identidade do servidor antes do primeiro uso.",
+      "alterada": "A identidade do servidor mudou. Confirme a nova identidade para continuar.",
+      "nada-pendente": "Não há identidade pendente de confirmação.",
+      "fingerprint-diferente": "A impressão digital informada não é a que o servidor apresentou."
+    },
+    "escrita": {
+      "sem-permissao": "Sem permissão de escrita."
+    },
+    "leitura": {
+      "falhou": "Não foi possível ler o diretório inicial."
+    },
+    "local": {
+      "fora-das-raizes": "Caminho fora das raízes permitidas do host.",
+      "caminho-invalido": "Caminho inválido.",
+      "desativado": "O acesso LOCAL está desativado."
+    },
+    "arquivo": {
+      "nao-encontrado": "Item não encontrado: {{ caminho }}",
+      "sem-permissao": "Sem permissão para acessar: {{ caminho }}"
+    },
+    "protocolo": {
+      "nao-suportado": "Protocolo ainda não suportado: {{ protocolo }}"
+    },
+    "credencial": {
+      "invalida": "Não foi possível carregar a credencial (a chave mestra mudou?)."
+    }
+  },
+  "comum": {
+    "cancelar": "Cancelar",
+    "salvar": "Salvar",
+    "fechar": "Fechar",
+    "confirmar": "Confirmar",
+    "editar": "Editar",
+    "excluir": "Excluir",
+    "sim": "Sim",
+    "nao": "Não"
+  },
+  "maquinas": {
+    "titulo": "Máquinas",
+    "nova": "Nova máquina",
+    "testar": "Testar conexão",
+    "vazio": "Nenhuma máquina cadastrada.",
+    "nunca-testada": "Nunca testada",
+    "sem-criptografia": "Sem criptografia",
+    "fidelidade-parcial": "Fidelidade parcial",
+    "col": {
+      "nome": "Nome",
+      "protocolo": "Protocolo",
+      "endereco": "Endereço",
+      "usuario": "Usuário",
+      "identidade": "Identidade do servidor",
+      "teste": "Último teste"
+    },
+    "protocolo": {
+      "LOCAL": "LOCAL (este host)",
+      "SFTP": "SFTP (via SSH)",
+      "FTP": "FTP",
+      "FTPS": "FTPS"
+    },
+    "identidade": {
+      "confirmada": "Confirmada",
+      "pendente": "A confirmar",
+      "alterada": "Alterada"
+    },
+    "remover": {
+      "titulo": "Remover a máquina {{ nome }}?",
+      "mensagem": "A máquina será removida. O histórico continuará exibindo o nome dela."
+    },
+    "form": {
+      "nova": "Nova máquina",
+      "editar": "Editar máquina",
+      "nome": "Nome",
+      "descricao": "Descrição (opcional)",
+      "protocolo": "Protocolo",
+      "host": "Host (IP ou nome DNS)",
+      "porta": "Porta",
+      "modo-ftps": "Modo FTPS",
+      "ftps-explicito": "Explícito (porta 21)",
+      "ftps-implicito": "Implícito (porta 990)",
+      "usuario": "Usuário",
+      "autenticacao": "Autenticação",
+      "por-chave": "Chave SSH do m2m (recomendado)",
+      "por-senha": "Senha",
+      "senha": "Senha",
+      "senha-salva": "Senha salva. Deixe em branco para mantê-la.",
+      "alerta-ftp": "FTP sem TLS: usuário, senha e arquivos trafegam sem criptografia. Prefira SFTP ou FTPS.",
+      "chave-titulo": "Chave pública do m2m",
+      "chave-instrucao": "Execute este comando na máquina de destino para autorizar o m2m (SSH):",
+      "copiar-comando": "Copiar comando",
+      "copiado": "Copiado!",
+      "copiar-chave": "Copiar só a chave pública"
+    },
+    "fidelidade": {
+      "titulo": "O que este protocolo preserva",
+      "content": "Conteúdo",
+      "mtime": "Datas de modificação",
+      "permissions": "Permissões Unix",
+      "symlinks": "Links simbólicos",
+      "preservado": "Preservado",
+      "nao-preservado": "Não preservado"
+    },
+    "teste": {
+      "titulo": "Teste de conexão — {{ nome }}",
+      "testando": "Testando a conexão…",
+      "sucesso": "Conexão pronta para uso.",
+      "somente-origem": "Sem permissão de escrita: esta máquina só pode ser usada como origem.",
+      "repetir": "Testar novamente",
+      "recursos": "Recursos detectados",
+      "passo": {
+        "alcance": "Alcance de rede",
+        "autenticacao": "Autenticação",
+        "identidade": "Identidade do servidor",
+        "leitura": "Leitura",
+        "escrita": "Escrita"
+      },
+      "status": {
+        "OK": "ok",
+        "FAIL": "falhou",
+        "SKIPPED": "não executado",
+        "ACTION": "requer sua confirmação"
+      },
+      "recurso": {
+        "exec": "Hash no servidor (exec)",
+        "statvfs": "Espaço livre (statvfs)",
+        "mfmt": "Data de modificação (MFMT)"
+      },
+      "identidade-nova": "Confirme a identidade do servidor",
+      "identidade-alterada": "A identidade do servidor mudou!",
+      "identidade-explicacao": "Compare a impressão digital abaixo com a do servidor antes de confirmar. Enquanto não for confirmada, o m2m não conecta.",
+      "fingerprint-anterior": "Anterior:",
+      "confirmar-identidade": "Confirmar esta identidade"
     }
   }
 }

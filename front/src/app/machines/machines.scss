@@ -1,0 +1,47 @@
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tabela {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.descricao {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.acoes {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.vazio {
+  text-align: center;
+  padding: 24px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.erro {
+  display: flex;
+  gap: 8px;
+  color: var(--m2m-fail);
+  background: var(--m2m-fail-container);
+  padding: 8px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+
+  p {
+    margin: 0;
+  }
+  ul {
+    margin: 4px 0 0;
+  }
+}

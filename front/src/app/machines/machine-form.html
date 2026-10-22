@@ -1,0 +1,120 @@
+<h2 mat-dialog-title>
+  {{ (editando ? 'maquinas.form.editar' : 'maquinas.form.nova') | transloco }}
+</h2>
+
+<form [formGroup]="form" (ngSubmit)="salvar()">
+  <mat-dialog-content class="campos">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'maquinas.form.nome' | transloco }}</mat-label>
+      <input matInput formControlName="name" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'maquinas.form.descricao' | transloco }}</mat-label>
+      <input matInput formControlName="description" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'maquinas.form.protocolo' | transloco }}</mat-label>
+      <mat-select formControlName="protocol">
+        @for (p of protocolos; track p) {
+          <mat-option [value]="p">{{ 'maquinas.protocolo.' + p | transloco }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    @if (protocolo() === 'FTP') {
+      <p class="alerta" role="alert">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        {{ 'maquinas.form.alerta-ftp' | transloco }}
+      </p>
+    }
+
+    @if (protocolo() !== 'LOCAL') {
+      <div class="linha">
+        <mat-form-field appearance="outline" class="host">
+          <mat-label>{{ 'maquinas.form.host' | transloco }}</mat-label>
+          <input matInput formControlName="host" placeholder="192.168.0.10" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="porta">
+          <mat-label>{{ 'maquinas.form.porta' | transloco }}</mat-label>
+          <input matInput type="number" formControlName="port" />
+        </mat-form-field>
+      </div>
+
+      @if (protocolo() === 'FTPS') {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'maquinas.form.modo-ftps' | transloco }}</mat-label>
+          <mat-select formControlName="ftpsMode">
+            <mat-option value="EXPLICIT">{{
+              'maquinas.form.ftps-explicito' | transloco
+            }}</mat-option>
+            <mat-option value="IMPLICIT">{{
+              'maquinas.form.ftps-implicito' | transloco
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      }
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'maquinas.form.usuario' | transloco }}</mat-label>
+        <input matInput formControlName="username" autocomplete="off" />
+      </mat-form-field>
+
+      @if (protocolo() === 'SFTP') {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'maquinas.form.autenticacao' | transloco }}</mat-label>
+          <mat-select formControlName="authType">
+            <mat-option value="KEY">{{ 'maquinas.form.por-chave' | transloco }}</mat-option>
+            <mat-option value="PASSWORD">{{ 'maquinas.form.por-senha' | transloco }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      }
+
+      @if (precisaSenha()) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'maquinas.form.senha' | transloco }}</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            [placeholder]="senhaSalva() ? '••••••••' : ''"
+          />
+          @if (senhaSalva()) {
+            <mat-hint>{{ 'maquinas.form.senha-salva' | transloco }}</mat-hint>
+          }
+        </mat-form-field>
+      }
+
+      @if (usaChave() && identidade(); as id) {
+        <section class="chave">
+          <h3>{{ 'maquinas.form.chave-titulo' | transloco }}</h3>
+          <p>{{ 'maquinas.form.chave-instrucao' | transloco }}</p>
+          <pre>{{ id.suggestedCommand }}</pre>
+          <button mat-stroked-button type="button" (click)="copiar(id.suggestedCommand)">
+            <mat-icon>content_copy</mat-icon>
+            {{ (copiado() ? 'maquinas.form.copiado' : 'maquinas.form.copiar-comando') | transloco }}
+          </button>
+          <button mat-button type="button" (click)="copiar(id.publicKey)">
+            {{ 'maquinas.form.copiar-chave' | transloco }}
+          </button>
+        </section>
+      }
+    }
+
+    @if (erro(); as e) {
+      <p class="erro" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        {{ 'erro.' + e.codigo | transloco: e.parametros }}
+      </p>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>{{ 'comum.cancelar' | transloco }}</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid || salvando()">
+      {{ 'comum.salvar' | transloco }}
+    </button>
+  </mat-dialog-actions>
+</form>

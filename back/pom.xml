@@ -21,6 +21,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<sshd.version>2.20.0</sshd.version>
+		<bouncycastle.version>1.86</bouncycastle.version>
 		<commons-compress.version>1.28.0</commons-compress.version>
 		<zstd-jni.version>1.5.7-24</zstd-jni.version>
 		<springdoc.version>3.1.1</springdoc.version>
@@ -72,6 +73,17 @@
 			<groupId>org.apache.sshd</groupId>
 			<artifactId>sshd-sftp</artifactId>
 			<version>${sshd.version}</version>
+		</dependency>
+		<!-- Ed25519 no MINA SSHD e Argon2id (exportação de configuração) -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>${bouncycastle.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -177,7 +189,7 @@
 					<failOnBlacklist>true</failOnBlacklist>
 					<licenseMerges>
 						<licenseMerge>Apache-2.0|Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache License 2.0|The Apache License, Version 2.0|Apache License Version 2.0|AL 2.0</licenseMerge>
-						<licenseMerge>MIT|The MIT License</licenseMerge>
+						<licenseMerge>MIT|The MIT License|Bouncy Castle Licence</licenseMerge>
 						<licenseMerge>BSD|BSD-2-Clause|BSD-3-Clause|BSD 2-Clause License|Eclipse Distribution License - v 1.0|Eclipse Distribution License v. 1.0|EDL 1.0</licenseMerge>
 						<licenseMerge>CC0|Public Domain, per Creative Commons CC0</licenseMerge>
 						<licenseMerge>EPL-2.0|EPL 2.0|Eclipse Public License v. 2.0|Eclipse Public License - v 2.0</licenseMerge>

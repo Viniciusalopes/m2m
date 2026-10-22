@@ -1,0 +1,85 @@
+<h2 mat-dialog-title>{{ 'maquinas.teste.titulo' | transloco: { nome: machine.name } }}</h2>
+
+<mat-dialog-content>
+  @if (testando()) {
+    <mat-progress-bar mode="indeterminate" />
+    <p>{{ 'maquinas.teste.testando' | transloco }}</p>
+  }
+
+  @if (erro(); as e) {
+    <p class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ 'erro.' + e.codigo | transloco: e.parametros }}
+    </p>
+  }
+
+  @if (resultado(); as r) {
+    <ul class="passos">
+      @for (s of r.steps; track s.name) {
+        <li>
+          <m2m-status [estado]="estado(s)" [texto]="'maquinas.teste.passo.' + s.name | transloco" />
+          <span class="status-texto">{{ 'maquinas.teste.status.' + s.status | transloco }}</span>
+          @if (s.code && s.status !== 'ACTION') {
+            <span class="codigo">{{ 'erro.' + s.code | transloco: detalhes(s) }}</span>
+          }
+        </li>
+      }
+    </ul>
+
+    @if (r.ok) {
+      <p class="ok">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        {{ 'maquinas.teste.sucesso' | transloco }}
+      </p>
+    }
+
+    @if (r.readOnly) {
+      <p class="aviso">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        {{ 'maquinas.teste.somente-origem' | transloco }}
+      </p>
+    }
+
+    @if (passoComAcao(); as acao) {
+      <section class="identidade" role="alert">
+        <h3>
+          {{
+            (identidadeAlterada()
+              ? 'maquinas.teste.identidade-alterada'
+              : 'maquinas.teste.identidade-nova'
+            ) | transloco
+          }}
+        </h3>
+        <p>{{ 'maquinas.teste.identidade-explicacao' | transloco }}</p>
+        <p class="fingerprint">{{ r.fingerprint }}</p>
+        @if (identidadeAlterada() && acao.params['confirmada']) {
+          <p>
+            {{ 'maquinas.teste.fingerprint-anterior' | transloco }}
+            <span class="fingerprint">{{ acao.params['confirmada'] }}</span>
+          </p>
+        }
+        <button mat-flat-button (click)="confirmar()">
+          {{ 'maquinas.teste.confirmar-identidade' | transloco }}
+        </button>
+      </section>
+    }
+
+    @if (r.features.length) {
+      <p>
+        <strong>{{ 'maquinas.teste.recursos' | transloco }}:</strong>
+        @for (f of r.features; track f) {
+          <span class="recurso">{{ 'maquinas.teste.recurso.' + f | transloco }}</span>
+        }
+      </p>
+    }
+  }
+
+  <m2m-fidelity [fidelidade]="machine.fidelity" />
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="executar()" [disabled]="testando()">
+    {{ 'maquinas.teste.repetir' | transloco }}
+  </button>
+  <button mat-flat-button mat-dialog-close>{{ 'comum.fechar' | transloco }}</button>
+</mat-dialog-actions>

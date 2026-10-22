@@ -72,6 +72,9 @@
           <button mat-flat-button (click)="backup(p)">
             <mat-icon>backup</mat-icon>{{ 'perfis.backup-agora' | transloco }}
           </button>
+          <button mat-button (click)="verificar(p)">
+            <mat-icon>compare_arrows</mat-icon>{{ 'perfis.verificar' | transloco }}
+          </button>
           <a
             mat-icon-button
             [routerLink]="['/perfis', p.id]"

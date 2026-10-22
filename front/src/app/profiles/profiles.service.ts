@@ -106,6 +106,12 @@ export class ProfilesService {
     return firstValueFrom(this.http.delete<void>(`/api/profiles/${id}`, { params }));
   }
 
+  verify(id: number, destMachineId: number, mode: 'QUICK' | 'FULL'): Promise<JobView> {
+    return firstValueFrom(
+      this.http.post<JobView>(`/api/profiles/${id}/verify`, { destMachineId, mode }),
+    );
+  }
+
   startBackup(id: number, complement: string | null): Promise<JobView> {
     return firstValueFrom(this.http.post<JobView>(`/api/profiles/${id}/backup`, { complement }));
   }

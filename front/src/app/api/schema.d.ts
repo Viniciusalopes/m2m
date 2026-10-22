@@ -100,6 +100,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profiles/{id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profiles/{id}/backup": {
         parameters: {
             query?: never;
@@ -252,6 +268,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["sshIdentity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profiles/{id}/verify-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["targets"];
         put?: never;
         post?: never;
         delete?: never;
@@ -631,8 +663,11 @@ export interface components {
             lastTestAt?: string;
             lastTest?: string;
         };
-        BackupRequest: {
-            complement?: string;
+        VerifyRequest: {
+            /** Format: int64 */
+            destMachineId: number;
+            /** @enum {string} */
+            mode: "QUICK" | "FULL";
         };
         JobView: {
             /** Format: int64 */
@@ -680,6 +715,9 @@ export interface components {
             container?: boolean;
             number?: boolean;
             embeddedValue?: boolean;
+        };
+        BackupRequest: {
+            complement?: string;
         };
         Result: {
             ok?: boolean;
@@ -744,6 +782,12 @@ export interface components {
             algorithm?: string;
             publicKey?: string;
             suggestedCommand?: string;
+        };
+        Target: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            protocol?: string;
         };
         Defaults: {
             /** Format: int64 */
@@ -1076,6 +1120,32 @@ export interface operations {
             };
         };
     };
+    verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JobView"];
+                };
+            };
+        };
+    };
     startBackup: {
         parameters: {
             query?: never;
@@ -1316,6 +1386,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PublicIdentity"];
+                };
+            };
+        };
+    };
+    targets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Target"][];
                 };
             };
         };

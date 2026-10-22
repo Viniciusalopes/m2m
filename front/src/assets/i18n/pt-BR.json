@@ -192,6 +192,9 @@
       "espaco-insuficiente": "Espaço insuficiente no armazenamento: necessário {{ necessario }} bytes, livre {{ livre }}.",
       "validacao-falhou": "A validação do arquivo falhou: {{ motivo }}",
       "perfil-sem-diretorios": "O perfil não tem diretórios de origem."
+    },
+    "verificacao": {
+      "sem-mapeamento": "A máquina {{ maquina }} não tem mapeamento para: {{ diretorios }}."
     }
   },
   "comum": {
@@ -358,7 +361,8 @@
       "agendamento": "Agendamento do backup",
       "backup-diario": "Backup diário ativo",
       "horario": "Horário"
-    }
+    },
+    "verificar": "Verificar"
   },
   "jobs": {
     "titulo": "Acompanhamento",
@@ -436,6 +440,9 @@
       "arquivo-removido-durante-a-leitura": "Arquivo removido durante o backup e não incluído: {{ caminho }}",
       "suspeito": "Backup suspeito: {{ arquivos }} arquivos contra {{ anteriores }} no último aceito. Aceite ou exclua o backup.",
       "retencao-falhou": "Não foi possível excluir o backup antigo {{ arquivo }}: {{ detalhe }}"
+    },
+    "verificacao": {
+      "nao-comparado": "Itens não comparados: {{ itens }}"
     }
   },
   "backups": {
@@ -493,6 +500,40 @@
       "data": "Modificado em",
       "vazio": "Vazio.",
       "mais": "Carregar mais"
+    }
+  },
+  "verificacao": {
+    "titulo": "Verificar {{ nome }}",
+    "explicacao": "Compara os diretórios da origem com os caminhos mapeados no destino. Nada é alterado.",
+    "destino": "Máquina de destino",
+    "sem-destinos": "Nenhuma máquina tem mapeamento para todos os diretórios deste perfil.",
+    "modo-rapido": "Rápida: lista, tipo, tamanho, data (±2 s) e permissões",
+    "modo-completo": "Completa: também o SHA-256 do conteúdo e o alvo dos links",
+    "iniciar": "Iniciar verificação",
+    "identicos": "Idênticos",
+    "diferentes": "Diferentes",
+    "resumo": "{{ origem }} × {{ destino }} ({{ modo }})",
+    "arquivos-comparados": "{{ total }} arquivo(s) comparado(s).",
+    "so-na-origem": "Só na origem ({{ total }})",
+    "so-no-destino": "Só no destino ({{ total }})",
+    "com-diferenca": "Presentes nos dois, com diferença ({{ total }})",
+    "truncado": "A lista foi limitada; há mais itens além dos exibidos.",
+    "especiais": "{{ total }} item(ns) especial(is) (pipe, socket, dispositivo) ignorado(s).",
+    "modo": {
+      "QUICK": "modo rápido",
+      "FULL": "modo completo"
+    },
+    "motivo": {
+      "TYPE": "tipo",
+      "SIZE": "tamanho",
+      "MTIME": "data de modificação",
+      "MODE": "permissões",
+      "CONTENT": "conteúdo",
+      "LINK": "alvo do link"
+    },
+    "nao-comparado": {
+      "permissions": "As permissões não foram comparadas (um dos lados não as preserva).",
+      "symlinks": "Os links simbólicos não foram comparados (um dos lados não os preserva)."
     }
   }
 }

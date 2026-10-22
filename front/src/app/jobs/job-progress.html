@@ -115,6 +115,9 @@
               {{ 'jobs.concluido' | transloco }}
             </p>
           }
+          @if (j.type === 'VERIFY') {
+            <m2m-verify-report [result]="resultado()" />
+          }
           @if (mensagens().length) {
             <ul class="mensagens">
               @for (m of mensagens(); track m.id) {

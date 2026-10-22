@@ -9,6 +9,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { apiErro, ApiErro } from '../core/api-error';
 import { JobView } from '../profiles/profiles.service';
 import { Estado, StatusChip } from '../ui/status-chip';
+import { VerifyReport } from './verify-report';
 import { JobEvent, JobMessage, JobsService } from './jobs.service';
 
 const ESTADOS: Record<string, Estado> = {
@@ -35,6 +36,7 @@ const ESTADOS: Record<string, Estado> = {
     DecimalPipe,
     DatePipe,
     RouterLink,
+    VerifyReport,
   ],
   templateUrl: './job-progress.html',
   styleUrl: './job-progress.scss',

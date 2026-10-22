@@ -10,6 +10,7 @@ import { apiErro, ApiErro } from '../core/api-error';
 import { StatusChip } from '../ui/status-chip';
 import { BackupDialog } from './backup-dialog';
 import { DeleteProfileDialog } from './delete-profile-dialog';
+import { VerifyDialog } from './verify-dialog';
 import { Profile, ProfilesService } from './profiles.service';
 
 @Component({
@@ -53,6 +54,23 @@ export class Profiles implements OnInit {
     }
     try {
       const job = await this.service.startBackup(p.id, r.complement);
+      await this.router.navigate(['/jobs', job.id]);
+    } catch (e) {
+      const err = apiErro(e);
+      this.erro.set({ ...err, jobId: err.parametros?.['jobId'] as number | undefined });
+    }
+  }
+
+  async verificar(p: Profile): Promise<void> {
+    this.erro.set(null);
+    const r = await firstValueFrom(
+      this.dialog.open(VerifyDialog, { data: p, width: '520px', maxWidth: '95vw' }).afterClosed(),
+    );
+    if (!r) {
+      return;
+    }
+    try {
+      const job = await this.service.verify(p.id, r.destMachineId, r.mode);
       await this.router.navigate(['/jobs', job.id]);
     } catch (e) {
       const err = apiErro(e);

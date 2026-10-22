@@ -10,6 +10,7 @@ import { apiErro, ApiErro } from '../core/api-error';
 import { JobView } from '../profiles/profiles.service';
 import { Estado, StatusChip } from '../ui/status-chip';
 import { RestoreService } from '../restore/restore.service';
+import { SyncService } from '../sync/sync.service';
 import { VerifyReport } from './verify-report';
 import { JobEvent, JobMessage, JobsService } from './jobs.service';
 
@@ -47,6 +48,7 @@ export class JobProgressPage implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private restoreService = inject(RestoreService);
+  private syncService = inject(SyncService);
 
   readonly job = signal<JobView | null>(null);
   readonly evento = signal<JobEvent | null>(null);
@@ -127,8 +129,25 @@ export class JobProgressPage implements OnInit, OnDestroy {
       return;
     }
     try {
-      const job = await this.restoreService.undo(id);
+      const job =
+        this.job()?.type === 'SYNC'
+          ? await this.syncService.undo(id)
+          : await this.restoreService.undo(id);
       await this.router.navigate(['/jobs', job.id]);
+    } catch (e) {
+      this.erro.set(apiErro(e));
+    }
+  }
+
+  /** Sincronização agendada parada por proteção: o usuário confirma e ela roda como manual. */
+  async confirmarSync(): Promise<void> {
+    const j = this.job();
+    if (!j) {
+      return;
+    }
+    try {
+      const novo = await this.syncService.confirm(j.id);
+      await this.router.navigate(['/jobs', novo.id]);
     } catch (e) {
       this.erro.set(apiErro(e));
     }

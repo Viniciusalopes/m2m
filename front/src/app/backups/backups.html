@@ -123,6 +123,11 @@
               <mat-icon>undo</mat-icon>{{ 'restauracao.desfazer.botao' | transloco }}
             </button>
           }
+          @if (podeUsarArquivo(b) && b.type === 'PRE_SYNC') {
+            <button mat-stroked-button (click)="desfazerSync(b)">
+              <mat-icon>undo</mat-icon>{{ 'sincronizacao.desfazer.botao' | transloco }}
+            </button>
+          }
           @if (podeUsarArquivo(b) && b.type === 'REGULAR') {
             <button mat-stroked-button (click)="restaurar(b)">
               <mat-icon>restore</mat-icon>{{ 'restauracao.botao' | transloco }}

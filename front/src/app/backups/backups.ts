@@ -17,6 +17,7 @@ import { Estado, StatusChip } from '../ui/status-chip';
 import { Router } from '@angular/router';
 import { SelectiveDialog } from '../restore/selective-dialog';
 import { RestoreService } from '../restore/restore.service';
+import { SyncService } from '../sync/sync.service';
 import { BackupTree } from './backup-tree';
 import { Backup, BackupsService } from './backups.service';
 
@@ -55,6 +56,7 @@ export class Backups implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private restoreService = inject(RestoreService);
+  private syncService = inject(SyncService);
 
   readonly colunas = [
     'data',
@@ -155,6 +157,32 @@ export class Backups implements OnInit {
     this.erro.set(null);
     try {
       const job = await this.restoreService.undo(b.id);
+      await this.router.navigate(['/jobs', job.id]);
+    } catch (e) {
+      this.erro.set(apiErro(e));
+    }
+  }
+
+  /** Desfazer sincronização: devolve ao destino o que o backup de segurança guardou. */
+  async desfazerSync(b: Backup): Promise<void> {
+    const ok = await firstValueFrom(
+      this.dialog
+        .open(ConfirmDialog, {
+          data: {
+            titulo: 'sincronizacao.desfazer.titulo',
+            mensagem: 'sincronizacao.desfazer.mensagem',
+            confirmar: 'sincronizacao.desfazer.confirmar',
+            params: { nome: b.fileName },
+          },
+        })
+        .afterClosed(),
+    );
+    if (!ok) {
+      return;
+    }
+    this.erro.set(null);
+    try {
+      const job = await this.syncService.undo(b.id);
       await this.router.navigate(['/jobs', job.id]);
     } catch (e) {
       this.erro.set(apiErro(e));

@@ -75,6 +75,17 @@
           <button mat-button (click)="verificar(p)">
             <mat-icon>compare_arrows</mat-icon>{{ 'perfis.verificar' | transloco }}
           </button>
+          <button mat-button (click)="sincronizar(p)">
+            <mat-icon>sync</mat-icon>{{ 'perfis.sincronizar' | transloco }}
+          </button>
+          <button
+            mat-icon-button
+            (click)="agendamentosSync(p)"
+            [attr.aria-label]="'perfis.agendamentos-sync' | transloco"
+            [title]="'perfis.agendamentos-sync' | transloco"
+          >
+            <mat-icon>schedule</mat-icon>
+          </button>
           <a
             mat-icon-button
             [routerLink]="['/perfis', p.id]"

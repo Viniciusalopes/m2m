@@ -10,7 +10,10 @@ import { apiErro, ApiErro } from '../core/api-error';
 import { StatusChip } from '../ui/status-chip';
 import { BackupDialog } from './backup-dialog';
 import { DeleteProfileDialog } from './delete-profile-dialog';
+import { SyncDialog } from './sync-dialog';
+import { SyncSchedulesDialog } from './sync-schedules-dialog';
 import { VerifyDialog } from './verify-dialog';
+import { SyncService } from '../sync/sync.service';
 import { Profile, ProfilesService } from './profiles.service';
 
 @Component({
@@ -31,6 +34,7 @@ export class Profiles implements OnInit {
   private service = inject(ProfilesService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private syncService = inject(SyncService);
 
   readonly colunas = ['nome', 'origem', 'diretorios', 'armazenamento', 'agendamento', 'acoes'];
   readonly perfis = signal<Profile[]>([]);
@@ -76,6 +80,27 @@ export class Profiles implements OnInit {
       const err = apiErro(e);
       this.erro.set({ ...err, jobId: err.parametros?.['jobId'] as number | undefined });
     }
+  }
+
+  async sincronizar(p: Profile): Promise<void> {
+    this.erro.set(null);
+    const r = await firstValueFrom(
+      this.dialog.open(SyncDialog, { data: p, width: '620px', maxWidth: '95vw' }).afterClosed(),
+    );
+    if (!r) {
+      return;
+    }
+    try {
+      const job = await this.syncService.start(p.id, r);
+      await this.router.navigate(['/jobs', job.id]);
+    } catch (e) {
+      const err = apiErro(e);
+      this.erro.set({ ...err, jobId: err.parametros?.['jobId'] as number | undefined });
+    }
+  }
+
+  agendamentosSync(p: Profile): void {
+    this.dialog.open(SyncSchedulesDialog, { data: p, width: '620px', maxWidth: '95vw' });
   }
 
   async excluir(p: Profile): Promise<void> {

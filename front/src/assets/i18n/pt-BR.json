@@ -211,6 +211,26 @@
       "nao-e-backup-de-seguranca": "Só backups de segurança podem ser desfeitos.",
       "maquina-do-desfazer-inexistente": "A máquina de onde o backup de segurança foi gerado não existe mais.",
       "acao-de-conflito-invalida": "Ação de conflito inválida."
+    },
+    "sincronizacao": {
+      "destino-igual-origem": "O destino da sincronização não pode ser a própria origem.",
+      "destino-sem-mapeamento": "Faltam caminhos de destino na máquina {{ maquina }} para: {{ diretorios }}.",
+      "confirmacao-obrigatoria": "É preciso confirmar explicitamente a sincronização.",
+      "origem-ausente": "O diretório de origem não existe: nada foi alterado no destino.",
+      "origem-vazia": "A origem está vazia e o destino tem {{ itens }} item(ns). Nada foi alterado.",
+      "origem-vazia-nao-confirmada": "A origem está vazia e o destino tem {{ itens }} item(ns). Confirme para prosseguir.",
+      "sem-estado-previo": "Não há registro de sincronização anterior para este destino; execute uma sincronização manual.",
+      "trabalho-no-destino": "Há {{ itens }} item(ns) alterados no destino desde a última sincronização. Nada foi alterado.",
+      "trabalho-no-destino-nao-confirmado": "Há {{ itens }} item(ns) alterados no destino desde a última sincronização. Confirme para prosseguir.",
+      "backup-de-seguranca-falhou": "Não foi possível criar o backup de segurança ({{ motivo }}). Nada foi alterado.",
+      "verificacao-falhou": "A verificação final encontrou diferenças: {{ diferencas }}.",
+      "nao-aguarda-confirmacao": "Este job não está aguardando confirmação.",
+      "nao-e-backup-de-seguranca": "Este backup não é um backup de segurança de sincronização.",
+      "limite-invalido": "Os limites de exclusão são inválidos.",
+      "agendamento-nao-encontrado": "Agendamento não encontrado.",
+      "agendamento-duplicado": "Já existe um agendamento para o destino {{ destino }}.",
+      "ativar-exige-manual-previa": "Execute antes uma sincronização manual concluída para o destino {{ destino }}.",
+      "sentido-contrario": "O perfil {{ perfil }} já sincroniza em sentido contrário ({{ origem }} → {{ destino }})."
     }
   },
   "comum": {
@@ -378,7 +398,9 @@
       "backup-diario": "Backup diário ativo",
       "horario": "Horário"
     },
-    "verificar": "Verificar"
+    "verificar": "Verificar",
+    "sincronizar": "Sincronizar",
+    "agendamentos-sync": "Agendamentos de sincronização"
   },
   "jobs": {
     "titulo": "Acompanhamento",
@@ -405,7 +427,8 @@
       "ARCHIVE_VERIFY": "Verificação dos backups",
       "REINDEX": "Reindexação",
       "DB_BACKUP": "Backup do banco do m2m",
-      "TEST": "Teste"
+      "TEST": "Teste",
+      "SYNC_UNDO": "Desfazer sincronização"
     },
     "gatilho": {
       "MANUAL": "Manual",
@@ -444,7 +467,13 @@
       "COPYING": "Copiando",
       "DELETING_EXTRAS": "Excluindo extras",
       "TESTE": "Teste",
-      "VERIFYING": "Verificando o resultado"
+      "VERIFYING": "Verificando o resultado",
+      "PLANNING": "Planejando a sincronização"
+    },
+    "aguardando": {
+      "titulo": "Sincronização aguardando confirmação",
+      "explicacao": "A sincronização agendada parou por segurança e nada foi alterado no destino. Revise o motivo e confirme para executar agora.",
+      "confirmar": "Confirmar e sincronizar"
     }
   },
   "aviso": {
@@ -465,7 +494,8 @@
       "link-nao-restaurado": "Link simbólico não restaurado (destino sem suporte): {{ caminho }} → {{ alvo }}",
       "fidelidade-parcial": "O destino {{ maquina }} não preserva permissões nem links.",
       "conflito-de-tipo-ignorado": "Conflito de tipo ignorado: {{ caminho }}"
-    }
+    },
+    "sincronizacao.itens-especiais-ignorados": "{{ total }} item(ns) especial(is) ignorado(s)."
   },
   "backups": {
     "titulo": "Backups",
@@ -690,6 +720,47 @@
       "teste-ok": "E-mail de teste enviado para o seu endereço.",
       "teste-falhou": "Falha no envio",
       "salvo": "Configuração salva."
+    }
+  },
+  "sincronizacao": {
+    "titulo": "Sincronizar {{ nome }}",
+    "explicacao": "Copia para o destino apenas o que mudou na origem e propaga as exclusões. Antes de alterar, o m2m guarda um backup de segurança do que será sobrescrito ou excluído.",
+    "sem-destinos": "Nenhuma máquina possui caminho mapeado em todos os diretórios do perfil. Edite o perfil para mapear um destino.",
+    "destino": "Máquina de destino",
+    "comparar-conteudo": "Comparar o conteúdo (mais lento)",
+    "previsualizar": "Pré-visualizar",
+    "iniciar": "Sincronizar agora",
+    "ja-sincronizado": "Já sincronizado: não há nada a alterar.",
+    "criar": "A criar",
+    "atualizar": "A atualizar",
+    "excluir": "A excluir",
+    "origem-vazia": "A origem está vazia e o destino tem {{ itens }} item(ns): todos seriam excluídos.",
+    "confirmar-origem-vazia": "Confirmo que a origem deve mesmo ficar vazia no destino",
+    "trabalho-no-destino": "{{ itens }} item(ns) foram alterados no destino desde a última sincronização e serão sobrescritos ou excluídos.",
+    "confirmar-trabalho-no-destino": "Confirmo que posso perder as alterações feitas no destino",
+    "alerta": {
+      "destino-fidelidade-parcial": "O destino não preserva permissões ou links simbólicos.",
+      "itens-especiais-ignorados": "Itens especiais (pipes, sockets, dispositivos) são ignorados."
+    },
+    "agendamentos": {
+      "titulo": "Agendamentos de sincronização — {{ nome }}",
+      "explicacao": "A sincronização agendada roda todo dia no horário escolhido, em modo rápido, e para para confirmação se houver exclusões acima do limite.",
+      "vazio": "Nenhum agendamento.",
+      "novo": "Novo ou atualizar agendamento",
+      "ativo": "(ativo)",
+      "inativo": "(inativo)",
+      "limite": "limite de exclusões: {{ pct }}% ou {{ abs }} itens",
+      "horario": "Horário",
+      "limite-pct": "Limite de exclusões (%)",
+      "limite-abs": "Limite de exclusões (itens)",
+      "ativar": "Ativar agendamento",
+      "dica-manual": "Para ativar, é preciso ter concluído antes uma sincronização manual para o mesmo destino."
+    },
+    "desfazer": {
+      "botao": "Desfazer sincronização",
+      "titulo": "Desfazer a sincronização?",
+      "mensagem": "O backup de segurança {{ nome }} será restaurado no destino: arquivos sobrescritos e excluídos voltam, e os criados pela sincronização são removidos.",
+      "confirmar": "Desfazer"
     }
   }
 }

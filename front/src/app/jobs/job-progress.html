@@ -121,7 +121,16 @@
               {{ 'restauracao.destino-parcial' | transloco }}
             </p>
           }
-          @if (preArchiveId() && j.type === 'RESTORE' && !ativo()) {
+          @if (status() === 'AWAITING_CONFIRMATION' && j.type === 'SYNC') {
+            <p class="aviso">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              {{ 'jobs.aguardando.explicacao' | transloco }}
+            </p>
+            <button mat-flat-button (click)="confirmarSync()">
+              <mat-icon>check</mat-icon>{{ 'jobs.aguardando.confirmar' | transloco }}
+            </button>
+          }
+          @if (preArchiveId() && (j.type === 'RESTORE' || j.type === 'SYNC') && !ativo()) {
             <button mat-stroked-button (click)="desfazer()">
               <mat-icon>undo</mat-icon>{{ 'restauracao.desfazer.botao' | transloco }}
             </button>

@@ -74,6 +74,18 @@ public class BackupScheduler implements ApplicationRunner {
         log.info("Backup do perfil {} agendado para {} (America/Sao_Paulo)", profileId, s.get().time());
     }
 
+    /** Próximo disparo do backup agendado do perfil (America/Sao_Paulo), se houver agendamento ativo. */
+    public java.util.Optional<java.time.Instant> nextFire(long profileId) {
+        var s = profiles.backupSchedule(profileId);
+        if (s.isEmpty() || !s.get().enabled()) {
+            return java.util.Optional.empty();
+        }
+        var cron = org.springframework.scheduling.support.CronExpression
+                .parse("0 " + s.get().time().getMinute() + " " + s.get().time().getHour() + " * * *");
+        var next = cron.next(java.time.ZonedDateTime.now(ZONE));
+        return java.util.Optional.ofNullable(next).map(java.time.ZonedDateTime::toInstant);
+    }
+
     public boolean isScheduled(long profileId) {
         return futures.containsKey(profileId);
     }

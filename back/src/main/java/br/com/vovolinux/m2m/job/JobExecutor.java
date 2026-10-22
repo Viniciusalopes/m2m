@@ -2,6 +2,8 @@ package br.com.vovolinux.m2m.job;
 
 import br.com.vovolinux.m2m.audit.AuditService;
 import br.com.vovolinux.m2m.files.GatewayException;
+import br.com.vovolinux.m2m.notification.NotificationService;
+import br.com.vovolinux.m2m.notification.SpaceMonitor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +34,12 @@ public class JobExecutor {
     private final JsonMapper json;
     private final JobService service;
     private final AuditService audit;
+    private final NotificationService notifications;
+    private final SpaceMonitor spaceMonitor;
 
     public JobExecutor(JobRepository repository, List<JobHandler> handlers, RunningJobs running, ProgressBus bus,
-            JsonMapper json, JobService service, AuditService audit) {
+            JsonMapper json, JobService service, AuditService audit, NotificationService notifications,
+            SpaceMonitor spaceMonitor) {
         this.repository = repository;
         this.handlers = handlers.stream().collect(Collectors.toMap(JobHandler::type, Function.identity()));
         this.running = running;
@@ -42,6 +47,8 @@ public class JobExecutor {
         this.json = json;
         this.service = service;
         this.audit = audit;
+        this.notifications = notifications;
+        this.spaceMonitor = spaceMonitor;
     }
 
     public JobHandler handlerFor(String type) {
@@ -135,6 +142,40 @@ public class JobExecutor {
         event.put("result", result);
         event.putAll(progress.snapshot());
         bus.publish("job." + job.id(), event);
+        notifyOutcome(job, status, result);
+        spaceMonitor.checkAsync(); // a cada job: confere o espaço dos armazenamentos
+    }
+
+    /** Falhas e abortos de jobs agendados/do sistema viram notificação; nunca afetam o job. */
+    private void notifyOutcome(Job job, String status, Map<String, Object> result) {
+        try {
+            boolean automatic = !"MANUAL".equals(job.trigger());
+            Map<String, Object> p = new HashMap<>();
+            p.put("tipo", job.type());
+            p.put("perfil", job.profileName() == null ? "—" : job.profileName());
+            p.put("horario", java.time.ZonedDateTime.now(java.time.ZoneId.of("America/Sao_Paulo"))
+                    .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            p.put("jobId", job.id());
+            p.put("motivo", reasonOf(result));
+            if (JobType.DB_BACKUP.equals(job.type()) && JobStatus.FAILED.equals(status)) {
+                notifications.notifyAdmins("DB_BACKUP_FAILED", NotificationService.ERROR, p);
+            } else if (automatic && JobStatus.FAILED.equals(status)) {
+                notifications.notify(job.ownerId(), "JOB_FAILED", NotificationService.ERROR, p, "job", job.id());
+            } else if (automatic && JobStatus.INTERRUPTED.equals(status)) {
+                notifications.notify(job.ownerId(), "JOB_INTERRUPTED", NotificationService.WARN, p, "job", job.id());
+            }
+        } catch (RuntimeException e) {
+            log.warn("Notificação do job {} não enviada: {}", job.id(), e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String reasonOf(Map<String, Object> result) {
+        Object err = result.get("error");
+        if (err instanceof Map<?, ?> m) {
+            return m.get("codigo") + (m.get("parametros") == null ? "" : " " + m.get("parametros"));
+        }
+        return String.valueOf(result.getOrDefault("reason", ""));
     }
 
     void publishProgress(Job job, String status, JobProgress progress) {

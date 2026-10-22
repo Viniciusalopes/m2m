@@ -25,7 +25,9 @@
     "maquinas": "Máquinas",
     "perfis": "Perfis",
     "acompanhamento": "Acompanhamento",
-    "backups": "Backups"
+    "backups": "Backups",
+    "notificacoes": "Notificações",
+    "configuracoes": "Configurações"
   },
   "layout": {
     "menu": "Abrir ou fechar o menu",
@@ -612,6 +614,82 @@
       "OVERWRITE_SIZE_OR_NEWER": "Sobrescrever se o tamanho diferir ou for mais novo",
       "RENAME": "Renomear",
       "SKIP": "Pular"
+    }
+  },
+  "painel": {
+    "titulo": "Painel",
+    "job-atual": "Job em andamento",
+    "nenhum-job": "Nenhum job em execução.",
+    "fila": "Na fila ({{ total }})",
+    "alertas": "Alertas",
+    "sem-alertas": "Nenhum alerta não lido.",
+    "alertas-nao-lidos": "{{ total }} alerta(s) não lido(s):",
+    "ver-todas": "Ver todas",
+    "atencao": "Precisa de atenção",
+    "ir-backups": "Ir para os backups",
+    "perfis": "Perfis",
+    "ultimo-backup": "Último backup",
+    "proximo": "Próximo backup agendado",
+    "ultimas-sincronizacoes": "Últimas sincronizações",
+    "arquivos": "arquivos",
+    "nunca": "Nenhum backup ainda",
+    "espaco": "Espaço dos armazenamentos",
+    "sem-armazenamento": "Nenhum armazenamento em uso.",
+    "livre": "{{ livre }} livres de {{ total }} ({{ percentual }}%)",
+    "espaco-estado": {
+      "OK": "Espaço suficiente",
+      "LOW": "Pouco espaço",
+      "UNKNOWN": "Não medido",
+      "ERROR": "Inacessível"
+    }
+  },
+  "notificacoes": {
+    "titulo": "Notificações",
+    "vazio": "Nenhuma notificação.",
+    "todas": "Mostrar todas",
+    "so-nao-lidas": "Só não lidas",
+    "marcar-todas": "Marcar todas como lidas",
+    "marcar-lida": "Marcar como lida",
+    "ver": "Ver",
+    "severidade": {
+      "INFO": "Informação",
+      "WARN": "Aviso",
+      "ERROR": "Erro"
+    },
+    "email": {
+      "SENT": "E-mail enviado",
+      "FAILED": "Falha no e-mail"
+    }
+  },
+  "notificacao": {
+    "JOB_FAILED": "O job {{ tipo }} agendado do perfil \"{{ perfil }}\" falhou: {{ motivo }}",
+    "JOB_INTERRUPTED": "O job {{ tipo }} agendado do perfil \"{{ perfil }}\" foi interrompido.",
+    "BACKUP_SUSPECT": "Backup suspeito no perfil \"{{ perfil }}\": {{ arquivos }} arquivos contra {{ anteriores }} no último aceito.",
+    "BACKUP_CORRUPTED": "Backup corrompido ({{ perfil }}): {{ arquivo }}.",
+    "SYNC_AWAITING": "Sincronização de \"{{ perfil }}\" para {{ destino }} aguarda confirmação: {{ motivo }}",
+    "SYNC_ABORTED": "Sincronização de \"{{ perfil }}\" para {{ destino }} abortada: {{ motivo }}",
+    "DB_BACKUP_FAILED": "O backup diário do banco do m2m falhou: {{ motivo }}",
+    "IDENTITY_CHANGED": "A identidade do servidor da máquina {{ maquina }} mudou. Confirme a nova identidade para voltar a conectar.",
+    "LOW_SPACE": "Pouco espaço em {{ maquina }}:{{ dir }}: {{ percentual }}% livres."
+  },
+  "config": {
+    "titulo": "Configurações",
+    "smtp": {
+      "titulo": "E-mail (SMTP)",
+      "explicacao": "Cadastre o seu servidor de e-mail para receber as notificações por e-mail, além do painel. A senha é guardada cifrada e nunca é exibida de novo.",
+      "host": "Servidor SMTP",
+      "porta": "Porta",
+      "seguranca": "Segurança",
+      "seguranca-nenhuma": "Nenhuma",
+      "usuario": "Usuário (opcional)",
+      "senha": "Senha",
+      "senha-salva": "Senha salva. Deixe em branco para mantê-la.",
+      "remetente": "Remetente",
+      "ativo": "Enviar notificações por e-mail",
+      "enviar-teste": "Enviar e-mail de teste",
+      "teste-ok": "E-mail de teste enviado para o seu endereço.",
+      "teste-falhou": "Falha no envio",
+      "salvo": "Configuração salva."
     }
   }
 }

@@ -45,7 +45,7 @@ test.describe('com sessão', () => {
 
   test('mostra o layout base e navega pelo menu', async ({ page }) => {
     await expect(page.getByRole('link', { name: /m2m - Machine To Machine/ })).toBeVisible();
-    await expect(page.getByText(`Olá, ${credenciais.usuario}`)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Painel' })).toBeVisible();
 
     await page.getByRole('link', { name: 'Auditoria' }).click();
     await expect(page).toHaveURL(/\/auditoria$/);

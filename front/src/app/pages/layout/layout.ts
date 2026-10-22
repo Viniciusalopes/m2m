@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { ThemeService } from '../../core/theme.service';
+import { NotificationsService } from '../../notifications/notifications.service';
 
 interface ItemMenu {
   rota: string;
@@ -37,16 +38,17 @@ interface ItemMenu {
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })
-export class Layout implements OnInit {
+export class Layout implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private router = inject(Router);
   readonly auth = inject(AuthService);
   readonly theme = inject(ThemeService);
+  private notificacoes = inject(NotificationsService);
 
   readonly menuAberto = signal(true);
   readonly chaveMestraConfirmada = signal(true);
-  /** Contador do sino; alimentado pela central de notificações (tarefa 11). */
-  readonly naoLidas = signal(0);
+  /** Contador do sino, atualizado em tempo real. */
+  readonly naoLidas = this.notificacoes.unread;
 
   readonly itens: ItemMenu[] = [
     { rota: '/', icone: 'dashboard', chave: 'menu.painel' },
@@ -54,11 +56,14 @@ export class Layout implements OnInit {
     { rota: '/perfis', icone: 'folder_copy', chave: 'menu.perfis' },
     { rota: '/backups', icone: 'inventory_2', chave: 'menu.backups' },
     { rota: '/jobs', icone: 'monitoring', chave: 'menu.acompanhamento' },
+    { rota: '/notificacoes', icone: 'notifications', chave: 'menu.notificacoes' },
+    { rota: '/configuracoes', icone: 'settings', chave: 'menu.configuracoes' },
     { rota: '/auditoria', icone: 'fact_check', chave: 'menu.auditoria' },
     { rota: '/sobre', icone: 'info', chave: 'menu.sobre' },
   ];
 
   async ngOnInit(): Promise<void> {
+    this.notificacoes.connect();
     try {
       const s = await firstValueFrom(
         this.http.get<{ acknowledged: boolean }>('/api/system/master-key'),
@@ -67,6 +72,10 @@ export class Layout implements OnInit {
     } catch {
       /* o aviso é reexibido na próxima navegação */
     }
+  }
+
+  ngOnDestroy(): void {
+    this.notificacoes.disconnect();
   }
 
   async confirmarChaveMestra(): Promise<void> {

@@ -283,6 +283,19 @@ public class LocalFileGateway implements FileGateway {
     }
 
     @Override
+    public Optional<br.com.vovolinux.m2m.files.SpaceInfo> space(String path) throws IOException {
+        Path p = resolve(path);
+        while (p != null && !Files.exists(p, LinkOption.NOFOLLOW_LINKS)) {
+            p = p.getParent();
+        }
+        if (p == null) {
+            return Optional.empty();
+        }
+        var store = Files.getFileStore(p);
+        return Optional.of(new br.com.vovolinux.m2m.files.SpaceInfo(store.getUsableSpace(), store.getTotalSpace()));
+    }
+
+    @Override
     public Optional<String> remoteSha256(String path) throws IOException {
         Path p = resolve(path);
         requireRegular(p, path);

@@ -64,6 +64,11 @@ public interface FileGateway extends AutoCloseable {
     /** Espaço livre em bytes no sistema de arquivos que contém {@code path}, quando for possível medir. */
     OptionalLong freeSpace(String path) throws IOException;
 
+    /** Espaço livre e total do sistema de arquivos que contém {@code path}; vazio se o protocolo não permite medir. */
+    default Optional<SpaceInfo> space(String path) throws IOException {
+        return Optional.empty();
+    }
+
     /** SHA-256 (hex) calculado no próprio servidor, quando a máquina permitir; vazio caso contrário. */
     Optional<String> remoteSha256(String path) throws IOException;
 

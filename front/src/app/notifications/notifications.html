@@ -1,0 +1,45 @@
+<section class="m2m-page">
+  <header class="cabecalho">
+    <h1>{{ 'notificacoes.titulo' | transloco }}</h1>
+    <div>
+      <button mat-stroked-button (click)="alternarFiltro()">
+        {{ (apenasNaoLidas() ? 'notificacoes.todas' : 'notificacoes.so-nao-lidas') | transloco }}
+      </button>
+      <button mat-flat-button (click)="todasLidas()">
+        <mat-icon>done_all</mat-icon>{{ 'notificacoes.marcar-todas' | transloco }}
+      </button>
+    </div>
+  </header>
+
+  <ul class="lista">
+    @for (n of itens(); track n.id) {
+      <li [class.nao-lida]="!n.read">
+        <m2m-status
+          [estado]="estado(n)"
+          [texto]="'notificacoes.severidade.' + n.severity | transloco"
+        />
+        <div class="corpo">
+          <p class="mensagem">{{ 'notificacao.' + n.type | transloco: n.params }}</p>
+          <p class="meta">
+            {{ n.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}
+            @if (n.emailStatus === 'SENT') {
+              · <mat-icon aria-hidden="true">mail</mat-icon>
+              {{ 'notificacoes.email.SENT' | transloco }}
+            } @else if (n.emailStatus === 'FAILED') {
+              · <mat-icon aria-hidden="true">mail_off</mat-icon>
+              {{ 'notificacoes.email.FAILED' | transloco }}: {{ n.emailError }}
+            }
+          </p>
+        </div>
+        @if (alvo(n); as rota) {
+          <a mat-button [routerLink]="rota">{{ 'notificacoes.ver' | transloco }}</a>
+        }
+        @if (!n.read) {
+          <button mat-button (click)="lida(n)">{{ 'notificacoes.marcar-lida' | transloco }}</button>
+        }
+      </li>
+    } @empty {
+      <li class="vazio">{{ 'notificacoes.vazio' | transloco }}</li>
+    }
+  </ul>
+</section>

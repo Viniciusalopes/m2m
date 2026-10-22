@@ -26,6 +26,7 @@ import br.com.vovolinux.m2m.job.JobType;
 import br.com.vovolinux.m2m.machine.Machine;
 import br.com.vovolinux.m2m.machine.MachineRepository;
 import br.com.vovolinux.m2m.machine.Protocol;
+import br.com.vovolinux.m2m.notification.NotificationService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -71,12 +72,13 @@ public class RestoreHandler implements JobHandler {
     private final RestoreRunRepository runs;
     private final br.com.vovolinux.m2m.profile.ProfileRepository profiles;
     private final JsonMapper json;
+    private final NotificationService notifications;
     private final Path tmpRoot;
 
     public RestoreHandler(BackupArchiveRepository archives, MachineRepository machines, GatewayPool pool,
             ArchiveValidator validator, ManifestLoader loader, Extractor extractor, ArchiveBuilder builder,
             SourceScanner scanner, TreeComparator comparator, RetentionService retention, RestoreRunRepository runs,
-            br.com.vovolinux.m2m.profile.ProfileRepository profiles, JsonMapper json,
+            br.com.vovolinux.m2m.profile.ProfileRepository profiles, JsonMapper json, NotificationService notifications,
             @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
         this.archives = archives;
         this.machines = machines;
@@ -91,6 +93,7 @@ public class RestoreHandler implements JobHandler {
         this.runs = runs;
         this.profiles = profiles;
         this.json = json;
+        this.notifications = notifications;
         this.tmpRoot = Path.of(tmpDir);
     }
 
@@ -197,6 +200,9 @@ public class RestoreHandler implements JobHandler {
                 validator.validate(in, session.tmpDir, ctx.token());
             } catch (ArchiveValidator.ValidationFailed e) {
                 archives.setStatus(archive.id(), ArchiveStatus.CORRUPTED, e.getMessage());
+                notifications.notify(ctx.ownerId(), "BACKUP_CORRUPTED", NotificationService.ERROR,
+                        Map.of("arquivo", archive.fileName(), "perfil", archive.profileNameSnapshot(), "motivo",
+                                String.valueOf(e.getMessage())), "backup", archive.id());
                 throw new JobFailure("restauracao.backup-corrompido", Map.of("motivo", String.valueOf(e.getMessage())));
             } catch (NoSuchFileException e) {
                 archives.setStatus(archive.id(), ArchiveStatus.MISSING, "arquivo ausente");

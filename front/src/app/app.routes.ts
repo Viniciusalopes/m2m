@@ -2,7 +2,9 @@ import { Routes } from '@angular/router';
 import { authGuard, loginGuard } from './core/auth.guard';
 import { About } from './pages/about/about';
 import { Audit } from './pages/audit/audit';
-import { Home } from './pages/home/home';
+import { DashboardPage } from './dashboard/dashboard';
+import { Notifications } from './notifications/notifications';
+import { Settings } from './settings/settings';
 import { Layout } from './pages/layout/layout';
 import { Backups } from './backups/backups';
 import { JobProgressPage } from './jobs/job-progress';
@@ -21,7 +23,9 @@ export const routes: Routes = [
     component: Layout,
     canActivate: [authGuard],
     children: [
-      { path: '', component: Home },
+      { path: '', component: DashboardPage },
+      { path: 'notificacoes', component: Notifications },
+      { path: 'configuracoes', component: Settings },
       { path: 'maquinas', component: Machines },
       { path: 'perfis', component: Profiles },
       { path: 'perfis/novo', component: ProfileForm },

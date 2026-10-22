@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/smtp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_1"];
+        put: operations["put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/password": {
         parameters: {
             query?: never;
@@ -59,7 +75,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_1"];
+        get: operations["get_2"];
         put: operations["update_1"];
         post?: never;
         delete: operations["delete_1"];
@@ -132,6 +148,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["readAll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/smtp/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/machines": {
         parameters: {
             query?: never;
@@ -157,7 +221,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["test"];
+        post: operations["test_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -404,6 +468,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["unread"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me": {
         parameters: {
             query?: never;
@@ -459,7 +571,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_2"];
+        get: operations["get_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -491,7 +603,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["events"];
+        get: operations["events_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -516,6 +628,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/backups": {
         parameters: {
             query?: never;
@@ -523,7 +651,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_2"];
+        get: operations["list_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -539,7 +667,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_3"];
+        get: operations["get_5"];
         put?: never;
         post?: never;
         delete: operations["delete_2"];
@@ -619,7 +747,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_3"];
+        get: operations["list_4"];
         put?: never;
         post?: never;
         delete?: never;
@@ -705,6 +833,27 @@ export interface components {
             nextBackupAt?: string;
             /** Format: date-time */
             createdAt?: string;
+        };
+        SmtpRequest: {
+            host: string;
+            /** Format: int32 */
+            port?: number;
+            security?: string;
+            username?: string;
+            password?: string;
+            fromAddress: string;
+            enabled?: boolean;
+        };
+        SmtpView: {
+            host?: string;
+            /** Format: int32 */
+            port?: number;
+            security?: string;
+            username?: string;
+            hasPassword?: boolean;
+            fromAddress?: string;
+            enabled?: boolean;
+            configured?: boolean;
         };
         ChangePassword: {
             currentPassword: string;
@@ -806,10 +955,10 @@ export interface components {
             null?: boolean;
             object?: boolean;
             float?: boolean;
-            /** @enum {string} */
-            nodeType?: "ARRAY" | "BINARY" | "BOOLEAN" | "MISSING" | "NULL" | "NUMBER" | "OBJECT" | "POJO" | "STRING";
             valueNode?: boolean;
             missingNode?: boolean;
+            /** @enum {string} */
+            nodeType?: "ARRAY" | "BINARY" | "BOOLEAN" | "MISSING" | "NULL" | "NUMBER" | "OBJECT" | "POJO" | "STRING";
             string?: boolean;
             integralNumber?: boolean;
             pojo?: boolean;
@@ -830,6 +979,10 @@ export interface components {
         };
         BackupRequest: {
             complement?: string;
+        };
+        TestResult: {
+            ok?: boolean;
+            error?: string;
         };
         Result: {
             ok?: boolean;
@@ -987,6 +1140,31 @@ export interface components {
             /** Format: double */
             suspectThreshold?: number;
         };
+        NotificationView: {
+            /** Format: int64 */
+            id?: number;
+            type?: string;
+            severity?: string;
+            messageCode?: string;
+            params?: components["schemas"]["JsonNode"];
+            targetType?: string;
+            /** Format: int64 */
+            targetId?: number;
+            read?: boolean;
+            emailStatus?: string;
+            emailError?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        Page: {
+            items?: components["schemas"]["NotificationView"][];
+            /** Format: int64 */
+            unread?: number;
+        };
+        SseEmitter: {
+            /** Format: int64 */
+            timeout?: number;
+        };
         Me: {
             /** Format: int64 */
             id?: number;
@@ -1011,11 +1189,6 @@ export interface components {
             parent?: string;
             items?: components["schemas"]["BrowseItem"][];
         };
-        Page: {
-            items?: components["schemas"]["JobView"][];
-            /** Format: int64 */
-            total?: number;
-        };
         MessageView: {
             /** Format: int64 */
             id?: number;
@@ -1025,13 +1198,80 @@ export interface components {
             code?: string;
             params?: components["schemas"]["JsonNode"];
         };
-        SseEmitter: {
-            /** Format: int64 */
-            timeout?: number;
-        };
         ActiveJobs: {
             running?: components["schemas"]["JobView"];
             queued?: components["schemas"]["JobView"][];
+        };
+        Attention: {
+            /** Format: int64 */
+            id?: number;
+            fileName?: string;
+            profileName?: string;
+            status?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        Dashboard: {
+            running?: components["schemas"]["JobBrief"];
+            queue?: components["schemas"]["JobBrief"][];
+            profiles?: components["schemas"]["ProfileStatus"][];
+            /** Format: int64 */
+            unread?: number;
+            alerts?: components["schemas"]["NotificationView"][];
+            attention?: components["schemas"]["Attention"][];
+            awaitingConfirmation?: components["schemas"]["JobBrief"][];
+            storage?: components["schemas"]["StorageUsage"][];
+        };
+        JobBrief: {
+            /** Format: int64 */
+            id?: number;
+            type?: string;
+            status?: string;
+            profileName?: string;
+            trigger?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        LastBackup: {
+            /** Format: int64 */
+            id?: number;
+            status?: string;
+            /** Format: date-time */
+            at?: string;
+            /** Format: int64 */
+            archiveBytes?: number;
+            /** Format: int64 */
+            fileCount?: number;
+            fileName?: string;
+        };
+        LastSync: {
+            destination?: string;
+            status?: string;
+            /** Format: date-time */
+            at?: string;
+        };
+        ProfileStatus: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            sourceMachine?: string;
+            storage?: string;
+            lastBackup?: components["schemas"]["LastBackup"];
+            lastSyncs?: components["schemas"]["LastSync"][];
+            /** Format: date-time */
+            nextBackupAt?: string;
+            scheduled?: boolean;
+        };
+        StorageUsage: {
+            machine?: string;
+            dir?: string;
+            /** Format: int64 */
+            freeBytes?: number;
+            /** Format: int64 */
+            totalBytes?: number;
+            /** Format: double */
+            freePercent?: number;
+            state?: string;
         };
         TreeNode: {
             name?: string;
@@ -1143,6 +1383,50 @@ export interface operations {
             };
         };
     };
+    get_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SmtpView"];
+                };
+            };
+        };
+    };
+    put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SmtpRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SmtpView"];
+                };
+            };
+        };
+    };
     changePassword: {
         parameters: {
             query?: never;
@@ -1187,7 +1471,7 @@ export interface operations {
             };
         };
     };
-    get_1: {
+    get_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1369,6 +1653,68 @@ export interface operations {
             };
         };
     };
+    read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    readAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    test: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SmtpRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TestResult"];
+                };
+            };
+        };
+    };
     list_1: {
         parameters: {
             query?: never;
@@ -1413,7 +1759,7 @@ export interface operations {
             };
         };
     };
-    test: {
+    test_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1778,6 +2124,72 @@ export interface operations {
             };
         };
     };
+    list_2: {
+        parameters: {
+            query?: {
+                unreadOnly?: boolean;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Page"];
+                };
+            };
+        };
+    };
+    unread: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: number;
+                    };
+                };
+            };
+        };
+    };
+    events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["SseEmitter"];
+                };
+            };
+        };
+    };
     me: {
         parameters: {
             query?: never;
@@ -1846,7 +2258,7 @@ export interface operations {
             };
         };
     };
-    get_2: {
+    get_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -1890,7 +2302,7 @@ export interface operations {
             };
         };
     };
-    events: {
+    events_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1932,7 +2344,27 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    get_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Dashboard"];
+                };
+            };
+        };
+    };
+    list_3: {
         parameters: {
             query?: {
                 profileId?: number;
@@ -1959,7 +2391,7 @@ export interface operations {
             };
         };
     };
-    get_3: {
+    get_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -2095,7 +2527,7 @@ export interface operations {
             };
         };
     };
-    list_3: {
+    list_4: {
         parameters: {
             query?: {
                 from?: string;

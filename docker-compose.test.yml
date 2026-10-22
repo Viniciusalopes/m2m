@@ -42,6 +42,12 @@ services:
       - "127.0.0.1:2122:21"
       - "127.0.0.1:30010-30019:30010-30019"
 
+  # Servidor SMTP de teste (MailDev): recebe os e-mails do m2m; interface em http://127.0.0.1:1080
+  m2m-test-smtp:
+    image: maildev/maildev:latest
+    ports:
+      - "127.0.0.1:1080:1080"
+
   # Sandbox local: diretório do host onde os testes podem gravar livremente
   m2m-back:
     environment:

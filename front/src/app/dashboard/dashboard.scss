@@ -1,0 +1,72 @@
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.vazio {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.ok {
+  color: var(--m2m-ok);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.arquivo {
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+  color: var(--mat-sys-on-surface-variant);
+  word-break: break-all;
+}
+
+.atencao {
+  border-color: var(--m2m-warn);
+}
+
+.rolavel {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    vertical-align: top;
+  }
+}
+
+.espaco {
+  margin-bottom: 12px;
+
+  .titulo {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+
+  .detalhe {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+    margin-top: 2px;
+  }
+
+  .baixo {
+    --mat-progress-bar-active-indicator-color: var(--m2m-fail);
+  }
+}

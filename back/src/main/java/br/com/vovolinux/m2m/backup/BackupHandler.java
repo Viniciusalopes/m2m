@@ -11,6 +11,7 @@ import br.com.vovolinux.m2m.job.JobType;
 import br.com.vovolinux.m2m.machine.Machine;
 import br.com.vovolinux.m2m.machine.MachineRepository;
 import br.com.vovolinux.m2m.machine.Protocol;
+import br.com.vovolinux.m2m.notification.NotificationService;
 import br.com.vovolinux.m2m.profile.ProfileRepository;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,11 +51,13 @@ public class BackupHandler implements JobHandler {
     private final BackupArchiveRepository archives;
     private final RetentionService retention;
     private final JsonMapper json;
+    private final NotificationService notifications;
     private final Path tmpRoot;
 
     public BackupHandler(ProfileRepository profiles, MachineRepository machines, GatewayPool pool,
             SourceScanner scanner, ArchiveBuilder builder, BackupArchiveRepository archives,
-            RetentionService retention, JsonMapper json, @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
+            RetentionService retention, JsonMapper json, NotificationService notifications,
+            @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
         this.profiles = profiles;
         this.machines = machines;
         this.pool = pool;
@@ -63,6 +66,7 @@ public class BackupHandler implements JobHandler {
         this.archives = archives;
         this.retention = retention;
         this.json = json;
+        this.notifications = notifications;
         this.tmpRoot = Path.of(tmpDir);
     }
 
@@ -209,8 +213,10 @@ public class BackupHandler implements JobHandler {
             summary.put("archiveId", id);
             summary.put("archiveStatus", status);
             if (suspect) {
-                ctx.message("WARN", "backup.suspeito", Map.of("arquivo", finalName, "arquivos", validation.files(),
-                        "anteriores", previous == null ? 0 : previous.fileCount()));
+                Map<String, Object> sp = Map.of("arquivo", finalName, "arquivos", validation.files(), "anteriores",
+                        previous == null ? 0 : previous.fileCount(), "perfil", profile.name());
+                ctx.message("WARN", "backup.suspeito", sp);
+                notifications.notify(ctx.ownerId(), "BACKUP_SUSPECT", NotificationService.WARN, sp, "backup", id);
             } else {
                 progress.step("RETENTION");
                 RetentionService.Outcome r = retention.applyRegular(profile.id());

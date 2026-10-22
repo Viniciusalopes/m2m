@@ -1,0 +1,200 @@
+<section class="m2m-page painel">
+  <h1>{{ 'painel.titulo' | transloco }}</h1>
+
+  @if (dados(); as d) {
+    <div class="grade">
+      <mat-card appearance="outlined">
+        <mat-card-header
+          ><mat-card-title>{{ 'painel.job-atual' | transloco }}</mat-card-title></mat-card-header
+        >
+        <mat-card-content>
+          @if (d.running; as r) {
+            <p>
+              <m2m-status estado="running" [texto]="'jobs.status.RUNNING' | transloco" />
+              <a [routerLink]="['/jobs', r.id]"
+                >{{ 'jobs.tipo.' + r.type | transloco }}
+                @if (r.profileName) {
+                  — {{ r.profileName }}
+                }
+              </a>
+            </p>
+          } @else {
+            <p class="vazio">{{ 'painel.nenhum-job' | transloco }}</p>
+          }
+          @if (d.queue.length) {
+            <h4>{{ 'painel.fila' | transloco: { total: d.queue.length } }}</h4>
+            <ul>
+              @for (j of d.queue; track j.id) {
+                <li>
+                  <a [routerLink]="['/jobs', j.id]"
+                    >{{ 'jobs.tipo.' + j.type | transloco }}
+                    @if (j.profileName) {
+                      — {{ j.profileName }}
+                    }
+                  </a>
+                  ({{ 'jobs.gatilho.' + j.trigger | transloco }})
+                </li>
+              }
+            </ul>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="outlined">
+        <mat-card-header
+          ><mat-card-title>{{ 'painel.alertas' | transloco }}</mat-card-title></mat-card-header
+        >
+        <mat-card-content>
+          @if (d.unread === 0) {
+            <p class="ok">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              {{ 'painel.sem-alertas' | transloco }}
+            </p>
+          } @else {
+            <p>{{ 'painel.alertas-nao-lidos' | transloco: { total: d.unread } }}</p>
+            <ul>
+              @for (a of d.alerts; track a.id) {
+                <li>{{ 'notificacao.' + a.type | transloco: a.params }}</li>
+              }
+            </ul>
+            <a mat-button routerLink="/notificacoes">{{ 'painel.ver-todas' | transloco }}</a>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    @if (d.attention.length || d.awaitingConfirmation.length) {
+      <mat-card appearance="outlined" class="atencao">
+        <mat-card-header
+          ><mat-card-title>{{ 'painel.atencao' | transloco }}</mat-card-title></mat-card-header
+        >
+        <mat-card-content>
+          <ul>
+            @for (a of d.attention; track a.id) {
+              <li>
+                <m2m-status
+                  [estado]="estado(a.status)"
+                  [texto]="'backups.status.' + a.status | transloco"
+                />
+                {{ a.profileName }} — <span class="arquivo">{{ a.fileName }}</span>
+              </li>
+            }
+            @for (j of d.awaitingConfirmation; track j.id) {
+              <li>
+                <m2m-status
+                  estado="warn"
+                  [texto]="'jobs.status.AWAITING_CONFIRMATION' | transloco"
+                />
+                <a [routerLink]="['/jobs', j.id]">{{ j.profileName }}</a>
+              </li>
+            }
+          </ul>
+          <a mat-button routerLink="/backups">{{ 'painel.ir-backups' | transloco }}</a>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>{{ 'painel.perfis' | transloco }}</mat-card-title></mat-card-header
+      >
+      <mat-card-content class="rolavel">
+        <table class="tabela">
+          <thead>
+            <tr>
+              <th>{{ 'perfis.col.nome' | transloco }}</th>
+              <th>{{ 'painel.ultimo-backup' | transloco }}</th>
+              <th>{{ 'painel.proximo' | transloco }}</th>
+              <th>{{ 'painel.ultimas-sincronizacoes' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of d.profiles; track p.id) {
+              <tr>
+                <td>
+                  <strong>{{ p.name }}</strong>
+                  <div class="arquivo">{{ p.sourceMachine }} → {{ p.storage }}</div>
+                </td>
+                <td>
+                  @if (p.lastBackup; as b) {
+                    <m2m-status
+                      [estado]="estado(b.status)"
+                      [texto]="'backups.status.' + b.status | transloco"
+                    />
+                    <div>
+                      {{ b.at | date: 'dd/MM/yyyy HH:mm' }} · {{ b.archiveBytes | bytes }} ·
+                      {{ b.fileCount | number: '1.0-0' : 'pt-BR' }}
+                      {{ 'painel.arquivos' | transloco }}
+                    </div>
+                  } @else {
+                    <span class="vazio">{{ 'painel.nunca' | transloco }}</span>
+                  }
+                </td>
+                <td>
+                  @if (p.nextBackupAt) {
+                    {{ p.nextBackupAt | date: 'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    <span class="vazio">{{ 'perfis.sem-agendamento' | transloco }}</span>
+                  }
+                </td>
+                <td>
+                  @for (s of p.lastSyncs; track s.destination) {
+                    <div>
+                      {{ s.destination }}: {{ s.at | date: 'dd/MM/yyyy HH:mm' }} ({{ s.status }})
+                    </div>
+                  } @empty {
+                    <span class="vazio">—</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="vazio">{{ 'perfis.vazio' | transloco }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>{{ 'painel.espaco' | transloco }}</mat-card-title></mat-card-header
+      >
+      <mat-card-content>
+        @for (s of d.storage; track s.machine + s.dir) {
+          <div class="espaco">
+            <div class="titulo">
+              <strong>{{ s.machine }}</strong
+              >: <span class="arquivo">{{ s.dir }}</span>
+              <m2m-status
+                [estado]="estadoEspaco(s)"
+                [texto]="'painel.espaco-estado.' + s.state | transloco"
+              />
+            </div>
+            @if (s.freePercent !== null && s.totalBytes) {
+              <mat-progress-bar
+                mode="determinate"
+                [value]="100 - s.freePercent"
+                [class.baixo]="s.state === 'LOW'"
+              />
+              <div class="detalhe">
+                {{
+                  'painel.livre'
+                    | transloco
+                      : {
+                          livre: (s.freeBytes! | bytes),
+                          total: (s.totalBytes | bytes),
+                          percentual: (s.freePercent | number: '1.0-1' : 'pt-BR'),
+                        }
+                }}
+              </div>
+            }
+          </div>
+        } @empty {
+          <p class="vazio">{{ 'painel.sem-armazenamento' | transloco }}</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</section>

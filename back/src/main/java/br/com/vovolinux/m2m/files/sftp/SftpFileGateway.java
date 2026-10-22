@@ -308,6 +308,28 @@ public class SftpFileGateway implements FileGateway {
         }
     }
 
+    @Override
+    public Optional<br.com.vovolinux.m2m.files.SpaceInfo> space(String path) throws IOException {
+        OpenSSHStatPathExtension ext = sftp.getExtension(OpenSSHStatPathExtension.class);
+        if (ext == null || !ext.isSupported()) {
+            return Optional.empty();
+        }
+        String p = path;
+        while (true) {
+            try {
+                OpenSSHStatExtensionInfo info = ext.stat(p);
+                return Optional.of(new br.com.vovolinux.m2m.files.SpaceInfo(info.f_bavail * info.f_frsize,
+                        info.f_blocks * info.f_frsize));
+            } catch (SftpException e) {
+                int i = p.lastIndexOf('/');
+                if (e.getStatus() != SftpConstants.SSH_FX_NO_SUCH_FILE || i <= 0) {
+                    return Optional.empty();
+                }
+                p = p.substring(0, i);
+            }
+        }
+    }
+
     /** Hash calculado no servidor pelo canal exec; vazio quando a máquina não permite executar comandos. */
     @Override
     public Optional<String> remoteSha256(String path) throws IOException {

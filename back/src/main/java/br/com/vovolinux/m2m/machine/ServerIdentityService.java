@@ -2,6 +2,7 @@ package br.com.vovolinux.m2m.machine;
 
 import br.com.vovolinux.m2m.audit.AuditService;
 import br.com.vovolinux.m2m.files.sftp.HostKeyPolicy;
+import br.com.vovolinux.m2m.notification.NotificationService;
 import br.com.vovolinux.m2m.web.ApiException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -27,10 +28,13 @@ public class ServerIdentityService {
 
     private final JdbcClient jdbc;
     private final AuditService audit;
+    private final org.springframework.beans.factory.ObjectProvider<NotificationService> notifications;
 
-    public ServerIdentityService(JdbcClient jdbc, AuditService audit) {
+    public ServerIdentityService(JdbcClient jdbc, AuditService audit,
+            org.springframework.beans.factory.ObjectProvider<NotificationService> notifications) {
         this.jdbc = jdbc;
         this.audit = audit;
+        this.notifications = notifications;
     }
 
     public Optional<Identity> find(long machineId) {
@@ -55,10 +59,28 @@ public class ServerIdentityService {
                 return;
             }
             registerPending(machineId, kind, fingerprint);
+            if (confirmada != null) {
+                notifyChanged(machineId, fingerprint);
+            }
             throw new IdentityException(
                     confirmada == null ? IdentityException.CONFIRMACAO_NECESSARIA : IdentityException.ALTERADA,
                     fingerprint, confirmada);
         };
+    }
+
+    /** A identidade mudou: avisa o dono, no máximo uma vez por hora para a mesma impressão digital. */
+    private void notifyChanged(long machineId, String fingerprint) {
+        try {
+            var row = jdbc.sql("select owner_id, name from machine where id = :m").param("m", machineId)
+                    .query((rs, i) -> new Object[] {rs.getLong(1), rs.getString(2)}).optional();
+            NotificationService n = notifications.getIfAvailable();
+            if (row.isPresent() && n != null) {
+                n.notifyOnce((Long) row.get()[0], "IDENTITY_CHANGED", NotificationService.ERROR,
+                        Map.of("maquina", row.get()[1], "fingerprint", fingerprint), "fingerprint", 1);
+            }
+        } catch (RuntimeException e) {
+            // notificação é acessória: a conexão já está sendo recusada
+        }
     }
 
     private void registerPending(long machineId, String kind, String fingerprint) {

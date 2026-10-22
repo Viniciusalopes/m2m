@@ -27,7 +27,8 @@
     "acompanhamento": "Acompanhamento",
     "backups": "Backups",
     "notificacoes": "Notificações",
-    "configuracoes": "Configurações"
+    "configuracoes": "Configurações",
+    "transferencia": "Transferência"
   },
   "layout": {
     "menu": "Abrir ou fechar o menu",
@@ -244,6 +245,42 @@
       "diretorio-inexistente": "O diretório {{ diretorio }} não existe na máquina.",
       "parametros-invalidos": "Informe a máquina e um diretório absoluto.",
       "manifesto-ilegivel": "Não foi possível ler o manifesto."
+    },
+    "transferencia": {
+      "nada-selecionado": "Selecione ao menos um item.",
+      "caminho-invalido": "Caminho inválido: {{ caminho }}.",
+      "destino-somente-leitura": "A máquina {{ maquina }} não permite gravação.",
+      "caminho-inexistente": "O caminho não existe: {{ caminho }}.",
+      "diretorio-inexistente": "O diretório {{ caminho }} não existe.",
+      "acao-invalida": "Ação de conflito inválida: {{ acao }}.",
+      "tipo-incompativel": "No destino já existe um item de outro tipo em {{ caminho }}.",
+      "destino-dentro-da-origem": "O destino {{ destino }} está dentro da própria origem {{ origem }}.",
+      "conflitos-sem-decisao": "{{ conflitos }} conflito(s) sem decisão.",
+      "nao-encontrada": "Transferência não encontrada.",
+      "nao-cancelavel": "Esta transferência não pode ser cancelada ({{ status }}).",
+      "nao-reiniciavel": "Esta transferência não pode ser retomada ({{ status }}).",
+      "destino-existe": "Já existe um item em {{ caminho }}.",
+      "exclusao-sem-confirmacao": "A exclusão precisa de confirmação.",
+      "destino-em-uso": "O destino está em uso pelo job {{ tipo }} #{{ jobId }} ({{ perfil }}), que espelha {{ caminho }}.",
+      "maquina-removida": "A máquina de origem ou destino foi removida.",
+      "origem-removida": "A origem não existe mais: {{ caminho }}.",
+      "origem-alterada": "A origem mudou durante a cópia: {{ caminho }}.",
+      "tamanho-divergente": "O tamanho gravado ({{ gravado }}) difere do esperado ({{ esperado }}).",
+      "falha": "Falha na transferência: {{ detalhe }}."
+    },
+    "filtro": {
+      "combinacao-invalida": "Combinação de filtro inválida.",
+      "campo-invalido": "Campo de filtro inválido: {{ campo }}.",
+      "operador-invalido": "Operador {{ operador }} inválido para {{ campo }}.",
+      "valor-invalido": "Valor inválido no filtro: {{ valor }}.",
+      "regex-invalida": "Expressão regular inválida: {{ expressao }}.",
+      "nao-encontrado": "Conjunto de filtros não encontrado.",
+      "nome-invalido": "Nome de conjunto inválido."
+    },
+    "comparacao": {
+      "filtros-diferentes": "Os dois painéis têm filtros diferentes ativos. Use o mesmo filtro (ou nenhum) nos dois lados para comparar.",
+      "modo-invalido": "Modo de comparação inválido.",
+      "parametros-invalidos": "Parâmetros de comparação inválidos."
     }
   },
   "comum": {
@@ -821,6 +858,165 @@
       "titulo": "Desfazer a sincronização?",
       "mensagem": "O backup de segurança {{ nome }} será restaurado no destino: arquivos sobrescritos e excluídos voltam, e os criados pela sincronização são removidos.",
       "confirmar": "Desfazer"
+    }
+  },
+  "transferencia": {
+    "titulo": "Transferência",
+    "ferramentas": "Ferramentas da transferência",
+    "mostrar-ocultos": "Mostrar arquivos ocultos",
+    "navegacao-sincronizada": "Navegação sincronizada",
+    "comparar": "Comparar pastas",
+    "painel-esquerdo": "Painel esquerdo",
+    "painel-direito": "Painel direito",
+    "enviar-para-direita": "Enviar a seleção do painel esquerdo para o direito",
+    "enviar-para-esquerda": "Enviar a seleção do painel direito para o esquerdo",
+    "subir": "Subir um nível",
+    "caminho": "Caminho",
+    "atualizar": "Atualizar",
+    "vazio": "Pasta vazia.",
+    "resumo": "{{ n }} item(ns) · {{ sel }} selecionado(s)",
+    "iniciar": "Transferir",
+    "iniciada": "{{ n }} item(ns) enviado(s) para a fila.",
+    "ver-job": "Ver o job em andamento",
+    "col": {
+      "nome": "Nome",
+      "tamanho": "Tamanho",
+      "data": "Modificado em",
+      "permissoes": "Permissões",
+      "diferenca": "Diferença"
+    },
+    "menu": {
+      "transferir": "Transferir para o outro painel",
+      "criar-pasta": "Criar pasta",
+      "renomear": "Renomear",
+      "excluir": "Excluir"
+    },
+    "criar-pasta": {
+      "titulo": "Criar pasta",
+      "nome": "Nome da pasta"
+    },
+    "renomear": {
+      "titulo": "Renomear",
+      "nome": "Novo nome"
+    },
+    "excluir": {
+      "titulo": "Excluir itens?",
+      "mensagem": "{{ itens }} item(ns) serão excluídos. Esta ação não pode ser desfeita."
+    },
+    "sincronizada": {
+      "suspensa-fora": "Navegação sincronizada suspensa: você saiu da pasta em que ela foi ativada.",
+      "suspensa-inexistente": "Navegação sincronizada suspensa: a pasta correspondente não existe no outro painel."
+    },
+    "comparacao": {
+      "modo": "Comparar por",
+      "por-data": "Data de modificação",
+      "por-tamanho": "Tamanho",
+      "tolerancia": "Tolerância (minutos)",
+      "ocultar-identicos": "Ocultar idênticos",
+      "legenda": "Legenda da comparação",
+      "ONLY_HERE": "Só neste lado",
+      "NEWER": "Mais novo",
+      "OLDER": "Mais antigo",
+      "SIZE_DIFFERENT": "Tamanho diferente",
+      "TYPE_DIFFERENT": "Tipo diferente"
+    },
+    "filtro": {
+      "botao": "Filtros",
+      "titulo": "Filtro de listagem",
+      "explicacao": "Itens que satisfazem o filtro ficam ocultos no painel. O filtro só afeta a visualização, a menos que você o aplique a uma transferência.",
+      "todas": "Ocultar se todas as condições forem verdadeiras",
+      "qualquer": "Ocultar se qualquer condição for verdadeira",
+      "nenhuma": "Ocultar se nenhuma condição for verdadeira",
+      "maiusculas": "Diferenciar maiúsculas e minúsculas",
+      "campo": "Campo",
+      "operador": "Operador",
+      "valor": "Valor",
+      "adicionar": "Adicionar condição",
+      "campos": {
+        "NAME": "Nome",
+        "PATH": "Caminho",
+        "SIZE": "Tamanho (bytes)",
+        "MTIME": "Data de modificação",
+        "PERMISSIONS": "Permissões (octal)"
+      },
+      "ops": {
+        "CONTAINS": "contém",
+        "EQUALS": "é igual a",
+        "STARTS": "começa com",
+        "ENDS": "termina com",
+        "REGEX": "expressão regular",
+        "EQ": "=",
+        "NE": "≠",
+        "GT": ">",
+        "LT": "<",
+        "BEFORE": "antes de",
+        "AFTER": "depois de",
+        "HAS": "inclui os bits"
+      },
+      "conjuntos": "Conjuntos salvos",
+      "salvos": "Conjuntos",
+      "carregar": "Carregar",
+      "nome-conjunto": "Nome do conjunto",
+      "salvar-conjunto": "Salvar conjunto",
+      "aplicar": "Aplicar",
+      "limpar": "Limpar filtro",
+      "ativo": "Filtro ativo · {{ n }} item(ns) oculto(s)",
+      "confirmar-titulo": "Há um filtro ativo",
+      "confirmar-explicacao": "Por padrão, o filtro afeta só a visualização e todos os itens da pasta são transferidos.",
+      "aplicar-a-transferencia": "Aplicar filtros à transferência",
+      "ignorados": "{{ n }} item(ns) serão ignorados."
+    },
+    "conflito": {
+      "titulo": "O item já existe no destino",
+      "tamanho": "Tamanho",
+      "data": "Modificado em",
+      "origem": "Origem",
+      "destino": "Destino",
+      "aplicar-a-todos": "Aplicar a todos os demais conflitos",
+      "progresso": "Conflito {{ n }} de {{ total }}",
+      "acao": {
+        "OVERWRITE": "Sobrescrever",
+        "OVERWRITE_NEWER": "Sobrescrever se a origem for mais nova",
+        "OVERWRITE_SIZE": "Sobrescrever se o tamanho for diferente",
+        "OVERWRITE_SIZE_OR_NEWER": "Sobrescrever se o tamanho for diferente ou a origem for mais nova",
+        "RESUME": "Retomar (se o destino for menor; senão, sobrescrever)",
+        "RENAME": "Renomear (acrescenta um sufixo)",
+        "SKIP": "Pular"
+      }
+    },
+    "fila": {
+      "titulo": "Fila de transferências",
+      "origem": "Origem",
+      "destino": "Destino",
+      "status": "Status",
+      "velocidade": "Velocidade",
+      "vazia": "Nenhuma transferência.",
+      "parar-tudo": "Parar tudo",
+      "repetir-falhas": "Repetir falhas",
+      "retomar": "Retomar interrompidos",
+      "cancelar": "Cancelar",
+      "retomar-item": "Retomar"
+    },
+    "status": {
+      "QUEUED": "Aguardando",
+      "TRANSFERRING": "Transferindo",
+      "COMPLETED": "Concluída",
+      "FAILED": "Falhou",
+      "CANCELED": "Cancelada",
+      "SKIPPED": "Pulada",
+      "INTERRUPTED": "Interrompida"
+    },
+    "motivo": {
+      "item-especial": "Item especial (pipe, socket ou dispositivo) ignorado.",
+      "destino-sem-links": "O destino não aceita links simbólicos.",
+      "pulado-pela-politica": "Pulado pela política de conflito.",
+      "destino-igual-ou-mais-novo": "Destino já igual ou mais novo."
+    },
+    "nota": {
+      "retomado": "Retomada do ponto em que parou.",
+      "retomada-recusada-origem-alterada": "A origem mudou desde a interrupção: transferida de novo desde o início.",
+      "retomada-recusada-temporario-ausente": "O arquivo parcial não existe mais: transferida de novo desde o início.",
+      "reinicio": "Interrompida pelo reinício do m2m."
     }
   }
 }

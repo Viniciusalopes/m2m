@@ -10,6 +10,21 @@ services:
     ports:
       - "127.0.0.1:2222:22"
 
+  # OpenSSH completo (sem chroot, home gravável em /config): destino das transferências e2e (D19)
+  m2m-test-ssh:
+    image: lscr.io/linuxserver/openssh-server:latest
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Sao_Paulo
+      USER_NAME: m2m
+      USER_PASSWORD: m2m-teste
+      PASSWORD_ACCESS: "true"
+    volumes:
+      - m2m-test-ssh-data:/config
+    ports:
+      - "127.0.0.1:2223:2222"
+
   m2m-test-ftp:
     image: stilliard/pure-ftpd:latest
     environment:
@@ -54,6 +69,7 @@ services:
       M2M_SANDBOX_DIR: /hostfs/home/usuario/m2m-sandbox
 
 volumes:
+  m2m-test-ssh-data:
   m2m-test-sftp-data:
   m2m-test-ftp-data:
   m2m-test-ftps-data:

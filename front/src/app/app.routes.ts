@@ -15,6 +15,7 @@ import { Password } from './pages/password/password';
 import { RestoreWizard } from './restore/restore-wizard';
 import { ProfileForm } from './profiles/profile-form';
 import { Profiles } from './profiles/profiles';
+import { TransferPage } from './transfer/transfer-page';
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [loginGuard] },
@@ -28,6 +29,7 @@ export const routes: Routes = [
       { path: 'configuracoes', component: Settings },
       { path: 'maquinas', component: Machines },
       { path: 'perfis', component: Profiles },
+      { path: 'transferencia', component: TransferPage },
       { path: 'perfis/novo', component: ProfileForm },
       { path: 'perfis/:id', component: ProfileForm },
       { path: 'backups', component: Backups },

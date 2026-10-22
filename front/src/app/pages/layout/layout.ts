@@ -54,6 +54,7 @@ export class Layout implements OnInit, OnDestroy {
     { rota: '/', icone: 'dashboard', chave: 'menu.painel' },
     { rota: '/maquinas', icone: 'computer', chave: 'menu.maquinas' },
     { rota: '/perfis', icone: 'folder_copy', chave: 'menu.perfis' },
+    { rota: '/transferencia', icone: 'swap_horiz', chave: 'menu.transferencia' },
     { rota: '/backups', icone: 'inventory_2', chave: 'menu.backups' },
     { rota: '/jobs', icone: 'monitoring', chave: 'menu.acompanhamento' },
     { rota: '/notificacoes', icone: 'notifications', chave: 'menu.notificacoes' },

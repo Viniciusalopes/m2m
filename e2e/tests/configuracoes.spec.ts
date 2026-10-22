@@ -47,7 +47,7 @@ test.describe('configurações e painel', () => {
     await expect(page.getByText('Falha no envio')).toBeVisible();
     await page.getByLabel('Porta').fill('1025');
 
-    await page.getByRole('button', { name: 'Salvar' }).click();
+    await page.locator('m2m-smtp-section').getByRole('button', { name: 'Salvar' }).click();
     await expect(page.getByText('Configuração salva.')).toBeVisible();
     await page.reload();
     await expect(page.getByLabel('Servidor SMTP')).toHaveValue('m2m-test-smtp');

@@ -42,6 +42,20 @@ public class BackupArchiveRepository {
                 .param("o", ownerId).param("p", profileId).query(BackupArchiveRepository::map).list();
     }
 
+    /** Backups cujo arquivo deve existir: tudo que não é ausente nem falha de gravação (D30). */
+    public List<BackupArchive> verifiable(long ownerId) {
+        return jdbc.sql("select " + COLUMNS + " from backup_archive where owner_id = :o"
+                + " and status in ('COMPLETED', 'COMPLETED_WITH_WARNINGS', 'SUSPECT', 'CORRUPTED') order by id")
+                .param("o", ownerId).query(BackupArchiveRepository::map).list();
+    }
+
+    /** Backups registrados num diretório de armazenamento de uma máquina (reindexação, D26). */
+    public List<BackupArchive> inDirectory(long ownerId, long machineId, String dir) {
+        return jdbc.sql("select " + COLUMNS
+                + " from backup_archive where owner_id = :o and storage_machine_id = :m and storage_dir = :d")
+                .param("o", ownerId).param("m", machineId).param("d", dir).query(BackupArchiveRepository::map).list();
+    }
+
     public Optional<BackupArchive> find(long ownerId, long id) {
         return jdbc.sql("select " + COLUMNS + " from backup_archive where owner_id = :o and id = :id")
                 .param("o", ownerId).param("id", id).query(BackupArchiveRepository::map).optional();

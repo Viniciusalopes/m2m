@@ -231,6 +231,19 @@
       "agendamento-duplicado": "Já existe um agendamento para o destino {{ destino }}.",
       "ativar-exige-manual-previa": "Execute antes uma sincronização manual concluída para o destino {{ destino }}.",
       "sentido-contrario": "O perfil {{ perfil }} já sincroniza em sentido contrário ({{ origem }} → {{ destino }})."
+    },
+    "configuracao": {
+      "cron-invalido": "Expressão cron inválida.",
+      "diretorio-invalido": "Informe um diretório absoluto.",
+      "senha-curta": "A senha deve ter pelo menos {{ minimo }} caracteres.",
+      "senha-incorreta": "Senha incorreta ou arquivo adulterado.",
+      "arquivo-invalido": "O arquivo não é uma configuração do m2m.",
+      "maquina-ausente": "A configuração usa a máquina {{ maquina }}, que não existe."
+    },
+    "reindexacao": {
+      "diretorio-inexistente": "O diretório {{ diretorio }} não existe na máquina.",
+      "parametros-invalidos": "Informe a máquina e um diretório absoluto.",
+      "manifesto-ilegivel": "Não foi possível ler o manifesto."
     }
   },
   "comum": {
@@ -495,7 +508,12 @@
       "fidelidade-parcial": "O destino {{ maquina }} não preserva permissões nem links.",
       "conflito-de-tipo-ignorado": "Conflito de tipo ignorado: {{ caminho }}"
     },
-    "sincronizacao.itens-especiais-ignorados": "{{ total }} item(ns) especial(is) ignorado(s)."
+    "sincronizacao.itens-especiais-ignorados": "{{ total }} item(ns) especial(is) ignorado(s).",
+    "reindexacao.manifesto-ilegivel": "Manifesto ilegível em {{ arquivo }}: {{ motivo }}.",
+    "verificacao-periodica.corrompido": "Backup corrompido: {{ arquivo }} ({{ motivo }}).",
+    "verificacao-periodica.ausente": "Backup ausente: {{ arquivo }}.",
+    "verificacao-periodica.armazenamento-removido": "Armazenamento removido: {{ arquivo }} não foi verificado.",
+    "verificacao-periodica.criptografado-nao-suportado": "Backup criptografado ainda não verificável: {{ arquivo }}."
   },
   "backups": {
     "titulo": "Backups",
@@ -700,7 +718,8 @@
     "SYNC_ABORTED": "Sincronização de \"{{ perfil }}\" para {{ destino }} abortada: {{ motivo }}",
     "DB_BACKUP_FAILED": "O backup diário do banco do m2m falhou: {{ motivo }}",
     "IDENTITY_CHANGED": "A identidade do servidor da máquina {{ maquina }} mudou. Confirme a nova identidade para voltar a conectar.",
-    "LOW_SPACE": "Pouco espaço em {{ maquina }}:{{ dir }}: {{ percentual }}% livres."
+    "LOW_SPACE": "Pouco espaço em {{ maquina }}:{{ dir }}: {{ percentual }}% livres.",
+    "BACKUP_MISSING": "O arquivo do backup {{ arquivo }} (perfil {{ perfil }}) não foi encontrado e o backup foi marcado como ausente."
   },
   "config": {
     "titulo": "Configurações",
@@ -720,6 +739,47 @@
       "teste-ok": "E-mail de teste enviado para o seu endereço.",
       "teste-falhou": "Falha no envio",
       "salvo": "Configuração salva."
+    },
+    "manutencao": {
+      "titulo": "Manutenção",
+      "verificacao": "Verificação periódica dos backups",
+      "verificacao-explicacao": "Relê cada backup e confere a integridade. Backups que não conferem ficam como corrompidos e os sem arquivo, como ausentes; você é notificado.",
+      "ativar": "Ativado",
+      "cron": "Agendamento (expressão cron de 6 campos)",
+      "cron-dica": "Padrão: 0 0 4 * * SUN (domingo às 04:00, horário de São Paulo).",
+      "banco": "Backup do banco do m2m",
+      "banco-explicacao": "Todo dia o m2m grava um dump compactado do próprio banco e mantém os 7 mais recentes.",
+      "horario": "Horário",
+      "armazenamento": "Armazenamento",
+      "local": "Esta máquina (local)",
+      "diretorio": "Diretório",
+      "verificar-agora": "Verificar backups agora",
+      "backup-agora": "Fazer backup do banco agora"
+    },
+    "reindexar": {
+      "titulo": "Reindexar backups",
+      "explicacao": "Varre um diretório de qualquer máquina e recria o registro dos backups que o banco não conhece, lendo o manifesto de cada arquivo. Registros sem arquivo ficam como ausentes.",
+      "maquina": "Máquina",
+      "diretorio": "Diretório",
+      "iniciar": "Reindexar"
+    },
+    "transferir": {
+      "titulo": "Exportar e importar configuração",
+      "explicacao": "Gera um arquivo com máquinas (e suas credenciais), perfis, agendamentos e e-mail, cifrado pela senha que você informar. Guarde a senha: sem ela o arquivo não abre.",
+      "senha": "Senha do arquivo",
+      "senha-dica": "Mínimo de 8 caracteres.",
+      "exportar": "Exportar",
+      "escolher": "Escolher arquivo para importar",
+      "arquivo": "Arquivo escolhido: {{ nome }}",
+      "previsualizar": "Pré-visualizar importação",
+      "maquinas-criar": "Máquinas a criar",
+      "maquinas-substituir": "Máquinas a substituir",
+      "perfis-criar": "Perfis a criar",
+      "perfis-substituir": "Perfis a substituir",
+      "chave-ssh": "A chave SSH do m2m será substituída pela do arquivo.",
+      "smtp": "A configuração de e-mail será substituída.",
+      "importar": "Importar",
+      "importado": "Configuração importada."
     }
   },
   "sincronizacao": {

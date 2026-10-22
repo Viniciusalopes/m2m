@@ -18,6 +18,7 @@
     <table class="tabela">
       <thead>
         <tr>
+          <th></th>
           <th>{{ 'backups.conteudo.nome' | transloco }}</th>
           <th class="num">{{ 'backups.conteudo.tamanho' | transloco }}</th>
           <th>{{ 'backups.conteudo.data' | transloco }}</th>
@@ -26,6 +27,7 @@
       <tbody>
         @if (p.parent !== null) {
           <tr class="clicavel" (click)="abrir(p.parent)">
+            <td></td>
             <td><mat-icon aria-hidden="true">arrow_upward</mat-icon> ..</td>
             <td></td>
             <td></td>
@@ -33,6 +35,15 @@
         }
         @for (n of itens(); track n.path) {
           <tr [class.clicavel]="n.type === 'DIR'" (click)="n.type === 'DIR' && abrir(n.path)">
+            <td (click)="$event.stopPropagation()">
+              @if (p.path !== '') {
+                <mat-checkbox
+                  [checked]="selecionados().has(n.path)"
+                  (change)="alternar(n.path, $event.checked)"
+                  [attr.aria-label]="'backups.conteudo.selecionar' | transloco: { nome: n.name }"
+                />
+              }
+            </td>
             <td>
               <mat-icon aria-hidden="true">{{ icone(n.type) }}</mat-icon>
               {{ n.name }}
@@ -47,7 +58,7 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="3" class="vazio">{{ 'backups.conteudo.vazio' | transloco }}</td>
+            <td colspan="4" class="vazio">{{ 'backups.conteudo.vazio' | transloco }}</td>
           </tr>
         }
       </tbody>
@@ -61,4 +72,8 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-flat-button mat-dialog-close>{{ 'comum.fechar' | transloco }}</button>
+  <button mat-flat-button [disabled]="!selecionados().size" (click)="restaurarSelecionados()">
+    <mat-icon>restore_page</mat-icon
+    >{{ 'backups.conteudo.restaurar-selecionados' | transloco: { total: selecionados().size } }}
+  </button>
 </mat-dialog-actions>

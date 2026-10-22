@@ -76,3 +76,9 @@ a {
   margin: 0 auto;
   padding: 24px 16px;
 }
+
+// O texto do rótulo não pode interceptar o clique no campo (select abre ao clicar em qualquer ponto)
+mat-form-field mat-label,
+.mat-mdc-form-field .mdc-floating-label {
+  pointer-events: none;
+}

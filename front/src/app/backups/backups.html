@@ -118,6 +118,16 @@
               <mat-icon>check</mat-icon>{{ 'backups.aceitar' | transloco }}
             </button>
           }
+          @if (podeUsarArquivo(b) && b.type === 'PRE_RESTORE') {
+            <button mat-stroked-button (click)="desfazer(b)">
+              <mat-icon>undo</mat-icon>{{ 'restauracao.desfazer.botao' | transloco }}
+            </button>
+          }
+          @if (podeUsarArquivo(b) && b.type === 'REGULAR') {
+            <button mat-stroked-button (click)="restaurar(b)">
+              <mat-icon>restore</mat-icon>{{ 'restauracao.botao' | transloco }}
+            </button>
+          }
           @if (podeUsarArquivo(b)) {
             <button
               mat-icon-button

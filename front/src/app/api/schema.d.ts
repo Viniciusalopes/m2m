@@ -212,6 +212,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/backups/{id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{id}/selective": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["selective"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{id}/selective/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{id}/restore/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/backups/{id}/pin": {
         parameters: {
             query?: never;
@@ -268,6 +348,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["sshIdentity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/restores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -347,7 +443,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["history"];
+        get: operations["history_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -460,6 +556,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["tree"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/backups/{id}/restore/defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["defaults_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -696,10 +808,10 @@ export interface components {
             float?: boolean;
             /** @enum {string} */
             nodeType?: "ARRAY" | "BINARY" | "BOOLEAN" | "MISSING" | "NULL" | "NUMBER" | "OBJECT" | "POJO" | "STRING";
+            valueNode?: boolean;
+            missingNode?: boolean;
             string?: boolean;
             integralNumber?: boolean;
-            missingNode?: boolean;
-            valueNode?: boolean;
             pojo?: boolean;
             floatingPointNumber?: boolean;
             short?: boolean;
@@ -775,6 +887,67 @@ export interface components {
             /** Format: date-time */
             finishedAt?: string;
         };
+        SelectiveRequest: {
+            /** Format: int64 */
+            machineId?: number;
+            targetDir?: string;
+            items?: string[];
+            defaultAction?: string;
+            decisions?: {
+                [key: string]: string;
+            };
+        };
+        Conflict: {
+            entry?: string;
+            targetPath?: string;
+            /** Format: int64 */
+            incomingSize?: number;
+            /** Format: int64 */
+            incomingMtime?: number;
+            /** Format: int64 */
+            existingSize?: number;
+            /** Format: int64 */
+            existingMtime?: number;
+            typeConflict?: boolean;
+        };
+        RestoreRequest: {
+            /** Format: int64 */
+            machineId?: number;
+            targets?: components["schemas"]["Target"][];
+            confirmed?: boolean;
+        };
+        Target: {
+            /** Format: int32 */
+            dir?: number;
+            path?: string;
+        };
+        DirPreview: {
+            /** Format: int32 */
+            dir?: number;
+            sourcePath?: string;
+            targetPath?: string;
+            targetExists?: boolean;
+            /** Format: int64 */
+            create?: number;
+            /** Format: int64 */
+            overwrite?: number;
+            /** Format: int64 */
+            delete?: number;
+            /** Format: int64 */
+            files?: number;
+        };
+        Preview: {
+            directories?: components["schemas"]["DirPreview"][];
+            /** Format: int64 */
+            create?: number;
+            /** Format: int64 */
+            overwrite?: number;
+            /** Format: int64 */
+            delete?: number;
+            warnings?: string[];
+            archiveFile?: string;
+            destMachine?: string;
+        };
         Status: {
             acknowledged?: boolean;
         };
@@ -783,11 +956,29 @@ export interface components {
             publicKey?: string;
             suggestedCommand?: string;
         };
-        Target: {
+        Row: {
             /** Format: int64 */
             id?: number;
-            name?: string;
-            protocol?: string;
+            /** Format: int64 */
+            jobId?: number;
+            /** Format: int64 */
+            archiveId?: number;
+            archiveName?: string;
+            /** Format: int64 */
+            destMachineId?: number;
+            destMachineName?: string;
+            selective?: boolean;
+            paths?: string;
+            status?: string;
+            counts?: string;
+            /** Format: int64 */
+            preArchiveId?: number;
+            /** Format: int64 */
+            undoOfId?: number;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            finishedAt?: string;
         };
         Defaults: {
             /** Format: int64 */
@@ -860,6 +1051,12 @@ export interface components {
             /** Format: int64 */
             total?: number;
             items?: components["schemas"]["TreeNode"][];
+        };
+        DefaultTarget: {
+            /** Format: int32 */
+            dir?: number;
+            sourcePath?: string;
+            targetPath?: string;
         };
         StreamingResponseBody: unknown;
         CsrfToken: {
@@ -1306,6 +1503,132 @@ export interface operations {
             };
         };
     };
+    undo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JobView"];
+                };
+            };
+        };
+    };
+    selective: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelectiveRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JobView"];
+                };
+            };
+        };
+    };
+    plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelectiveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Conflict"][];
+                };
+            };
+        };
+    };
+    restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RestoreRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["JobView"];
+                };
+            };
+        };
+    };
+    preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RestoreRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Preview"];
+                };
+            };
+        };
+    };
     pin: {
         parameters: {
             query?: never;
@@ -1386,6 +1709,29 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PublicIdentity"];
+                };
+            };
+        };
+    };
+    history: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Row"][];
                 };
             };
         };
@@ -1477,7 +1823,7 @@ export interface operations {
             };
         };
     };
-    history: {
+    history_1: {
         parameters: {
             query?: {
                 page?: number;
@@ -1677,6 +2023,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TreePage"];
+                };
+            };
+        };
+    };
+    defaults_1: {
+        parameters: {
+            query: {
+                machineId: number;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DefaultTarget"][];
                 };
             };
         };

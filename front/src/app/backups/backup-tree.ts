@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -13,6 +14,7 @@ import { Backup, BackupsService, TreePage } from './backups.service';
 @Component({
   selector: 'm2m-backup-tree',
   imports: [
+    MatCheckboxModule,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
@@ -26,12 +28,14 @@ import { Backup, BackupsService, TreePage } from './backups.service';
 })
 export class BackupTree implements OnInit {
   private service = inject(BackupsService);
+  private ref = inject(MatDialogRef<BackupTree, string[]>);
   readonly backup = inject<Backup>(MAT_DIALOG_DATA);
 
   readonly pagina = signal<TreePage | null>(null);
   readonly carregando = signal(false);
   readonly erro = signal<ApiErro | null>(null);
   readonly itens = signal<TreePage['items']>([]);
+  readonly selecionados = signal<Set<string>>(new Set());
   private proxima = 0;
 
   ngOnInit(): void {
@@ -69,6 +73,23 @@ export class BackupTree implements OnInit {
     if (p) {
       await this.carregar(p.path);
     }
+  }
+
+  alternar(path: string, marcado: boolean): void {
+    this.selecionados.update((s) => {
+      const n = new Set(s);
+      if (marcado) {
+        n.add(path);
+      } else {
+        n.delete(path);
+      }
+      return n;
+    });
+  }
+
+  /** Fecha devolvendo os itens escolhidos para a restauração seletiva. */
+  restaurarSelecionados(): void {
+    this.ref.close([...this.selecionados()]);
   }
 
   icone(tipo: string): string {

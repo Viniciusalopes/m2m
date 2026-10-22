@@ -1,0 +1,149 @@
+<section class="m2m-page restauracao">
+  <h1>{{ 'restauracao.titulo' | transloco }}</h1>
+
+  @if (backup(); as b) {
+    <p class="arquivo">{{ b.fileName }}</p>
+  }
+
+  @if (erro(); as e) {
+    <p class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ 'erro.' + e.codigo | transloco: e.parametros }}
+    </p>
+  }
+
+  <mat-stepper orientation="vertical" [linear]="false">
+    <mat-step [label]="'restauracao.passo.destino' | transloco" [completed]="!!machineId()">
+      <p>{{ 'restauracao.escolha-destino' | transloco }}</p>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'restauracao.maquina-destino' | transloco }}</mat-label>
+        <mat-select [value]="machineId()" (selectionChange)="escolherDestino($event.value)">
+          @for (m of maquinas(); track m.id) {
+            <mat-option [value]="m.id"
+              >{{ m.name }} ({{ 'maquinas.protocolo.' + m.protocol | transloco }})</mat-option
+            >
+          }
+        </mat-select>
+      </mat-form-field>
+      <div>
+        <button mat-button matStepperNext [disabled]="!machineId()">
+          {{ 'restauracao.proximo' | transloco }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step [label]="'restauracao.passo.caminhos' | transloco" [completed]="caminhosCompletos()">
+      <p>{{ 'restauracao.caminhos-dica' | transloco }}</p>
+      @for (c of caminhos(); track c.dir) {
+        <div class="linha-caminho">
+          <div class="origem">{{ c.sourcePath }}</div>
+          <mat-form-field appearance="outline" class="destino">
+            <mat-label>{{ 'restauracao.caminho-destino' | transloco }}</mat-label>
+            <input
+              matInput
+              [ngModel]="c.targetPath ?? ''"
+              (ngModelChange)="editar(c.dir, $event)"
+            />
+            <button
+              matSuffix
+              mat-icon-button
+              type="button"
+              (click)="navegar(c.dir)"
+              [attr.aria-label]="'navegador.escolher' | transloco"
+            >
+              <mat-icon>folder_open</mat-icon>
+            </button>
+            @if (!c.targetPath) {
+              <mat-hint>{{ 'restauracao.sem-mapeamento' | transloco }}</mat-hint>
+            }
+          </mat-form-field>
+        </div>
+      }
+      <div>
+        <button mat-button matStepperPrevious>{{ 'restauracao.voltar' | transloco }}</button>
+        <button mat-button matStepperNext [disabled]="!caminhosCompletos()" (click)="gerarPrevia()">
+          {{ 'restauracao.proximo' | transloco }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step [label]="'restauracao.passo.previa' | transloco" [completed]="confirmado()">
+      @if (carregando()) {
+        <p>{{ 'restauracao.calculando' | transloco }}</p>
+      }
+      @if (preview(); as p) {
+        <table class="previa">
+          <thead>
+            <tr>
+              <th>{{ 'restauracao.previa.destino' | transloco }}</th>
+              <th class="num">{{ 'restauracao.previa.criar' | transloco }}</th>
+              <th class="num">{{ 'restauracao.previa.sobrescrever' | transloco }}</th>
+              <th class="num">{{ 'restauracao.previa.excluir' | transloco }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of p.directories; track d.dir) {
+              <tr>
+                <td class="caminho">
+                  {{ d.targetPath }}
+                  @if (!d.targetExists) {
+                    <span class="novo">({{ 'restauracao.previa.sera-criado' | transloco }})</span>
+                  }
+                </td>
+                <td class="num">{{ d.create | number: '1.0-0' : 'pt-BR' }}</td>
+                <td class="num">{{ d.overwrite | number: '1.0-0' : 'pt-BR' }}</td>
+                <td class="num excluir">{{ d.delete | number: '1.0-0' : 'pt-BR' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (p.warnings.includes('destino-fidelidade-parcial')) {
+          <p class="aviso">
+            <mat-icon aria-hidden="true">warning</mat-icon>
+            {{ 'restauracao.previa.fidelidade-parcial' | transloco }}
+          </p>
+        }
+        <p class="seguranca">
+          <mat-icon aria-hidden="true">shield</mat-icon>
+          {{ 'restauracao.previa.seguranca' | transloco }}
+        </p>
+      }
+      <div>
+        <button mat-button matStepperPrevious>{{ 'restauracao.voltar' | transloco }}</button>
+        <button mat-button matStepperNext [disabled]="!preview()">
+          {{ 'restauracao.proximo' | transloco }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step [label]="'restauracao.passo.confirmar' | transloco">
+      @if (preview(); as p) {
+        <div class="confirmacao" role="alert">
+          <mat-icon aria-hidden="true">warning</mat-icon>
+          <p>
+            {{
+              'restauracao.confirmacao'
+                | transloco
+                  : {
+                      destino: p.destMachine,
+                      criar: p.create,
+                      sobrescrever: p.overwrite,
+                      excluir: p.delete,
+                    }
+            }}
+          </p>
+        </div>
+        <mat-checkbox [checked]="confirmado()" (change)="confirmado.set($event.checked)">
+          {{ 'restauracao.entendo' | transloco }}
+        </mat-checkbox>
+      }
+      <div class="acoes">
+        <button mat-button matStepperPrevious>{{ 'restauracao.voltar' | transloco }}</button>
+        <button mat-button (click)="cancelar()">{{ 'comum.cancelar' | transloco }}</button>
+        <button mat-flat-button (click)="iniciar()" [disabled]="!confirmado()">
+          <mat-icon>restore</mat-icon>{{ 'restauracao.iniciar' | transloco }}
+        </button>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</section>

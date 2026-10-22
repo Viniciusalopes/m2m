@@ -1,0 +1,52 @@
+mat-dialog-content {
+  min-width: min(640px, 85vw);
+}
+
+.campo {
+  width: 100%;
+}
+
+.conflitos {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .caminho {
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+    flex: 1;
+  }
+
+  .acao {
+    width: 260px;
+  }
+
+  .tipo {
+    color: var(--m2m-warn);
+  }
+}
+
+.erro {
+  color: var(--m2m-fail);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ok {
+  color: var(--m2m-ok);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

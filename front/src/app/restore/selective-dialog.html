@@ -1,0 +1,98 @@
+<h2 mat-dialog-title>
+  {{ 'restauracao.seletiva.titulo' | transloco: { total: data.items.length } }}
+</h2>
+<mat-dialog-content>
+  <p>{{ 'restauracao.seletiva.explicacao' | transloco }}</p>
+  <mat-form-field appearance="outline" class="campo">
+    <mat-label>{{ 'restauracao.maquina-destino' | transloco }}</mat-label>
+    <mat-select
+      [value]="machineId()"
+      (selectionChange)="machineId.set($event.value); conflitos.set(null)"
+    >
+      @for (m of maquinas(); track m.id) {
+        <mat-option [value]="m.id">{{ m.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="campo">
+    <mat-label>{{ 'restauracao.seletiva.diretorio' | transloco }}</mat-label>
+    <input
+      matInput
+      [ngModel]="targetDir()"
+      (ngModelChange)="targetDir.set($event); conflitos.set(null)"
+      placeholder="/home/usuario/recuperados"
+    />
+    <button
+      matSuffix
+      mat-icon-button
+      type="button"
+      (click)="navegar()"
+      [disabled]="!machineId()"
+      [attr.aria-label]="'navegador.escolher' | transloco"
+    >
+      <mat-icon>folder_open</mat-icon>
+    </button>
+  </mat-form-field>
+
+  @if (erro(); as e) {
+    <p class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ 'erro.' + e.codigo | transloco: e.parametros }}
+    </p>
+  }
+
+  @if (conflitos(); as lista) {
+    @if (lista.length === 0) {
+      <p class="ok">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        {{ 'restauracao.seletiva.sem-conflitos' | transloco }}
+      </p>
+    } @else {
+      <h3>{{ 'restauracao.seletiva.conflitos' | transloco: { total: lista.length } }}</h3>
+      <div class="todos">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'restauracao.seletiva.aplicar-a-todos' | transloco }}</mat-label>
+          <mat-select [value]="padrao()" (selectionChange)="aplicarATodos($event.value)">
+            @for (a of acoes; track a) {
+              <mat-option [value]="a">{{ 'restauracao.acao.' + a | transloco }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <ul class="conflitos">
+        @for (c of lista; track c.entry) {
+          <li>
+            <span class="caminho">{{ c.targetPath }}</span>
+            @if (c.typeConflict) {
+              <span class="tipo">{{ 'restauracao.seletiva.conflito-de-tipo' | transloco }}</span>
+            } @else {
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="acao">
+                <mat-select
+                  [value]="decisao(c)"
+                  (selectionChange)="definir(c, $event.value)"
+                  [attr.aria-label]="c.targetPath"
+                >
+                  @for (a of acoes; track a) {
+                    <mat-option [value]="a">{{ 'restauracao.acao.' + a | transloco }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            }
+          </li>
+        }
+      </ul>
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>{{ 'comum.cancelar' | transloco }}</button>
+  @if (conflitos() === null) {
+    <button mat-flat-button (click)="verificar()" [disabled]="!podeVerificar() || ocupado()">
+      {{ 'restauracao.seletiva.verificar' | transloco }}
+    </button>
+  } @else {
+    <button mat-flat-button (click)="iniciar()">
+      {{ 'restauracao.seletiva.iniciar' | transloco }}
+    </button>
+  }
+</mat-dialog-actions>

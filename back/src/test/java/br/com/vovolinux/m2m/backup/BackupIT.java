@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Import;
 
 @IntegrationTest
 @Import(BackupTestSupport.class)
-class BackupIT {
+public class BackupIT {
 
     @Autowired
     BackupTestSupport t;
@@ -30,7 +30,7 @@ class BackupIT {
     }
 
     /** Monta uma árvore com tudo que o backup precisa preservar. */
-    static void montarOrigem(Path o) throws Exception {
+    public static void montarOrigem(Path o) throws Exception {
         Files.writeString(o.resolve(".env"), "SEGREDO=1\n");
         Files.createDirectories(o.resolve(".git"));
         Files.writeString(o.resolve(".git/config"), "[core]\n");
@@ -52,13 +52,13 @@ class BackupIT {
         Files.setLastModifiedTime(o.resolve("build.sh"), FileTime.from(Instant.parse("2021-03-04T05:06:07Z")));
     }
 
-    static void criarEspeciais(Path o) throws Exception {
+    public static void criarEspeciais(Path o) throws Exception {
         new ProcessBuilder("mkfifo", o.resolve("fila").toString()).inheritIO().start().waitFor();
         new ProcessBuilder("python3", "-c", "import socket,sys;s=socket.socket(socket.AF_UNIX);s.bind(sys.argv[1])",
                 o.resolve("app.sock").toString()).inheritIO().start().waitFor();
     }
 
-    static void extrairComTar(Path arquivo, Path destino) throws Exception {
+    public static void extrairComTar(Path arquivo, Path destino) throws Exception {
         Files.createDirectories(destino);
         Process p = new ProcessBuilder("tar", "--zstd", "-xpf", arquivo.toString(), "-C", destino.toString())
                 .redirectErrorStream(true).start();

@@ -195,6 +195,20 @@
     },
     "verificacao": {
       "sem-mapeamento": "A máquina {{ maquina }} não tem mapeamento para: {{ diretorios }}."
+    },
+    "restauracao": {
+      "confirmacao-obrigatoria": "É preciso confirmar explicitamente a restauração.",
+      "destino-sem-caminho": "Informe o caminho de destino do diretório {{ diretorio }}.",
+      "caminho-invalido": "Caminho inválido: {{ caminho }}.",
+      "destino-somente-leitura": "A máquina {{ maquina }} não tem permissão de escrita e não pode ser destino.",
+      "backup-corrompido": "O backup está corrompido e não foi restaurado ({{ motivo }}). Nada foi alterado.",
+      "backup-ausente": "O arquivo de backup {{ arquivo }} não existe mais.",
+      "backup-de-seguranca-falhou": "Não foi possível criar o backup de segurança do destino ({{ motivo }}). A restauração foi cancelada e nada foi alterado.",
+      "verificacao-falhou": "A verificação final encontrou diferenças: {{ diferencas }}. Você pode desfazer pelo backup de segurança.",
+      "nada-selecionado": "Nenhum item selecionado foi encontrado.",
+      "nao-e-backup-de-seguranca": "Só backups de segurança podem ser desfeitos.",
+      "maquina-do-desfazer-inexistente": "A máquina de onde o backup de segurança foi gerado não existe mais.",
+      "acao-de-conflito-invalida": "Ação de conflito inválida."
     }
   },
   "comum": {
@@ -424,10 +438,11 @@
       "FINALIZING": "Finalizando",
       "RETENTION": "Aplicando retenção",
       "COMPARING": "Comparando",
-      "SAFETY_BACKUP": "Backup de segurança",
+      "SAFETY_BACKUP": "Backup de segurança do destino",
       "COPYING": "Copiando",
       "DELETING_EXTRAS": "Excluindo extras",
-      "TESTE": "Teste"
+      "TESTE": "Teste",
+      "VERIFYING": "Verificando o resultado"
     }
   },
   "aviso": {
@@ -443,6 +458,11 @@
     },
     "verificacao": {
       "nao-comparado": "Itens não comparados: {{ itens }}"
+    },
+    "restauracao": {
+      "link-nao-restaurado": "Link simbólico não restaurado (destino sem suporte): {{ caminho }} → {{ alvo }}",
+      "fidelidade-parcial": "O destino {{ maquina }} não preserva permissões nem links.",
+      "conflito-de-tipo-ignorado": "Conflito de tipo ignorado: {{ caminho }}"
     }
   },
   "backups": {
@@ -499,7 +519,9 @@
       "tamanho": "Tamanho",
       "data": "Modificado em",
       "vazio": "Vazio.",
-      "mais": "Carregar mais"
+      "mais": "Carregar mais",
+      "restaurar-selecionados": "Restaurar selecionados ({{ total }})",
+      "selecionar": "Selecionar {{ nome }}"
     }
   },
   "verificacao": {
@@ -534,6 +556,62 @@
     "nao-comparado": {
       "permissions": "As permissões não foram comparadas (um dos lados não as preserva).",
       "symlinks": "Os links simbólicos não foram comparados (um dos lados não os preserva)."
+    }
+  },
+  "restauracao": {
+    "titulo": "Restaurar backup",
+    "botao": "Restaurar",
+    "proximo": "Continuar",
+    "voltar": "Voltar",
+    "escolha-destino": "Escolha a máquina que passará a refletir exatamente o conteúdo deste backup.",
+    "maquina-destino": "Máquina de destino",
+    "caminhos-dica": "Caminho de destino de cada diretório do backup (pré-preenchido pelo mapeamento gravado no backup). Diretórios que não existem serão criados.",
+    "caminho-destino": "Caminho de destino",
+    "sem-mapeamento": "O backup não tem mapeamento para esta máquina: informe o caminho.",
+    "calculando": "Calculando a prévia…",
+    "passo": {
+      "destino": "Destino",
+      "caminhos": "Caminhos",
+      "previa": "Prévia das alterações",
+      "confirmar": "Confirmação"
+    },
+    "previa": {
+      "destino": "Diretório de destino",
+      "criar": "Criar",
+      "sobrescrever": "Sobrescrever",
+      "excluir": "Excluir",
+      "sera-criado": "será criado",
+      "fidelidade-parcial": "O destino é FTP/FTPS: permissões Unix e links simbólicos não serão restaurados.",
+      "seguranca": "Antes de alterar o destino, o m2m cria um backup de segurança dele, que permite desfazer."
+    },
+    "confirmacao": "O destino {{ destino }} passará a ter exatamente o conteúdo do backup: {{ criar }} item(ns) serão criados, {{ sobrescrever }} arquivo(s) serão sobrescritos e {{ excluir }} item(ns) que não existem no backup serão excluídos.",
+    "entendo": "Entendo que o destino será espelhado e que itens extras serão excluídos.",
+    "iniciar": "Iniciar restauração",
+    "destino-parcial": "A restauração foi interrompida e o destino está em estado parcial. Você pode desfazer pelo backup de segurança.",
+    "desfazer": {
+      "botao": "Desfazer",
+      "titulo": "Desfazer a restauração?",
+      "mensagem": "O backup de segurança {{ nome }} será restaurado nos mesmos caminhos de onde foi gerado, devolvendo o destino ao estado anterior à restauração.",
+      "confirmar": "Desfazer"
+    },
+    "seletiva": {
+      "titulo": "Restauração seletiva — {{ total }} item(ns)",
+      "explicacao": "Os itens escolhidos serão extraídos para o diretório abaixo, preservando a estrutura relativa. Nada será excluído no destino.",
+      "diretorio": "Diretório de destino",
+      "verificar": "Verificar conflitos",
+      "iniciar": "Iniciar restauração",
+      "sem-conflitos": "Nenhum item existe no destino: não há conflitos.",
+      "conflitos": "{{ total }} item(ns) já existem no destino",
+      "aplicar-a-todos": "Aplicar a todos",
+      "conflito-de-tipo": "Existe um diretório com este nome no destino (será ignorado)"
+    },
+    "acao": {
+      "OVERWRITE": "Sobrescrever",
+      "OVERWRITE_NEWER": "Sobrescrever se mais novo",
+      "OVERWRITE_SIZE": "Sobrescrever se o tamanho diferir",
+      "OVERWRITE_SIZE_OR_NEWER": "Sobrescrever se o tamanho diferir ou for mais novo",
+      "RENAME": "Renomear",
+      "SKIP": "Pular"
     }
   }
 }

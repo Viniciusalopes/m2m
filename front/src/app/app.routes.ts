@@ -10,6 +10,7 @@ import { JobsRedirect } from './jobs/jobs-redirect';
 import { Machines } from './machines/machines';
 import { Login } from './pages/login/login';
 import { Password } from './pages/password/password';
+import { RestoreWizard } from './restore/restore-wizard';
 import { ProfileForm } from './profiles/profile-form';
 import { Profiles } from './profiles/profiles';
 
@@ -26,6 +27,7 @@ export const routes: Routes = [
       { path: 'perfis/novo', component: ProfileForm },
       { path: 'perfis/:id', component: ProfileForm },
       { path: 'backups', component: Backups },
+      { path: 'restaurar/:id', component: RestoreWizard },
       { path: 'jobs', component: JobsRedirect },
       { path: 'jobs/:id', component: JobProgressPage },
       { path: 'auditoria', component: Audit },

@@ -9,6 +9,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { apiErro, ApiErro } from '../core/api-error';
 import { JobView } from '../profiles/profiles.service';
 import { Estado, StatusChip } from '../ui/status-chip';
+import { RestoreService } from '../restore/restore.service';
 import { VerifyReport } from './verify-report';
 import { JobEvent, JobMessage, JobsService } from './jobs.service';
 
@@ -45,6 +46,7 @@ export class JobProgressPage implements OnInit, OnDestroy {
   private jobs = inject(JobsService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private restoreService = inject(RestoreService);
 
   readonly job = signal<JobView | null>(null);
   readonly evento = signal<JobEvent | null>(null);
@@ -106,6 +108,29 @@ export class JobProgressPage implements OnInit, OnDestroy {
       this.erro.set(apiErro(e));
     } finally {
       this.cancelando.set(false);
+    }
+  }
+
+  /** Id do backup de segurança que permite desfazer uma restauração interrompida ou concluída. */
+  readonly preArchiveId = computed(() => {
+    const r = this.resultado() as { preArchiveId?: number } | null;
+    return r?.preArchiveId ?? null;
+  });
+  readonly destinoParcial = computed(() => {
+    const r = this.resultado() as { partial?: boolean } | null;
+    return !!r?.partial;
+  });
+
+  async desfazer(): Promise<void> {
+    const id = this.preArchiveId();
+    if (!id) {
+      return;
+    }
+    try {
+      const job = await this.restoreService.undo(id);
+      await this.router.navigate(['/jobs', job.id]);
+    } catch (e) {
+      this.erro.set(apiErro(e));
     }
   }
 

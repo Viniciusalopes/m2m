@@ -126,7 +126,14 @@ public class ArchiveValidator {
             if (!sawManifest) {
                 throw new ValidationFailed("manifesto ausente", Manifest.INTERNAL_ENTRY);
             }
-            Manifest.Header header = compare(computed, manifestFile, counts[0]);
+            Manifest.Header header;
+            try {
+                header = compare(computed, manifestFile, counts[0]);
+            } catch (ValidationFailed e) {
+                throw e;
+            } catch (IOException | RuntimeException e) {
+                throw new ValidationFailed("manifesto ilegível: " + e.getMessage(), Manifest.INTERNAL_ENTRY);
+            }
             return new Result(header, counts[0], counts[1], counts[2], raw.count(), raw.sha256());
         } finally {
             Files.deleteIfExists(computed);

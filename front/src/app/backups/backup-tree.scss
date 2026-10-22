@@ -1,0 +1,68 @@
+mat-dialog-content {
+  min-width: min(720px, 85vw);
+  max-height: 65vh;
+}
+
+.arquivo,
+.caminho,
+.link {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.caminho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.link {
+  color: var(--mat-sys-on-surface-variant);
+  margin-left: 8px;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  td mat-icon {
+    vertical-align: middle;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+  }
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .clicavel {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--mat-sys-surface-container-high);
+    }
+  }
+}
+
+.vazio {
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.erro {
+  color: var(--m2m-fail);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

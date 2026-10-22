@@ -1,0 +1,165 @@
+<section class="m2m-page">
+  <h1>{{ 'backups.titulo' | transloco }}</h1>
+
+  <form class="filtros" [formGroup]="filtros">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'backups.filtro.perfil' | transloco }}</mat-label>
+      <mat-select formControlName="profileId">
+        <mat-option [value]="null">{{ 'backups.filtro.todos' | transloco }}</mat-option>
+        @for (p of perfis(); track p.id) {
+          <mat-option [value]="p.id">{{ p.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'backups.filtro.estado' | transloco }}</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="">{{ 'backups.filtro.todos' | transloco }}</mat-option>
+        @for (s of statuses; track s) {
+          <mat-option [value]="s">{{ 'backups.status.' + s | transloco }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'backups.filtro.tipo' | transloco }}</mat-label>
+      <mat-select formControlName="type">
+        <mat-option value="">{{ 'backups.filtro.todos' | transloco }}</mat-option>
+        <mat-option value="REGULAR">{{ 'backups.tipo.REGULAR' | transloco }}</mat-option>
+        <mat-option value="PRE_RESTORE">{{ 'backups.tipo.PRE_RESTORE' | transloco }}</mat-option>
+        <mat-option value="PRE_SYNC">{{ 'backups.tipo.PRE_SYNC' | transloco }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'backups.filtro.orfaos' | transloco }}</mat-label>
+      <mat-select formControlName="orphan">
+        <mat-option [value]="false">{{ 'backups.filtro.todos' | transloco }}</mat-option>
+        <mat-option [value]="true">{{ 'backups.filtro.so-orfaos' | transloco }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+
+  @if (erro(); as e) {
+    <p class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ 'erro.' + e.codigo | transloco: e.parametros }}
+    </p>
+  }
+
+  <div class="tabela">
+    <table mat-table [dataSource]="backups()">
+      <ng-container matColumnDef="data">
+        <th mat-header-cell *matHeaderCellDef>{{ 'backups.col.data' | transloco }}</th>
+        <td mat-cell *matCellDef="let b">{{ b.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="perfil">
+        <th mat-header-cell *matHeaderCellDef>{{ 'backups.col.perfil' | transloco }}</th>
+        <td mat-cell *matCellDef="let b">
+          {{ b.profileName }}
+          @if (b.orphan) {
+            <m2m-status estado="info" [texto]="'backups.orfao' | transloco" />
+          }
+          <div class="arquivo">{{ b.fileName }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef>{{ 'backups.col.tipo' | transloco }}</th>
+        <td mat-cell *matCellDef="let b">{{ 'backups.tipo.' + b.type | transloco }}</td>
+      </ng-container>
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell *matHeaderCellDef>{{ 'backups.col.estado' | transloco }}</th>
+        <td mat-cell *matCellDef="let b">
+          <m2m-status [estado]="estado(b)" [texto]="'backups.status.' + b.status | transloco" />
+          @if (b.pinned) {
+            <mat-icon
+              class="fixado"
+              [attr.aria-label]="'backups.fixado' | transloco"
+              [title]="'backups.fixado' | transloco"
+              >push_pin</mat-icon
+            >
+          }
+          @if (b.encrypted) {
+            <mat-icon class="fixado" [title]="'perfis.criptografado' | transloco">lock</mat-icon>
+          }
+          @if (!b.fullFidelity) {
+            <m2m-status estado="info" [texto]="'backups.fidelidade-parcial' | transloco" />
+          }
+          @if (b.error) {
+            <div class="erro-linha">{{ b.error }}</div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="arquivos">
+        <th mat-header-cell *matHeaderCellDef class="num">
+          {{ 'backups.col.arquivos' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let b" class="num">{{ b.fileCount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="tamanho">
+        <th mat-header-cell *matHeaderCellDef class="num">
+          {{ 'backups.col.tamanho' | transloco }}
+        </th>
+        <td mat-cell *matCellDef="let b" class="num">
+          {{ b.archiveBytes | bytes }}
+          <div class="arquivo">{{ b.totalBytes | bytes }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="armazenamento">
+        <th mat-header-cell *matHeaderCellDef>{{ 'backups.col.armazenamento' | transloco }}</th>
+        <td mat-cell *matCellDef="let b">
+          {{ b.storageMachineName }}
+          <div class="arquivo">{{ b.storageDir }}</div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let b" class="acoes">
+          @if (b.status === 'SUSPECT') {
+            <button mat-flat-button (click)="aceitar(b)">
+              <mat-icon>check</mat-icon>{{ 'backups.aceitar' | transloco }}
+            </button>
+          }
+          @if (podeUsarArquivo(b)) {
+            <button
+              mat-icon-button
+              (click)="verConteudo(b)"
+              [attr.aria-label]="'backups.ver-conteudo' | transloco"
+              [title]="'backups.ver-conteudo' | transloco"
+            >
+              <mat-icon>folder_open</mat-icon>
+            </button>
+            <a
+              mat-icon-button
+              [href]="baixar(b)"
+              [attr.aria-label]="'backups.baixar' | transloco"
+              [title]="'backups.baixar' | transloco"
+              ><mat-icon>download</mat-icon></a
+            >
+            <button
+              mat-icon-button
+              (click)="fixar(b)"
+              [attr.aria-label]="(b.pinned ? 'backups.desafixar' : 'backups.fixar') | transloco"
+              [title]="(b.pinned ? 'backups.desafixar' : 'backups.fixar') | transloco"
+            >
+              <mat-icon>{{ b.pinned ? 'keep_off' : 'push_pin' }}</mat-icon>
+            </button>
+          }
+          <button
+            mat-icon-button
+            (click)="excluir(b)"
+            [attr.aria-label]="'comum.excluir' | transloco"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell vazio" [attr.colspan]="colunas.length">
+          {{ 'backups.vazio' | transloco }}
+        </td>
+      </tr>
+    </table>
+  </div>
+</section>

@@ -24,7 +24,8 @@
     "sair": "Sair",
     "maquinas": "Máquinas",
     "perfis": "Perfis",
-    "acompanhamento": "Acompanhamento"
+    "acompanhamento": "Acompanhamento",
+    "backups": "Backups"
   },
   "layout": {
     "menu": "Abrir ou fechar o menu",
@@ -177,6 +178,20 @@
       "nao-esta-ativo": "O job não está em execução ({{ status }}).",
       "tipo-sem-handler": "Tipo de job sem executor: {{ tipo }}.",
       "falha-inesperada": "O job falhou: {{ detalhe }}"
+    },
+    "backup": {
+      "nao-encontrado": "Backup não encontrado.",
+      "nao-esta-suspeito": "O backup não está marcado como suspeito.",
+      "em-uso": "O backup está em uso por um job e não pode ser excluído agora.",
+      "falha-ao-excluir": "Não foi possível excluir {{ arquivo }}: {{ detalhe }}",
+      "arquivo-indisponivel": "O arquivo deste backup não está disponível ({{ status }}).",
+      "manifesto-indisponivel": "O manifesto lateral deste backup não está disponível.",
+      "caminho-invalido": "Caminho inválido: {{ caminho }}",
+      "diretorio-origem-ausente": "O diretório de origem {{ diretorio }} não existe.",
+      "erro-de-leitura": "Não foi possível ler {{ caminho }} ({{ detalhe }}).",
+      "espaco-insuficiente": "Espaço insuficiente no armazenamento: necessário {{ necessario }} bytes, livre {{ livre }}.",
+      "validacao-falhou": "A validação do arquivo falhou: {{ motivo }}",
+      "perfil-sem-diretorios": "O perfil não tem diretórios de origem."
     }
   },
   "comum": {
@@ -414,6 +429,70 @@
   "aviso": {
     "teste": {
       "aviso": "Aviso de teste: {{ item }}"
+    },
+    "backup": {
+      "item-especial-ignorado": "Item especial ignorado (pipe, socket ou dispositivo): {{ caminho }}",
+      "arquivo-alterado-durante-a-leitura": "Arquivo alterado durante a leitura; incluída a última versão lida: {{ caminho }}",
+      "arquivo-removido-durante-a-leitura": "Arquivo removido durante o backup e não incluído: {{ caminho }}",
+      "suspeito": "Backup suspeito: {{ arquivos }} arquivos contra {{ anteriores }} no último aceito. Aceite ou exclua o backup.",
+      "retencao-falhou": "Não foi possível excluir o backup antigo {{ arquivo }}: {{ detalhe }}"
+    }
+  },
+  "backups": {
+    "titulo": "Backups",
+    "vazio": "Nenhum backup encontrado.",
+    "orfao": "Órfão",
+    "fixado": "Fixado (fora da retenção)",
+    "fidelidade-parcial": "Fidelidade parcial",
+    "aceitar": "Aceitar",
+    "ver-conteudo": "Ver conteúdo",
+    "baixar": "Baixar",
+    "fixar": "Fixar",
+    "desafixar": "Desafixar",
+    "col": {
+      "data": "Data",
+      "perfil": "Perfil / arquivo",
+      "tipo": "Tipo",
+      "estado": "Estado",
+      "arquivos": "Arquivos",
+      "tamanho": "Tamanho (arquivo / conteúdo)",
+      "armazenamento": "Armazenamento"
+    },
+    "filtro": {
+      "perfil": "Perfil",
+      "estado": "Estado",
+      "tipo": "Tipo",
+      "orfaos": "Órfãos",
+      "todos": "Todos",
+      "so-orfaos": "Só órfãos"
+    },
+    "tipo": {
+      "REGULAR": "Backup",
+      "PRE_RESTORE": "Segurança (antes de restaurar)",
+      "PRE_SYNC": "Segurança (antes de sincronizar)"
+    },
+    "status": {
+      "COMPLETED": "Concluído",
+      "COMPLETED_WITH_WARNINGS": "Concluído com avisos",
+      "SUSPECT": "Suspeito",
+      "FAILED": "Falhou",
+      "INTERRUPTED": "Interrompido",
+      "CORRUPTED": "Corrompido",
+      "MISSING": "Ausente"
+    },
+    "excluir": {
+      "titulo": "Excluir o backup {{ nome }}?",
+      "mensagem": "O arquivo e o manifesto serão removidos do armazenamento. Esta ação não pode ser desfeita.",
+      "mensagem-fixado": "Este backup está fixado. O arquivo e o manifesto serão removidos do armazenamento e a ação não pode ser desfeita."
+    },
+    "conteudo": {
+      "titulo": "Conteúdo do backup",
+      "raiz": "Diretórios de origem",
+      "nome": "Nome",
+      "tamanho": "Tamanho",
+      "data": "Modificado em",
+      "vazio": "Vazio.",
+      "mais": "Carregar mais"
     }
   }
 }

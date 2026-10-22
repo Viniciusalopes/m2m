@@ -1,0 +1,55 @@
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tabela {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.num {
+  text-align: right;
+}
+
+.arquivo {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+  word-break: break-all;
+}
+
+.fixado {
+  vertical-align: middle;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
+}
+
+.erro-linha {
+  color: var(--m2m-fail);
+  font: var(--mat-sys-body-small);
+}
+
+.acoes {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.vazio {
+  text-align: center;
+  padding: 24px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.erro {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--m2m-fail);
+}

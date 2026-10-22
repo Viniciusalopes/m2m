@@ -52,6 +52,7 @@ export class Layout implements OnInit {
     { rota: '/', icone: 'dashboard', chave: 'menu.painel' },
     { rota: '/maquinas', icone: 'computer', chave: 'menu.maquinas' },
     { rota: '/perfis', icone: 'folder_copy', chave: 'menu.perfis' },
+    { rota: '/backups', icone: 'inventory_2', chave: 'menu.backups' },
     { rota: '/jobs', icone: 'monitoring', chave: 'menu.acompanhamento' },
     { rota: '/auditoria', icone: 'fact_check', chave: 'menu.auditoria' },
     { rota: '/sobre', icone: 'info', chave: 'menu.sobre' },

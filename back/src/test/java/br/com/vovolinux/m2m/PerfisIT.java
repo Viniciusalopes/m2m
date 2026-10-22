@@ -231,10 +231,12 @@ class PerfisIT {
         fire.invoke(scheduler, id);
         assertThat(jdbc.sql("select count(*) from job where profile_id = :p and trigger = 'SCHEDULED' and type = 'BACKUP'")
                 .param("p", id).query(Long.class).single()).isEqualTo(1);
-        // o motor de backup só chega no grupo 8: sem handler o job falha com um código claro (ainda sem duplicar)
-        org.awaitility.Awaitility.await().atMost(Duration.ofSeconds(20)).until(() -> jdbc
+        // o job agendado roda de verdade (um só) e gera o backup do perfil
+        org.awaitility.Awaitility.await().atMost(Duration.ofSeconds(30)).until(() -> jdbc
                 .sql("select status from job where profile_id = :p").param("p", id).query(String.class).single()
-                .equals("FAILED"));
+                .equals("COMPLETED"));
+        assertThat(jdbc.sql("select count(*) from backup_archive where profile_id = :p and status = 'COMPLETED'")
+                .param("p", id).query(Long.class).single()).isEqualTo(1);
     }
 
     @Test

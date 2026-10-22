@@ -26,7 +26,7 @@ test.describe('máquinas', () => {
     await page.getByRole('button', { name: 'Nova máquina' }).click();
     await page.getByRole('combobox', { name: 'Protocolo' }).click();
     await page.getByRole('option', { name: 'FTP', exact: true }).click();
-    await expect(page.getByRole('alert')).toContainText('FTP sem TLS');
+    await expect(page.getByRole('dialog').getByRole('alert')).toContainText('FTP sem TLS');
     await page.getByRole('button', { name: 'Cancelar' }).click();
   });
 

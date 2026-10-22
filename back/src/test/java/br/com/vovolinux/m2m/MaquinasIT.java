@@ -22,6 +22,7 @@ import br.com.vovolinux.m2m.support.SftpServer;
 import br.com.vovolinux.m2m.support.Usuarios;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -355,22 +356,23 @@ class MaquinasIT {
 
     @Test
     void navegacaoLocalListaDiretoriosDoHost() throws Exception {
-        Files.createDirectories(java.nio.file.Path.of("target/test-hostfs/home/teste/pasta-a"));
-        Files.writeString(java.nio.file.Path.of("target/test-hostfs/home/teste/.oculto"), "x");
+        // diretório exclusivo: outros testes também criam pastas em /home/teste
+        String d = "nav-" + UUID.randomUUID().toString().substring(0, 8);
+        Files.createDirectories(java.nio.file.Path.of("target/test-hostfs/home/teste/" + d + "/pasta-a"));
+        Files.writeString(java.nio.file.Path.of("target/test-hostfs/home/teste/" + d + "/.oculto"), "x");
         MockHttpSession s = entrarAdmin();
-        long local = json.readTree(mvc.perform(get("/api/machines").session(s)).andReturn().getResponse()
-                .getContentAsString()).findValues("id").get(0).asLong();
         long hp = jdbc.sql("select id from machine where protocol = 'LOCAL'").query(Long.class).single();
-        assertThat(hp).isPositive();
-        mvc.perform(get("/api/machines/" + hp + "/browse").param("path", "/home/teste").session(s))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.parent").value("/home"))
+        mvc.perform(get("/api/machines/" + hp + "/browse").param("path", "/home/teste/" + d).session(s))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.parent").value("/home/teste"))
                 .andExpect(jsonPath("$.items[0].name").value("pasta-a"))
                 .andExpect(jsonPath("$.items[?(@.name=='.oculto')]", hasSize(1)));
+        // a raiz do host não oferece "subir" para fora das raízes
+        mvc.perform(get("/api/machines/" + hp + "/browse").param("path", "/home").session(s))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.parent").doesNotExist());
         mvc.perform(get("/api/machines/" + hp + "/browse").param("path", "/etc").session(s))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.codigo").value("local.fora-das-raizes"));
-        mvc.perform(get("/api/machines/" + hp + "/browse").param("path", "/home/teste").param("onlyDirs", "true")
+        mvc.perform(get("/api/machines/" + hp + "/browse").param("path", "/home/teste/" + d).param("onlyDirs", "true")
                 .session(s)).andExpect(jsonPath("$.items[?(@.name=='.oculto')]").isEmpty());
-        assertThat(local).isPositive();
     }
 
     @SuppressWarnings("unused")

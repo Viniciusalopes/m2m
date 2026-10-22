@@ -1,0 +1,64 @@
+<h2 mat-dialog-title>{{ 'backups.conteudo.titulo' | transloco }}</h2>
+<mat-dialog-content>
+  <p class="arquivo">{{ backup.fileName }}</p>
+  @if (carregando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  @if (erro(); as e) {
+    <p class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ 'erro.' + e.codigo | transloco: e.parametros }}
+    </p>
+  }
+  @if (pagina(); as p) {
+    <p class="caminho">
+      <mat-icon aria-hidden="true">folder_open</mat-icon>
+      <span>{{ p.path || ('backups.conteudo.raiz' | transloco) }}</span>
+    </p>
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>{{ 'backups.conteudo.nome' | transloco }}</th>
+          <th class="num">{{ 'backups.conteudo.tamanho' | transloco }}</th>
+          <th>{{ 'backups.conteudo.data' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (p.parent !== null) {
+          <tr class="clicavel" (click)="abrir(p.parent)">
+            <td><mat-icon aria-hidden="true">arrow_upward</mat-icon> ..</td>
+            <td></td>
+            <td></td>
+          </tr>
+        }
+        @for (n of itens(); track n.path) {
+          <tr [class.clicavel]="n.type === 'DIR'" (click)="n.type === 'DIR' && abrir(n.path)">
+            <td>
+              <mat-icon aria-hidden="true">{{ icone(n.type) }}</mat-icon>
+              {{ n.name }}
+              @if (n.type === 'SYMLINK') {
+                <span class="link">→ {{ n.link }}</span>
+              } @else if (p.path === '' && n.link) {
+                <span class="link">{{ n.link }}</span>
+              }
+            </td>
+            <td class="num">{{ n.type === 'FILE' ? (n.size | bytes) : '' }}</td>
+            <td>{{ n.mtime ? (n.mtime | date: 'dd/MM/yyyy HH:mm') : '' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="3" class="vazio">{{ 'backups.conteudo.vazio' | transloco }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (temMais()) {
+      <button mat-stroked-button (click)="maisItens()">
+        {{ 'backups.conteudo.mais' | transloco }} ({{ itens().length }} / {{ p.total }})
+      </button>
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-flat-button mat-dialog-close>{{ 'comum.fechar' | transloco }}</button>
+</mat-dialog-actions>

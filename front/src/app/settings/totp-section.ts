@@ -8,7 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
-import QRCode from 'qrcode';
 import { apiErro, ApiErro } from '../core/api-error';
 
 interface TotpStatus {
@@ -197,7 +196,11 @@ export class TotpSection implements OnInit {
       const c = await firstValueFrom(
         this.http.post<{ secret: string; otpauthUri: string }>('/api/me/2fa/setup', null),
       );
-      this.qr.set(await QRCode.toDataURL(c.otpauthUri, { margin: 1, width: 220 }));
+      // a biblioteca do QR code só é baixada quando alguém ativa o segundo fator
+      // (módulo CommonJS: dependendo do empacotador, as funções vêm em `default`)
+      const modulo = await import('qrcode');
+      const qrcode = (modulo as unknown as { default?: typeof modulo }).default ?? modulo;
+      this.qr.set(await qrcode.toDataURL(c.otpauthUri, { margin: 1, width: 220 }));
       this.configuracao.set(c);
     } catch (e) {
       this.erro.set(apiErro(e));

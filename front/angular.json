@@ -54,7 +54,8 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "allowedCommonJsDependencies": ["qrcode", "dijkstrajs"]
             },
             "development": {
               "optimization": false,

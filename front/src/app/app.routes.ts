@@ -1,21 +1,9 @@
 import { Routes } from '@angular/router';
 import { authGuard, loginGuard } from './core/auth.guard';
-import { About } from './pages/about/about';
-import { Audit } from './pages/audit/audit';
 import { DashboardPage } from './dashboard/dashboard';
-import { Notifications } from './notifications/notifications';
-import { Settings } from './settings/settings';
 import { Layout } from './pages/layout/layout';
-import { Backups } from './backups/backups';
-import { JobProgressPage } from './jobs/job-progress';
 import { JobsRedirect } from './jobs/jobs-redirect';
-import { Machines } from './machines/machines';
 import { Login } from './pages/login/login';
-import { Password } from './pages/password/password';
-import { RestoreWizard } from './restore/restore-wizard';
-import { ProfileForm } from './profiles/profile-form';
-import { Profiles } from './profiles/profiles';
-import { TransferPage } from './transfer/transfer-page';
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [loginGuard] },
@@ -25,20 +13,53 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: DashboardPage },
-      { path: 'notificacoes', component: Notifications },
-      { path: 'configuracoes', component: Settings },
-      { path: 'maquinas', component: Machines },
-      { path: 'perfis', component: Profiles },
-      { path: 'transferencia', component: TransferPage },
-      { path: 'perfis/novo', component: ProfileForm },
-      { path: 'perfis/:id', component: ProfileForm },
-      { path: 'backups', component: Backups },
-      { path: 'restaurar/:id', component: RestoreWizard },
+      {
+        path: 'notificacoes',
+        loadComponent: () => import('./notifications/notifications').then((m) => m.Notifications),
+      },
+      {
+        path: 'configuracoes',
+        loadComponent: () => import('./settings/settings').then((m) => m.Settings),
+      },
+      {
+        path: 'maquinas',
+        loadComponent: () => import('./machines/machines').then((m) => m.Machines),
+      },
+      {
+        path: 'perfis',
+        loadComponent: () => import('./profiles/profiles').then((m) => m.Profiles),
+      },
+      {
+        path: 'transferencia',
+        loadComponent: () => import('./transfer/transfer-page').then((m) => m.TransferPage),
+      },
+      {
+        path: 'perfis/novo',
+        loadComponent: () => import('./profiles/profile-form').then((m) => m.ProfileForm),
+      },
+      {
+        path: 'perfis/:id',
+        loadComponent: () => import('./profiles/profile-form').then((m) => m.ProfileForm),
+      },
+      { path: 'backups', loadComponent: () => import('./backups/backups').then((m) => m.Backups) },
+      {
+        path: 'restaurar/:id',
+        loadComponent: () => import('./restore/restore-wizard').then((m) => m.RestoreWizard),
+      },
       { path: 'jobs', component: JobsRedirect },
-      { path: 'jobs/:id', component: JobProgressPage },
-      { path: 'auditoria', component: Audit },
-      { path: 'senha', component: Password },
-      { path: 'sobre', component: About },
+      {
+        path: 'jobs/:id',
+        loadComponent: () => import('./jobs/job-progress').then((m) => m.JobProgressPage),
+      },
+      {
+        path: 'auditoria',
+        loadComponent: () => import('./pages/audit/audit').then((m) => m.Audit),
+      },
+      {
+        path: 'senha',
+        loadComponent: () => import('./pages/password/password').then((m) => m.Password),
+      },
+      { path: 'sobre', loadComponent: () => import('./pages/about/about').then((m) => m.About) },
     ],
   },
   { path: '**', redirectTo: '' },

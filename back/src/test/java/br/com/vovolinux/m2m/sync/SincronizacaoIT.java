@@ -316,4 +316,93 @@ class SincronizacaoIT {
                 new SyncRequest(t.localMachineId(), false, true, false, false))).isInstanceOf(ApiException.class)
                 .hasMessageContaining("destino-igual-origem");
     }
+
+    // ---- arquivo em uso e interrupção ----
+
+    /** Árvore do destino: caminho relativo → "tamanho:hash do conteúdo" (sem temporários do m2m). */
+    Map<String, String> retratoDestino() throws Exception {
+        Map<String, String> m = new java.util.TreeMap<>();
+        if (!Files.exists(destino)) {
+            return m;
+        }
+        try (var st = Files.walk(destino)) {
+            for (Path p : (Iterable<Path>) st.skip(1)::iterator) {
+                if (Files.isRegularFile(p)) {
+                    m.put(destino.relativize(p).toString(), Files.size(p) + ":"
+                            + java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+                                    .digest(Files.readAllBytes(p))));
+                }
+            }
+        }
+        return m;
+    }
+
+    @Test
+    void arquivoEmUsoNaOrigemNaoDeixaTemporarioNemCorrompeOsDemais() throws Exception {
+        sincronizarBase();
+        Path vivo = origem.resolve("vivo.log");
+        try (java.io.RandomAccessFile f = new java.io.RandomAccessFile(vivo.toFile(), "rw")) {
+            f.setLength(120L * 1024 * 1024);
+        }
+        escrever(origem, "estavel.txt", "estável", 1_700_000_100L);
+        // outro processo continua gravando no arquivo enquanto a sincronização o lê
+        var parar = new java.util.concurrent.atomic.AtomicBoolean();
+        Thread escritor = Thread.ofPlatform().start(() -> {
+            try (java.io.RandomAccessFile f = new java.io.RandomAccessFile(vivo.toFile(), "rw")) {
+                while (!parar.get()) {
+                    f.seek(f.length() - 1);
+                    f.write(1);
+                    Files.setLastModifiedTime(vivo, FileTime.fromMillis(System.currentTimeMillis()));
+                    Thread.sleep(5);
+                }
+            } catch (Exception ignorado) {
+                // o teste só precisa do arquivo mudando durante a leitura
+            }
+        });
+        Job j;
+        try {
+            j = manual(req(false, false, false));
+        } finally {
+            parar.set(true);
+            escritor.join();
+        }
+        // pode terminar com aviso ou ser recusado pela verificação final (a origem seguiu mudando): nunca em silêncio
+        assertThat(j.status()).isIn(JobStatus.COMPLETED_WITH_WARNINGS, JobStatus.COMPLETED, JobStatus.FAILED);
+        try (var st = Files.walk(destino)) {
+            assertThat(st.map(p -> p.getFileName().toString())).noneMatch(n -> n.endsWith(".m2m-tmp"));
+        }
+        assertThat(lerDestino("a.txt")).isEqualTo("A");
+        assertThat(lerDestino("estavel.txt")).isEqualTo("estável");
+    }
+
+    @Test
+    void interrupcaoNoMeioDeixaOPreSyncEODesfazerDevolveODestino() throws Exception {
+        sincronizarBase();
+        Map<String, String> antes = retratoDestino();
+        // mudanças a copiar: um arquivo atualizado, um excluído e um grande novo (dá tempo de interromper)
+        escrever(origem, "a.txt", "A-NOVO", 1_700_000_200L);
+        Files.delete(origem.resolve("sub/c.txt"));
+        try (java.io.RandomAccessFile f = new java.io.RandomAccessFile(origem.resolve("z-grande.bin").toFile(), "rw")) {
+            f.setLength(400L * 1024 * 1024);
+        }
+        t.awaitIdle();
+        Job iniciado = sync.start(t.adminId(), profile, req(false, false, false));
+        await().atMost(Duration.ofSeconds(120)).until(() -> {
+            var j = jobRepo.findAny(iniciado.id()).orElseThrow();
+            return "COPYING".equals(j.step()) || JobStatus.isFinal(j.status());
+        });
+        jobs.cancel(t.adminId(), iniciado.id());
+        Job parado = t.esperar(iniciado.id());
+        assertThat(parado.status()).isEqualTo(JobStatus.INTERRUPTED);
+        long pre = resultado(parado).path("preArchiveId").asLong();
+        assertThat(pre).as(parado.result()).isPositive();
+        // nenhum temporário e nenhum arquivo parcial do grande com o nome final
+        try (var st = Files.walk(destino)) {
+            assertThat(st.map(p -> p.getFileName().toString())).noneMatch(n -> n.endsWith(".m2m-tmp"));
+        }
+
+        Job u = t.esperar(sync.undo(t.adminId(), pre).id());
+        assertThat(u.status()).as(u.result()).isIn(JobStatus.COMPLETED, JobStatus.COMPLETED_WITH_WARNINGS);
+        assertThat(retratoDestino()).isEqualTo(antes);
+    }
 }

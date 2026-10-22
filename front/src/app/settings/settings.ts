@@ -3,15 +3,17 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { ConfigTransferSection } from './config-transfer-section';
 import { MaintenanceSection } from './maintenance-section';
 import { SmtpSection } from './smtp-section';
+import { TotpSection } from './totp-section';
 
-/** Configurações do usuário; o segundo fator (2FA) chega no marco M4. */
+/** Configurações do usuário;. */
 @Component({
   selector: 'm2m-settings',
-  imports: [SmtpSection, MaintenanceSection, ConfigTransferSection, TranslocoPipe],
+  imports: [SmtpSection, TotpSection, MaintenanceSection, ConfigTransferSection, TranslocoPipe],
   template: `
     <section class="m2m-page config">
       <h1>{{ 'config.titulo' | transloco }}</h1>
       <m2m-smtp-section />
+      <m2m-totp-section />
       <m2m-maintenance-section />
       <m2m-config-transfer-section />
     </section>

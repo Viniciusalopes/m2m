@@ -224,6 +224,13 @@ public class TransferExecutor {
                 }
             }
         }
+        if (start > 0 && !src.supportsResume()) {
+            // origem FTP sem REST: não dá para abrir a leitura no deslocamento; recomeça pelo temporário
+            start = 0;
+            direct = false;
+            target = tmp;
+            note = "retomada-recusada-servidor-sem-suporte";
+        }
         repository.markStarted(item.id(), se.size(), srcMtime, direct ? null : tmp, start, note);
         h.bytes = start;
 

@@ -15,7 +15,7 @@ public class BackupArchiveRepository {
             id, owner_id, profile_id, profile_name_snapshot, type, status, accepted, pinned, storage_machine_id,
             storage_machine_name, storage_dir, file_name, source_machine_name, source_protocol, full_fidelity,
             item_count, file_count, total_bytes, archive_bytes, sha256, encrypted, mapping::text as mapping,
-            warnings::text as warnings, error, job_id, dest_machine_name, created_at, finished_at\s""";
+            warnings::text as warnings, error, job_id, dest_machine_name, created_at, finished_at, key_id\s""";
 
     private final JdbcClient jdbc;
 
@@ -34,7 +34,7 @@ public class BackupArchiveRepository {
                 rs.getLong("archive_bytes"), rs.getString("sha256"), rs.getBoolean("encrypted"),
                 rs.getString("mapping"), rs.getString("warnings"), rs.getString("error"),
                 (Long) rs.getObject("job_id"), rs.getString("dest_machine_name"),
-                rs.getTimestamp("created_at").toInstant(), fin == null ? null : fin.toInstant());
+                rs.getTimestamp("created_at").toInstant(), fin == null ? null : fin.toInstant(), rs.getString("key_id"));
     }
 
     public List<BackupArchive> byProfile(long ownerId, long profileId) {
@@ -85,7 +85,20 @@ public class BackupArchiveRepository {
             String warningsJson,
             String error,
             Long jobId,
-            String destMachineName) {
+            String destMachineName,
+            String keyId) {
+
+        /** Sem chave: backups em claro. */
+        public NewArchive(long ownerId, Long profileId, String profileName, String type, String status,
+                boolean accepted, Long storageMachineId, String storageMachineName, String storageDir, String fileName,
+                String sourceMachineName, String sourceProtocol, boolean fullFidelity, long itemCount, long fileCount,
+                long totalBytes, long archiveBytes, String sha256, boolean encrypted, String mappingJson,
+                String warningsJson, String error, Long jobId, String destMachineName) {
+            this(ownerId, profileId, profileName, type, status, accepted, storageMachineId, storageMachineName,
+                    storageDir, fileName, sourceMachineName, sourceProtocol, fullFidelity, itemCount, fileCount,
+                    totalBytes, archiveBytes, sha256, encrypted, mappingJson, warningsJson, error, jobId,
+                    destMachineName, null);
+        }
     }
 
     public long insert(NewArchive a) {
@@ -93,10 +106,11 @@ public class BackupArchiveRepository {
                 insert into backup_archive (owner_id, profile_id, profile_name_snapshot, type, status, accepted,
                        storage_machine_id, storage_machine_name, storage_dir, file_name, source_machine_name,
                        source_protocol, full_fidelity, item_count, file_count, total_bytes, archive_bytes, sha256,
-                       encrypted, mapping, warnings, error, job_id, dest_machine_name, finished_at)
+                       encrypted, mapping, warnings, error, job_id, dest_machine_name, key_id, finished_at)
                 values (:owner, :profile, :pname, :type, :status, :accepted, :sm, :smn, :sdir, :file, :src, :proto,
+                        
                         :full, :items, :files, :bytes, :abytes, :sha, :enc, cast(:mapping as jsonb),
-                        cast(:warnings as jsonb), :error, :job, :dest, now())
+                        cast(:warnings as jsonb), :error, :job, :dest, :key, now())
                 returning id""")
                 .param("owner", a.ownerId()).param("profile", a.profileId()).param("pname", a.profileName())
                 .param("type", a.type()).param("status", a.status()).param("accepted", a.accepted())
@@ -106,7 +120,7 @@ public class BackupArchiveRepository {
                 .param("files", a.fileCount()).param("bytes", a.totalBytes()).param("abytes", a.archiveBytes())
                 .param("sha", a.sha256()).param("enc", a.encrypted()).param("mapping", a.mappingJson())
                 .param("warnings", a.warningsJson()).param("error", a.error()).param("job", a.jobId())
-                .param("dest", a.destMachineName()).query(Long.class).single();
+                .param("dest", a.destMachineName()).param("key", a.keyId()).query(Long.class).single();
     }
 
     /** Último backup REGULAR aceito do perfil (base da regra de backup suspeito, D25). */

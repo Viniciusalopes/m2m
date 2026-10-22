@@ -158,6 +158,17 @@
         <mat-checkbox formControlName="encryptionEnabled">{{
           'perfis.form.criptografia' | transloco
         }}</mat-checkbox>
+        @if (id && form.controls.encryptionEnabled.value) {
+          <div class="chave">
+            <p class="recomendacao">
+              <mat-icon aria-hidden="true">key</mat-icon>
+              {{ 'perfis.form.chave-aviso' | transloco }}
+            </p>
+            <button mat-stroked-button type="button" (click)="exportarChave()">
+              <mat-icon>download</mat-icon>{{ 'perfis.form.exportar-chave' | transloco }}
+            </button>
+          </div>
+        }
         @if (armazenamentoRemoto() && !form.controls.encryptionEnabled.value) {
           <p class="recomendacao">
             <mat-icon aria-hidden="true">lightbulb</mat-icon>

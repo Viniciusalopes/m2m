@@ -26,14 +26,16 @@ public class ManifestLoader {
     }
 
     private final ManifestIO manifestIO;
+    private final ArchiveFiles files;
 
-    public ManifestLoader(ManifestIO manifestIO) {
+    public ManifestLoader(ManifestIO manifestIO, ArchiveFiles files) {
         this.manifestIO = manifestIO;
+        this.files = files;
     }
 
     public Loaded load(FileGateway storage, BackupArchive a) throws IOException {
         String path = ArchiveFiles.path(a);
-        try (InputStream side = new ZstdInputStream(storage.openRead(path + ArchiveFiles.MANIFEST_SUFFIX, 0))) {
+        try (InputStream side = new ZstdInputStream(files.openSideManifest(storage, a))) {
             return parse(side, a);
         } catch (NoSuchFileException e) {
             return loadInternal(storage, a);
@@ -43,7 +45,7 @@ public class ManifestLoader {
     /** Fallback: percorre o tar até a última entrada (.m2m-manifest.json). */
     private Loaded loadInternal(FileGateway storage, BackupArchive a) throws IOException {
         try (TarArchiveInputStream tar = new TarArchiveInputStream(
-                new ZstdInputStream(storage.openRead(ArchiveFiles.path(a), 0)), StandardCharsets.UTF_8.name())) {
+                new ZstdInputStream(files.openArchive(storage, a)), StandardCharsets.UTF_8.name())) {
             TarArchiveEntry e;
             while ((e = tar.getNextEntry()) != null) {
                 if (e.getName().equals(Manifest.INTERNAL_ENTRY)) {

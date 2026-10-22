@@ -110,7 +110,7 @@ public class SftpConnector {
     }
 
     /** Converte falhas do MINA em erros com código estável. */
-    static GatewayException traduzir(String host, int port, Throwable e) {
+    public static GatewayException traduzir(String host, int port, Throwable e) {
         Map<String, Object> params = Map.of("host", host, "porta", port);
         Throwable raiz = e;
         while (raiz.getCause() != null && raiz.getCause() != raiz) {

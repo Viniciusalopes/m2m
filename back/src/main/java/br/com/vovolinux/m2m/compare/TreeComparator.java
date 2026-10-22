@@ -46,6 +46,8 @@ public class TreeComparator {
         public long onlyTarget;
         public long different;
         public long specialsIgnored;
+        /** Links simbólicos de um lado cujo outro lado não os preserva (ex.: FTP): não são diferença. */
+        public long linksSkipped;
         public boolean modesCompared;
         public boolean linksCompared;
     }
@@ -88,6 +90,10 @@ public class TreeComparator {
                         stats.specialsIgnored++;
                         continue;
                     }
+                    if (na.type() == FileType.SYMLINK && !target.preservesLinks()) {
+                        stats.linksSkipped++;
+                        continue;
+                    }
                     String rel = join(p.rel(), na.name());
                     stats.onlySource++;
                     visitor.onlySource(rel, na);
@@ -98,6 +104,10 @@ public class TreeComparator {
                     j++;
                     if (nb.type() == FileType.SPECIAL) {
                         stats.specialsIgnored++;
+                        continue;
+                    }
+                    if (nb.type() == FileType.SYMLINK && !source.preservesLinks()) {
+                        stats.linksSkipped++;
                         continue;
                     }
                     String rel = join(p.rel(), nb.name());

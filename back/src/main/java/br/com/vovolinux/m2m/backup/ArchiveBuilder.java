@@ -1,5 +1,6 @@
 package br.com.vovolinux.m2m.backup;
 
+import br.com.vovolinux.m2m.crypto.ArchiveCrypto;
 import br.com.vovolinux.m2m.files.FileGateway;
 import br.com.vovolinux.m2m.job.JobContext;
 import br.com.vovolinux.m2m.job.JobFailure;
@@ -36,6 +37,8 @@ public class ArchiveBuilder {
         /** Raízes de origem (índice dir-N → caminho), na ordem do manifesto. */
         public List<String> roots = List.of();
         public final List<Map<String, Object>> warnings = new ArrayList<>();
+        /** Chave de criptografia do perfil; {@code null} grava o arquivo em claro. */
+        public ArchiveCrypto.Key key;
 
         public Session(Path tmpDir) {
             this.tmpDir = tmpDir;
@@ -48,13 +51,15 @@ public class ArchiveBuilder {
     private final SourceFileReader reader;
     private final ManifestIO manifestIO;
     private final ArchiveValidator validator;
+    private final ArchiveCrypto crypto;
     private final int spoolLimit;
 
     public ArchiveBuilder(SourceFileReader reader, ManifestIO manifestIO, ArchiveValidator validator,
-            @Value("${m2m.backup.spool-limit:" + Spool.DEFAULT_LIMIT + "}") int spoolLimit) {
+            ArchiveCrypto crypto, @Value("${m2m.backup.spool-limit:" + Spool.DEFAULT_LIMIT + "}") int spoolLimit) {
         this.reader = reader;
         this.manifestIO = manifestIO;
         this.validator = validator;
+        this.crypto = crypto;
         this.spoolLimit = spoolLimit;
     }
 
@@ -94,7 +99,8 @@ public class ArchiveBuilder {
         progress.resetCounters();
         progress.totals(readBytes, 0);
         ArchiveValidator.Result validation;
-        try (InputStream in = new ProgressInputStream(dst.openRead(partial, 0), progress)) {
+        try (InputStream raw = new ProgressInputStream(dst.openRead(partial, 0), progress);
+                InputStream in = session.key == null ? raw : crypto.decrypt(session.key, raw)) {
             validation = validator.validate(in, session.tmpDir, ctx.token());
         } catch (ArchiveValidator.ValidationFailed e) {
             throw new JobFailure("backup.validacao-falhou", Map.of("motivo", String.valueOf(e.getMessage())));
@@ -107,14 +113,17 @@ public class ArchiveBuilder {
         String finalPath = storageDir + "/" + finalName;
         dst.rename(partial, finalPath);
         session.partialPath = null;
-        writeSideManifest(dst, finalPath, itemsFile, header);
+        writeSideManifest(dst, finalPath, itemsFile, header, session.key);
         return new Built(finalName, validation);
     }
 
     private long writeArchive(JobContext ctx, Session session, FileGateway src, FileGateway dst, String partial,
             Path scanFile, Path itemsFile, Manifest.Header header) throws IOException {
         JobProgress progress = ctx.progress();
-        HashingOutputStream sink = new HashingOutputStream(dst.openWrite(partial, 0));
+        // o SHA-256 é do .tar.zst em claro; a cifragem fica por baixo, entre o hash e o armazenamento
+        OutputStream file = dst.openWrite(partial, 0);
+        HashingOutputStream sink = new HashingOutputStream(session.key == null ? file
+                : crypto.encrypt(session.key, file));
         long[] total = {0};
         boolean ok = false;
         try (BufferedWriter items = manifestIO.openItemsWriter(itemsFile)) {
@@ -203,10 +212,11 @@ public class ArchiveBuilder {
         session.warnings.add(w);
     }
 
-    private void writeSideManifest(FileGateway dst, String finalPath, Path itemsFile, Manifest.Header header)
-            throws IOException {
+    private void writeSideManifest(FileGateway dst, String finalPath, Path itemsFile, Manifest.Header header,
+            ArchiveCrypto.Key key) throws IOException {
         String partial = finalPath + ArchiveFiles.MANIFEST_SUFFIX + ".partial";
-        try (OutputStream out = dst.openWrite(partial, 0);
+        OutputStream raw = dst.openWrite(partial, 0);
+        try (OutputStream out = key == null ? raw : crypto.encrypt(key, raw);
                 com.github.luben.zstd.ZstdOutputStream z = new com.github.luben.zstd.ZstdOutputStream(out,
                         TarZstWriter.ZSTD_LEVEL)) {
             manifestIO.writeManifest(z, header, itemsFile);

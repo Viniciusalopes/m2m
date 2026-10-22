@@ -32,15 +32,27 @@ export class AuthService {
     return this._me();
   }
 
-  async login(username: string, password: string): Promise<void> {
+  /** @returns {@code 'segundo-fator'} quando a senha está certa mas falta o código do segundo fator. */
+  async login(username: string, password: string): Promise<'ok' | 'segundo-fator'> {
     // O GET garante o cookie XSRF-TOKEN antes do POST do login
     await firstValueFrom(this.http.get('/api/auth/csrf'));
     const body = new URLSearchParams({ username, password });
-    await firstValueFrom(
+    const r = await firstValueFrom(
       this.http.post('/api/auth/login', body.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        observe: 'response',
       }),
     );
+    if (r.status === 202) {
+      return 'segundo-fator';
+    }
+    await this.restore();
+    return 'ok';
+  }
+
+  /** Segunda etapa: código TOTP ou de recuperação. */
+  async verifySecondFactor(code: string): Promise<void> {
+    await firstValueFrom(this.http.post('/api/auth/2fa', { code }));
     await this.restore();
   }
 

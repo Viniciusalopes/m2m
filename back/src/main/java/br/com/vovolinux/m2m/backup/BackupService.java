@@ -125,7 +125,7 @@ public class BackupService {
         try (GatewayPool.Lease lease = pool.acquire(storage)) {
             FileGateway gw = lease.gateway();
             Manifest.Header header;
-            try (InputStream in = new ZstdInputStream(gw.openRead(ArchiveFiles.path(a) + ArchiveFiles.MANIFEST_SUFFIX, 0))) {
+            try (InputStream in = new ZstdInputStream(files.openSideManifest(gw, a))) {
                 String dirPrefix;
                 int wantedDir;
                 if (virtual.isEmpty()) {

@@ -63,6 +63,7 @@ public class SyncHandler implements JobHandler {
 
     private static final Logger log = LoggerFactory.getLogger(SyncHandler.class);
 
+    private final br.com.vovolinux.m2m.crypto.ArchiveCrypto crypto;
     private final ProfileRepository profiles;
     private final MachineRepository machines;
     private final GatewayPool pool;
@@ -83,8 +84,9 @@ public class SyncHandler implements JobHandler {
             SyncStateService states, SyncRunRepository runs, ArchiveBuilder builder,
             BackupArchiveRepository archives, RetentionService retention, SourceFileReader reader,
             TreeComparator comparator, NotificationService notifications, JsonMapper json,
-            @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir,
+            br.com.vovolinux.m2m.crypto.ArchiveCrypto crypto, @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir,
             @Value("${m2m.backup.spool-limit:" + Spool.DEFAULT_LIMIT + "}") int spoolLimit) {
+        this.crypto = crypto;
         this.profiles = profiles;
         this.machines = machines;
         this.pool = pool;
@@ -377,8 +379,12 @@ public class SyncHandler implements JobHandler {
                 throw new JobFailure("backup.espaco-insuficiente", Map.of("necessario", bytes, "livre", free.getAsLong()));
             }
             ZonedDateTime now = ZonedDateTime.now(BackupNaming.ZONE);
+            boolean encrypted = profile.encryptionEnabled();
+            if (encrypted) {
+                session.key = crypto.forProfile(ctx.ownerId(), profile.id(), profile.name());
+            }
             String name = builder.uniqueName(sto, profile.storageDir(),
-                    t -> BackupNaming.safety(profile.name(), "pre-sync", dest.name(), t, false), now);
+                    t -> BackupNaming.safety(profile.name(), "pre-sync", dest.name(), t, encrypted), now);
             List<Manifest.Directory> dirs = new ArrayList<>();
             for (SyncPlanner.DirPair p : pairs) {
                 dirs.add(new Manifest.Directory(p.index(), p.targetPath(),
@@ -395,8 +401,9 @@ public class SyncHandler implements JobHandler {
             long id = archives.insert(new BackupArchiveRepository.NewArchive(ctx.ownerId(), profile.id(), profile.name(),
                     "PRE_SYNC", ArchiveStatus.COMPLETED, true, storage.id(), storage.name(), profile.storageDir(), name,
                     dest.name(), dest.protocol().name(), full, v.items(), v.files(), v.bytes(), v.archiveBytes(),
-                    v.archiveSha256(), false, json.writeValueAsString(dirs), json.writeValueAsString(session.warnings),
-                    null, ctx.id(), dest.name()));
+                    v.archiveSha256(), encrypted, json.writeValueAsString(dirs),
+                    json.writeValueAsString(session.warnings), null, ctx.id(), dest.name(),
+                    session.key == null ? null : session.key.keyId()));
             retention.applySafety(profile.id(), "PRE_SYNC", dest.name());
             session.warnings.clear();
             return id;

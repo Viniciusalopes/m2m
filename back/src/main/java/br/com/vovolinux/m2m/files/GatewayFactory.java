@@ -2,6 +2,8 @@ package br.com.vovolinux.m2m.files;
 
 import br.com.vovolinux.m2m.config.LocalProperties;
 import br.com.vovolinux.m2m.crypto.CryptoService;
+import br.com.vovolinux.m2m.files.ftp.FtpConnector;
+import br.com.vovolinux.m2m.files.ftp.FtpFileGateway;
 import br.com.vovolinux.m2m.files.local.LocalFileGateway;
 import br.com.vovolinux.m2m.files.sftp.SftpConnector;
 import br.com.vovolinux.m2m.files.sftp.SftpFileGateway;
@@ -24,15 +26,17 @@ public class GatewayFactory {
 
     private final LocalProperties local;
     private final SftpConnector sftp;
+    private final FtpConnector ftp;
     private final CryptoService crypto;
     private final SshIdentityService sshIdentity;
     private final ServerIdentityService serverIdentity;
     private final JsonMapper json;
 
-    public GatewayFactory(LocalProperties local, SftpConnector sftp, CryptoService crypto,
+    public GatewayFactory(LocalProperties local, SftpConnector sftp, FtpConnector ftp, CryptoService crypto,
             SshIdentityService sshIdentity, ServerIdentityService serverIdentity, JsonMapper json) {
         this.local = local;
         this.sftp = sftp;
+        this.ftp = ftp;
         this.crypto = crypto;
         this.sshIdentity = sshIdentity;
         this.serverIdentity = serverIdentity;
@@ -72,9 +76,37 @@ public class GatewayFactory {
                 return new LocalFileGateway(Path.of(local.baseDir()), local.roots());
             case SFTP:
                 return openSftp(m);
+            case FTP:
+            case FTPS:
+                return openFtp(m);
             default:
                 throw new GatewayException("protocolo.nao-suportado", "Protocolo ainda não suportado: " + m.protocol(),
                         Map.of("protocolo", m.protocol().name()), null);
+        }
+    }
+
+    private FileGateway openFtp(Machine m) throws IOException {
+        String password = null;
+        try {
+            if (m.passwordEnc() != null) {
+                password = crypto.decryptString(m.passwordEnc());
+            }
+        } catch (RuntimeException e) {
+            throw new GatewayException("credencial.invalida", "Não foi possível carregar a credencial", Map.of(), e);
+        }
+        String tls = m.protocol() == br.com.vovolinux.m2m.machine.Protocol.FTPS
+                ? (m.ftpsMode() == null ? "EXPLICIT" : m.ftpsMode()) : null;
+        org.apache.commons.net.ftp.FTPClient client = ftp.open(m.host(), m.port(), m.username(), password, tls,
+                tls == null ? null : serverIdentity.policy(m.id(), "TLS"));
+        try {
+            return new FtpFileGateway(client, capabilitiesOf(m));
+        } catch (IOException | RuntimeException e) {
+            try {
+                client.disconnect();
+            } catch (IOException ignorado) {
+                // já desconectado
+            }
+            throw e;
         }
     }
 

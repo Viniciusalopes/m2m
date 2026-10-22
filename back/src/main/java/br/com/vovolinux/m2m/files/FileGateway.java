@@ -72,6 +72,26 @@ public interface FileGateway extends AutoCloseable {
     /** SHA-256 (hex) calculado no próprio servidor, quando a máquina permitir; vazio caso contrário. */
     Optional<String> remoteSha256(String path) throws IOException;
 
+    /** A conexão continua utilizável (o pool a descarta se não estiver). */
+    default boolean isOpen() {
+        return true;
+    }
+
+    /** O servidor permite abrir a leitura a partir de um deslocamento (FTP: comando {@code REST}). */
+    default boolean supportsResume() {
+        return true;
+    }
+
+    /** Caminho canônico do diretório, com os links resolvidos pelo servidor; usado para detectar ciclos. */
+    default String canonicalDir(String path) throws IOException {
+        return path;
+    }
+
+    /** A origem pode ter ciclos de diretório invisíveis na listagem (ex.: FTP) e precisa de {@link #canonicalDir}. */
+    default boolean detectsCycles() {
+        return false;
+    }
+
     /** Mesma exceção para o cancelamento por fechamento forçado: leituras/gravações em curso falham com IOException. */
     @Override
     void close();

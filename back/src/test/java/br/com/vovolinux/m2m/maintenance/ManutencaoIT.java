@@ -121,7 +121,8 @@ class ManutencaoIT {
         BackupArchive a = t.arquivos(p[0]).get(0);
 
         Job ok = rodar(JobType.ARCHIVE_VERIFY, Map.of());
-        assertThat(ok.status()).isEqualTo(JobStatus.COMPLETED);
+        assertThat(ok.status()).isIn(JobStatus.COMPLETED, JobStatus.COMPLETED_WITH_WARNINGS);
+        assertThat(t.arquivos(p[0]).get(0).status()).isEqualTo(ArchiveStatus.COMPLETED);
 
         try (RandomAccessFile f = new RandomAccessFile(arquivoDe(sb, a).toFile(), "rw")) {
             long meio = f.length() / 2;

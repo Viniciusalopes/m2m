@@ -35,15 +35,17 @@ import tools.jackson.databind.json.JsonMapper;
 public class SelectiveRestoreHandler implements JobHandler {
 
     private final BackupArchiveRepository archives;
+    private final ArchiveFiles files;
     private final MachineRepository machines;
     private final GatewayPool pool;
     private final Extractor extractor;
     private final RestoreRunRepository runs;
     private final JsonMapper json;
 
-    public SelectiveRestoreHandler(BackupArchiveRepository archives, MachineRepository machines, GatewayPool pool,
+    public SelectiveRestoreHandler(ArchiveFiles files, BackupArchiveRepository archives, MachineRepository machines, GatewayPool pool,
             Extractor extractor, RestoreRunRepository runs, JsonMapper json) {
         this.archives = archives;
+        this.files = files;
         this.machines = machines;
         this.pool = pool;
         this.extractor = extractor;
@@ -139,7 +141,7 @@ public class SelectiveRestoreHandler implements JobHandler {
                     return new Extractor.Resolution(d == ConflictPolicy.Decision.RESUME
                             ? ConflictPolicy.Decision.WRITE : d, destPath);
                 }, false);
-                Extractor.Counts c = extractor.extract(ctx, sto.openRead(ArchiveFiles.path(archive), 0), dst, opts);
+                Extractor.Counts c = extractor.extract(ctx, files.openArchive(sto, archive), dst, opts);
                 counts.put("created", c.created);
                 counts.put("overwritten", c.overwritten);
                 counts.put("skipped", c.skipped);

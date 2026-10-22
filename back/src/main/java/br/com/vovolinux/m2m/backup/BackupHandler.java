@@ -52,12 +52,13 @@ public class BackupHandler implements JobHandler {
     private final RetentionService retention;
     private final JsonMapper json;
     private final NotificationService notifications;
+    private final br.com.vovolinux.m2m.crypto.ArchiveCrypto crypto;
     private final Path tmpRoot;
 
     public BackupHandler(ProfileRepository profiles, MachineRepository machines, GatewayPool pool,
             SourceScanner scanner, ArchiveBuilder builder, BackupArchiveRepository archives,
             RetentionService retention, JsonMapper json, NotificationService notifications,
-            @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
+            br.com.vovolinux.m2m.crypto.ArchiveCrypto crypto, @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
         this.profiles = profiles;
         this.machines = machines;
         this.pool = pool;
@@ -67,6 +68,7 @@ public class BackupHandler implements JobHandler {
         this.retention = retention;
         this.json = json;
         this.notifications = notifications;
+        this.crypto = crypto;
         this.tmpRoot = Path.of(tmpDir);
     }
 
@@ -178,7 +180,10 @@ public class BackupHandler implements JobHandler {
             ZonedDateTime started = ZonedDateTime.now(BackupNaming.ZONE);
             String complement = complementOverride != null && !complementOverride.isBlank() ? complementOverride
                     : profile.complement();
-            boolean encrypted = false; // criptografia por perfil entra na tarefa 15.4
+            boolean encrypted = profile.encryptionEnabled();
+            if (encrypted) {
+                session.key = crypto.forProfile(ctx.ownerId(), profile.id(), profile.name());
+            }
             String finalName = builder.uniqueName(dst, storageDir,
                     t -> BackupNaming.regular(profile.name(), complement, source.name(), t, encrypted), started);
             Manifest.Header header = header(profile, source, dirs, started);
@@ -209,8 +214,10 @@ public class BackupHandler implements JobHandler {
                     source.name(), source.protocol().name(), header.fullFidelity(), validation.items(),
                     validation.files(), validation.bytes(), validation.archiveBytes(), validation.archiveSha256(),
                     encrypted, json.writeValueAsString(header.directories()),
-                    json.writeValueAsString(session.warnings), null, ctx.id(), null));
+                    json.writeValueAsString(session.warnings), null, ctx.id(), null,
+                    session.key == null ? null : session.key.keyId()));
             summary.put("archiveId", id);
+            summary.put("encrypted", encrypted);
             summary.put("archiveStatus", status);
             if (suspect) {
                 Map<String, Object> sp = Map.of("arquivo", finalName, "arquivos", validation.files(), "anteriores",

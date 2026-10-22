@@ -14,6 +14,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { apiErro, ApiErro } from '../core/api-error';
 import { Machine, MachinesService } from '../machines/machines.service';
+import { ConfirmDialog } from '../ui/confirm-dialog';
 import { DirBrowser, DirBrowserData } from '../ui/dir-browser';
 import { ProfileRequest, ProfilesService } from './profiles.service';
 
@@ -167,6 +168,38 @@ export class ProfileForm implements OnInit {
 
   mapeamentoDe(i: number, machineId: number): string {
     return this.dirs()[i]?.mappings[machineId] ?? '';
+  }
+
+  /** Exporta a chave de criptografia do perfil: avisa antes, porque quem a tem decifra os backups. */
+  async exportarChave(): Promise<void> {
+    if (!this.id) {
+      return;
+    }
+    const ok = await firstValueFrom(
+      this.dialog
+        .open(ConfirmDialog, {
+          data: {
+            titulo: 'perfis.chave.titulo',
+            mensagem: 'perfis.chave.mensagem',
+            confirmar: 'perfis.chave.confirmar',
+          },
+        })
+        .afterClosed(),
+    );
+    if (!ok) {
+      return;
+    }
+    try {
+      const texto = await this.profiles.exportKey(this.id);
+      const url = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'chave-do-perfil.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      this.erro.set(apiErro(e));
+    }
   }
 
   async salvar(): Promise<void> {

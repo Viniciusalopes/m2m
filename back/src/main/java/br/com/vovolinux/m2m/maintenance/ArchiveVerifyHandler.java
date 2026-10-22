@@ -66,7 +66,16 @@ public class ArchiveVerifyHandler implements JobHandler {
             for (BackupArchive a : todos) {
                 ctx.token().throwIfCancelled();
                 ctx.progress().current(a.fileName());
-                switch (verificar(ctx, a, tmp)) {
+                Outcome r;
+                try {
+                    r = verificar(ctx, a, tmp);
+                } catch (IOException e) {
+                    // um armazenamento inalcançável não pode derrubar a verificação dos demais backups
+                    ctx.message("WARN", "verificacao-periodica.armazenamento-inacessivel",
+                            Map.of("arquivo", a.fileName(), "detalhe", String.valueOf(e.getMessage())));
+                    r = Outcome.SKIPPED;
+                }
+                switch (r) {
                     case OK -> ok++;
                     case CORRUPTED -> corrompidos++;
                     case MISSING -> ausentes++;
@@ -94,10 +103,6 @@ public class ArchiveVerifyHandler implements JobHandler {
             ctx.message("WARN", "verificacao-periodica.armazenamento-removido", Map.of("arquivo", a.fileName()));
             return Outcome.SKIPPED;
         }
-        if (a.encrypted()) {
-            ctx.message("WARN", "verificacao-periodica.criptografado-nao-suportado", Map.of("arquivo", a.fileName()));
-            return Outcome.SKIPPED;
-        }
         try (GatewayPool.Lease lease = pool.acquire(storage)) {
             FileGateway gw = lease.gateway();
             String path = ArchiveFiles.path(a);
@@ -105,7 +110,7 @@ public class ArchiveVerifyHandler implements JobHandler {
                 marcar(ctx, a, ArchiveStatus.MISSING, "arquivo inexistente", "BACKUP_MISSING");
                 return Outcome.MISSING;
             }
-            try (InputStream in = gw.openRead(path, 0)) {
+            try (InputStream in = files.openArchive(gw, a)) {
                 ArchiveValidator.Result r = validator.validate(in, tmp, ctx.token());
                 if (a.sha256() != null && !a.sha256().equals(r.archiveSha256())) {
                     marcar(ctx, a, ArchiveStatus.CORRUPTED, "SHA-256 do arquivo divergente", "BACKUP_CORRUPTED");
@@ -117,6 +122,14 @@ public class ArchiveVerifyHandler implements JobHandler {
             } catch (NoSuchFileException e) {
                 marcar(ctx, a, ArchiveStatus.MISSING, "arquivo inexistente", "BACKUP_MISSING");
                 return Outcome.MISSING;
+            } catch (br.com.vovolinux.m2m.files.GatewayException e) {
+                if (!"backup.chave-ausente".equals(e.codigo())) {
+                    lease.discard();
+                    throw e;
+                }
+                // chave de criptografia ausente: não dá para verificar, mas o arquivo não é culpado
+                ctx.message("WARN", "verificacao-periodica.chave-ausente", Map.of("arquivo", a.fileName()));
+                return Outcome.SKIPPED;
             } catch (IOException e) {
                 lease.discard();
                 throw e;

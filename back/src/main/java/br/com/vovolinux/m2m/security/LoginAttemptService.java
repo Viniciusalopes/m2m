@@ -25,11 +25,13 @@ public class LoginAttemptService {
     private final UserRepository users;
     private final JdbcClient jdbc;
     private final AuditService audit;
+    private final TotpService totp;
 
-    public LoginAttemptService(UserRepository users, JdbcClient jdbc, AuditService audit) {
+    public LoginAttemptService(UserRepository users, JdbcClient jdbc, AuditService audit, TotpService totp) {
         this.users = users;
         this.jdbc = jdbc;
         this.audit = audit;
+        this.totp = totp;
     }
 
     @EventListener
@@ -55,9 +57,34 @@ public class LoginAttemptService {
         if (!(auth.getPrincipal() instanceof M2mUserDetails u)) {
             return;
         }
+        if (totp.isEnabled(u.id())) {
+            // senha certa, falta o segundo fator: as falhas continuam contando até o código ser aceito
+            registrar(u.getUsername(), ip(auth), true, "2FA_PENDENTE");
+            audit.record(u.id(), u.getUsername(), ip(auth), "LOGIN", u.getUsername(), AuditService.SUCESSO,
+                    Map.of("segundoFator", "pendente"));
+            return;
+        }
         users.resetAttempts(u.id());
         registrar(u.getUsername(), ip(auth), true, null);
         audit.record(u.id(), u.getUsername(), ip(auth), "LOGIN", u.getUsername(), AuditService.SUCESSO, Map.of());
+    }
+
+    /** Código errado na segunda etapa: conta para o bloqueio. @return {@code true} se a conta acabou de bloquear */
+    @Transactional
+    public boolean secondFactorFailed(AppUser user, String ip) {
+        users.registerFailure(user.id(), LIMITE_FALHAS, BLOQUEIO_SEGUNDOS);
+        registrar(user.username(), ip, false, "CODIGO_2FA");
+        audit.record(user.id(), user.username(), ip, "LOGIN_2FA", user.username(), AuditService.FALHA,
+                Map.of("motivo", "CODIGO"));
+        return users.findById(user.id()).map(u -> u.lockedUntil() != null
+                && u.lockedUntil().isAfter(java.time.Instant.now())).orElse(false);
+    }
+
+    @Transactional
+    public void secondFactorPassed(AppUser user, String ip) {
+        users.resetAttempts(user.id());
+        registrar(user.username(), ip, true, "2FA");
+        audit.record(user.id(), user.username(), ip, "LOGIN_2FA", user.username(), AuditService.SUCESSO, Map.of());
     }
 
     private void registrar(String username, String ip, boolean ok, String motivo) {

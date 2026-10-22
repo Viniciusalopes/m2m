@@ -6,7 +6,7 @@ Gerado automaticamente por `scripts/gerar-third-party-notices.sh`. O m2m não co
 
 ```
 
-Lists of 141 third-party dependencies.
+Lists of 147 third-party dependencies.
      (EPL-2.0) (LGPL-2.1-only) Logback Classic Module (ch.qos.logback:logback-classic:1.5.38 - http://logback.qos.ch/logback-classic)
      (EPL-2.0) (LGPL-2.1-only) Logback Core Module (ch.qos.logback:logback-core:1.5.38 - http://logback.qos.ch/logback-core)
      (Apache-2.0) ClassMate (com.fasterxml:classmate:1.7.3 - https://github.com/FasterXML/java-classmate)
@@ -16,12 +16,18 @@ Lists of 141 third-party dependencies.
      (Apache-2.0) Jackson-dataformat-YAML (com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.5 - https://github.com/FasterXML/jackson-dataformats-text)
      (Apache-2.0) Jackson datatype: JSR310 (com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.5 - https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310)
      (BSD) zstd-jni (com.github.luben:zstd-jni:1.5.7-24 - https://github.com/luben/zstd-jni)
+     (Apache-2.0) FindBugs-jsr305 (com.google.code.findbugs:jsr305:3.0.2 - http://findbugs.sourceforge.net/)
+     (Apache-2.0) Gson (com.google.code.gson:gson:2.13.2 - https://github.com/google/gson)
+     (Apache-2.0) Tink Cryptography API (com.google.crypto.tink:tink:1.18.0 - http://github.com/tink-crypto/tink-java)
+     (Apache-2.0) error-prone annotations (com.google.errorprone:error_prone_annotations:2.22.0 - https://errorprone.info/error_prone_annotations)
+     (BSD) Protocol Buffers [Core] (com.google.protobuf:protobuf-java:4.35.1 - https://developers.google.com/protocol-buffers/protobuf-java/)
      (Apache-2.0) (GPL v2) (MPL 2.0) RabbitMQ Java Client (com.rabbitmq:amqp-client:5.30.0 - https://www.rabbitmq.com)
      (BSD) istack common utility code runtime (com.sun.istack:istack-commons-runtime:4.1.2 - https://projects.eclipse.org/projects/ee4j/istack-commons/istack-commons-runtime)
      (Apache-2.0) HikariCP (com.zaxxer:HikariCP:7.0.2 - https://github.com/brettwooldridge/HikariCP)
      (Apache-2.0) Apache Commons Codec (commons-codec:commons-codec:1.21.0 - https://commons.apache.org/proper/commons-codec/)
      (Apache-2.0) Apache Commons IO (commons-io:commons-io:2.20.0 - https://commons.apache.org/proper/commons-io/)
      (Apache-2.0) Apache Commons Logging (commons-logging:commons-logging:1.3.6 - https://commons.apache.org/proper/commons-logging/)
+     (Apache-2.0) Apache Commons Net (commons-net:commons-net:3.11.1 - https://commons.apache.org/proper/commons-net/)
      (Apache-2.0) micrometer-commons (io.micrometer:micrometer-commons:1.17.1 - https://github.com/micrometer-metrics/micrometer-commercial)
      (Apache-2.0) micrometer-core (io.micrometer:micrometer-core:1.17.1 - https://github.com/micrometer-metrics/micrometer-commercial)
      (Apache-2.0) micrometer-jakarta9 (io.micrometer:micrometer-jakarta9:1.17.1 - https://github.com/micrometer-metrics/micrometer-commercial)
@@ -168,24 +174,53 @@ Lists of 141 third-party dependencies.
 - [@jsverse/transloco@8.4.0](https://github.com/jsverse/transloco) - MIT
 - [@jsverse/utils@1.0.0-beta.5](https://github.com/jsverse/utils) - MIT
 - [@standard-schema/spec@1.1.0](https://github.com/standard-schema/standard-schema) - MIT
+- [ansi-regex@5.0.1](https://github.com/chalk/ansi-regex) - MIT
+- [ansi-styles@4.3.0](https://github.com/chalk/ansi-styles) - MIT
 - [argparse@2.0.1](https://github.com/nodeca/argparse) - Python-2.0
 - [callsites@3.1.0](https://github.com/sindresorhus/callsites) - MIT
+- [camelcase@5.3.1](https://github.com/sindresorhus/camelcase) - MIT
+- [cliui@6.0.0](https://github.com/yargs/cliui) - ISC
+- [color-convert@2.0.1](https://github.com/Qix-/color-convert) - MIT
+- [color-name@1.1.4](https://github.com/colorjs/color-name) - MIT
 - [cosmiconfig@8.3.6](https://github.com/cosmiconfig/cosmiconfig) - MIT
+- [decamelize@1.2.0](https://github.com/sindresorhus/decamelize) - MIT
+- [dijkstrajs@1.0.3](https://github.com/tcort/dijkstrajs) - MIT
+- [emoji-regex@8.0.0](https://github.com/mathiasbynens/emoji-regex) - MIT
 - [entities@8.1.0](https://github.com/fb55/entities) - BSD-2-Clause
 - [error-ex@1.3.4](https://github.com/qix-/node-error-ex) - MIT
+- [find-up@4.1.0](https://github.com/sindresorhus/find-up) - MIT
+- [get-caller-file@2.0.5](https://github.com/stefanpenner/get-caller-file) - ISC
 - [import-fresh@3.3.1](https://github.com/sindresorhus/import-fresh) - MIT
 - [is-arrayish@0.2.1](https://github.com/qix-/node-is-arrayish) - MIT
+- [is-fullwidth-code-point@3.0.0](https://github.com/sindresorhus/is-fullwidth-code-point) - MIT
 - [js-tokens@4.0.0](https://github.com/lydell/js-tokens) - MIT
 - [js-yaml@4.3.2](https://github.com/nodeca/js-yaml) - MIT
 - [json-parse-even-better-errors@2.3.1](https://github.com/npm/json-parse-even-better-errors) - MIT
 - [lines-and-columns@1.2.4](https://github.com/eventualbuddha/lines-and-columns) - MIT
+- [locate-path@5.0.0](https://github.com/sindresorhus/locate-path) - MIT
+- [p-limit@2.3.0](https://github.com/sindresorhus/p-limit) - MIT
+- [p-locate@4.1.0](https://github.com/sindresorhus/p-locate) - MIT
+- [p-try@2.2.0](https://github.com/sindresorhus/p-try) - MIT
 - [parent-module@1.0.1](https://github.com/sindresorhus/parent-module) - MIT
 - [parse-json@5.2.0](https://github.com/sindresorhus/parse-json) - MIT
 - [parse5@8.0.1](https://github.com/inikulin/parse5) - MIT
+- [path-exists@4.0.0](https://github.com/sindresorhus/path-exists) - MIT
 - [path-type@4.0.0](https://github.com/sindresorhus/path-type) - MIT
 - [picocolors@1.1.1](https://github.com/alexeyraspopov/picocolors) - ISC
+- [pngjs@5.0.0](https://github.com/lukeapage/pngjs) - MIT
+- [qrcode@1.5.4](https://github.com/soldair/node-qrcode) - MIT
+- [require-directory@2.1.1](https://github.com/troygoode/node-require-directory) - MIT
+- [require-main-filename@2.0.0](https://github.com/yargs/require-main-filename) - ISC
 - [resolve-from@4.0.0](https://github.com/sindresorhus/resolve-from) - MIT
 - [rxjs@7.8.2](https://github.com/reactivex/rxjs) - Apache-2.0
+- [set-blocking@2.0.0](https://github.com/yargs/set-blocking) - ISC
+- [string-width@4.2.3](https://github.com/sindresorhus/string-width) - MIT
+- [strip-ansi@6.0.1](https://github.com/chalk/strip-ansi) - MIT
 - [tslib@2.8.1](https://github.com/Microsoft/tslib) - 0BSD
 - [typescript@6.0.3](https://github.com/microsoft/TypeScript) - Apache-2.0
+- [which-module@2.0.1](https://github.com/nexdrew/which-module) - ISC
+- [wrap-ansi@6.2.0](https://github.com/chalk/wrap-ansi) - MIT
+- [y18n@4.0.3](https://github.com/yargs/y18n) - ISC
+- [yargs-parser@18.1.3](https://github.com/yargs/yargs-parser) - ISC
+- [yargs@15.4.1](https://github.com/yargs/yargs) - MIT
 - [zod@4.6.6](https://github.com/colinhacks/zod) - MIT

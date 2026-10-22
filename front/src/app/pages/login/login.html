@@ -9,44 +9,76 @@
       </p>
     }
 
-    <form [formGroup]="form" (ngSubmit)="entrar()">
-      <mat-form-field appearance="outline">
-        <mat-label>{{ 'login.usuario' | transloco }}</mat-label>
-        <input matInput formControlName="username" autocomplete="username" autofocus />
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>{{ 'login.senha' | transloco }}</mat-label>
-        <input
-          matInput
-          formControlName="password"
-          [type]="mostrarSenha() ? 'text' : 'password'"
-          autocomplete="current-password"
-        />
-        <button
-          mat-icon-button
-          matSuffix
-          type="button"
-          (click)="mostrarSenha.set(!mostrarSenha())"
-          [attr.aria-label]="'login.mostrar-senha' | transloco"
-        >
-          <mat-icon>{{ mostrarSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
+    @if (segundoFator()) {
+      <form [formGroup]="formCodigo" (ngSubmit)="verificar()">
+        <p>{{ 'login.segundo-fator.explicacao' | transloco }}</p>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'login.segundo-fator.codigo' | transloco }}</mat-label>
+          <input
+            matInput
+            formControlName="codigo"
+            autocomplete="one-time-code"
+            inputmode="text"
+            autofocus
+          />
+          <mat-hint>{{ 'login.segundo-fator.dica' | transloco }}</mat-hint>
+        </mat-form-field>
+        @if (erro(); as e) {
+          <p class="erro" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ 'erro.' + e.codigo | transloco: e.parametros }}
+          </p>
+        }
+        @if (enviando()) {
+          <mat-progress-bar mode="indeterminate" />
+        }
+        <button mat-flat-button type="submit" [disabled]="codigo.invalid || enviando()">
+          {{ 'login.segundo-fator.verificar' | transloco }}
         </button>
-      </mat-form-field>
+        <button mat-button type="button" (click)="voltar()">
+          {{ 'login.segundo-fator.voltar' | transloco }}
+        </button>
+      </form>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="entrar()">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'login.usuario' | transloco }}</mat-label>
+          <input matInput formControlName="username" autocomplete="username" autofocus />
+        </mat-form-field>
 
-      @if (erro(); as e) {
-        <p class="erro" role="alert">
-          <mat-icon aria-hidden="true">error</mat-icon>
-          {{ 'erro.' + e.codigo | transloco: e.parametros }}
-        </p>
-      }
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'login.senha' | transloco }}</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="mostrarSenha() ? 'text' : 'password'"
+            autocomplete="current-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="mostrarSenha.set(!mostrarSenha())"
+            [attr.aria-label]="'login.mostrar-senha' | transloco"
+          >
+            <mat-icon>{{ mostrarSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
 
-      @if (enviando()) {
-        <mat-progress-bar mode="indeterminate" />
-      }
-      <button mat-flat-button type="submit" [disabled]="form.invalid || enviando()">
-        {{ 'login.entrar' | transloco }}
-      </button>
-    </form>
+        @if (erro(); as e) {
+          <p class="erro" role="alert">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            {{ 'erro.' + e.codigo | transloco: e.parametros }}
+          </p>
+        }
+
+        @if (enviando()) {
+          <mat-progress-bar mode="indeterminate" />
+        }
+        <button mat-flat-button type="submit" [disabled]="form.invalid || enviando()">
+          {{ 'login.entrar' | transloco }}
+        </button>
+      </form>
+    }
   </mat-card>
 </main>

@@ -69,4 +69,34 @@ test.describe('máquinas', () => {
     await page.getByRole('dialog').getByRole('button', { name: 'Excluir' }).click();
     await expect(linha).toHaveCount(0);
   });
+
+  test('FTPS explícito: confirma o certificado e mostra a fidelidade parcial', async ({ page }) => {
+    test.skip(!comServidores, 'requer o compose de teste (E2E_SERVERS=1)');
+    const nome = `E2E-FTPS-${Date.now()}`;
+    await page.getByRole('button', { name: 'Nova máquina' }).click();
+    await page.getByLabel('Nome', { exact: true }).fill(nome);
+    await page.getByRole('combobox', { name: 'Protocolo' }).click();
+    await page.getByRole('option', { name: 'FTPS', exact: true }).click();
+    await page.getByLabel('Host (IP ou nome DNS)').fill(process.env.E2E_FTPS_HOST ?? 'm2m-test-ftps');
+    await page.getByLabel('Usuário', { exact: true }).fill('m2m');
+    await page.getByLabel('Senha', { exact: true }).fill('m2m-teste');
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    const linha = page.getByRole('row', { name: new RegExp(nome) });
+    await expect(linha).toBeVisible();
+
+    await linha.getByRole('button', { name: 'Testar conexão' }).click();
+    await expect(page.getByRole('heading', { name: 'Confirme a identidade do servidor' })).toBeVisible();
+    await expect(page.locator('.fingerprint').first()).toContainText('SHA256:');
+    await page.getByRole('button', { name: 'Confirmar esta identidade' }).click();
+
+    // FTPS lê e grava, mas não preserva permissões nem links
+    await expect(page.getByText('Não preservado').first()).toBeVisible();
+    await expect(page.getByText('Preservado').first()).toBeVisible();
+    await page.getByRole('button', { name: 'Fechar' }).click();
+    await expect(linha).toContainText('Confirmada');
+
+    await linha.getByRole('button', { name: 'Excluir' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Excluir' }).click();
+    await expect(linha).toHaveCount(0);
+  });
 });

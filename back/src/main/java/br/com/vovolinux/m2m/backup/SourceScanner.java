@@ -42,6 +42,8 @@ public class SourceScanner {
         long links = 0;
         long bytes = 0;
         List<String> specials = new ArrayList<>();
+        boolean cycles = gw.detectsCycles();
+        Map<String, List<String>> chains = new java.util.HashMap<>();
         try (BufferedWriter out = manifestIO.openItemsWriter(ndjson)) {
             for (int i = 0; i < roots.size(); i++) {
                 String root = roots.get(i);
@@ -59,12 +61,24 @@ public class SourceScanner {
                 dirs++;
                 // pilha explícita: pré-ordem, filhos em ordem alfabética
                 java.util.ArrayDeque<String[]> stack = new java.util.ArrayDeque<>();
-                stack.push(new String[] {root, ""});
+                stack.push(new String[] {root, "", null});
                 while (!stack.isEmpty()) {
                     token.throwIfCancelled();
                     String[] cur = stack.pop();
                     String dirPath = cur[0];
                     String rel = cur[1];
+                    if (cycles) {
+                        // origem FTP: um diretório cujo caminho canônico já é de um ancestral é um ciclo (D8)
+                        String canon = gw.canonicalDir(dirPath);
+                        List<String> up = cur[2] == null ? List.of() : chains.get(cur[2]);
+                        if (up.contains(canon)) {
+                            throw new JobFailure("backup.ciclo-de-diretorios",
+                                    Map.of("diretorio", dirPath, "canonico", canon));
+                        }
+                        List<String> mine = new ArrayList<>(up);
+                        mine.add(canon);
+                        chains.put(dirPath, mine);
+                    }
                     List<FileEntry> children = list(gw, dirPath);
                     children.sort(Comparator.comparing(FileEntry::name));
                     List<String[]> subdirs = new ArrayList<>();
@@ -76,7 +90,7 @@ public class SourceScanner {
                                 manifestIO.writeItem(out, new Manifest.Item(i + 1, childRel, "DIR", 0,
                                         c.mtime().toEpochMilli(), c.mode(), null, null));
                                 dirs++;
-                                subdirs.add(new String[] {c.path(), childRel});
+                                subdirs.add(new String[] {c.path(), childRel, dirPath});
                             }
                             case FILE -> {
                                 manifestIO.writeItem(out, new Manifest.Item(i + 1, childRel, "FILE", c.size(),

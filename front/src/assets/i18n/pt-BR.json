@@ -44,7 +44,14 @@
     "senha": "Senha",
     "mostrar-senha": "Mostrar ou ocultar a senha",
     "entrar": "Entrar",
-    "sessao-expirada": "Sua sessão expirou. Entre novamente."
+    "sessao-expirada": "Sua sessão expirou. Entre novamente.",
+    "segundo-fator": {
+      "explicacao": "Informe o código de 6 dígitos do seu aplicativo autenticador ou um código de recuperação.",
+      "codigo": "Código",
+      "dica": "Códigos de recuperação valem uma única vez.",
+      "verificar": "Verificar",
+      "voltar": "Voltar"
+    }
   },
   "home": {
     "titulo": "Painel",
@@ -97,7 +104,10 @@
     "auth": {
       "credenciais-invalidas": "Usuário ou senha incorretos.",
       "conta-bloqueada": "Conta bloqueada por tentativas repetidas. Tente novamente em {{ minutos }} minutos.",
-      "nao-autenticado": "Sua sessão expirou. Entre novamente."
+      "nao-autenticado": "Sua sessão expirou. Entre novamente.",
+      "segundo-fator-pendente": "Falta informar o código do segundo fator.",
+      "segundo-fator-expirado": "O tempo para informar o código expirou. Entre de novo.",
+      "codigo-invalido": "Código inválido."
     },
     "conta": {
       "senha-atual-incorreta": "A senha atual está incorreta."
@@ -194,7 +204,9 @@
       "erro-de-leitura": "Não foi possível ler {{ caminho }} ({{ detalhe }}).",
       "espaco-insuficiente": "Espaço insuficiente no armazenamento: necessário {{ necessario }} bytes, livre {{ livre }}.",
       "validacao-falhou": "A validação do arquivo falhou: {{ motivo }}",
-      "perfil-sem-diretorios": "O perfil não tem diretórios de origem."
+      "perfil-sem-diretorios": "O perfil não tem diretórios de origem.",
+      "ciclo-de-diretorios": "Ciclo de diretórios detectado em {{ diretorio }} (equivale a {{ canonico }}): o backup foi abortado.",
+      "chave-ausente": "A chave de criptografia do backup {{ arquivo }} não existe mais: o arquivo não pode ser lido."
     },
     "verificacao": {
       "sem-mapeamento": "A máquina {{ maquina }} não tem mapeamento para: {{ diretorios }}."
@@ -281,6 +293,17 @@
       "filtros-diferentes": "Os dois painéis têm filtros diferentes ativos. Use o mesmo filtro (ou nenhum) nos dois lados para comparar.",
       "modo-invalido": "Modo de comparação inválido.",
       "parametros-invalidos": "Parâmetros de comparação inválidos."
+    },
+    "ftp": {
+      "retomada-nao-suportada": "O servidor FTP não suporta retomar a leitura.",
+      "links-nao-suportados": "O FTP não cria links simbólicos."
+    },
+    "criptografia": {
+      "sem-chave": "Este perfil ainda não tem chave de criptografia."
+    },
+    "segundo-fator": {
+      "codigo-invalido": "Código inválido.",
+      "ja-ativo": "O segundo fator já está ativo."
     }
   },
   "comum": {
@@ -446,11 +469,18 @@
       "criptografia-recomendada": "Recomendado: o armazenamento é uma máquina remota. Ative a criptografia para proteger os backups.",
       "agendamento": "Agendamento do backup",
       "backup-diario": "Backup diário ativo",
-      "horario": "Horário"
+      "horario": "Horário",
+      "chave-aviso": "A chave fica guardada cifrada pela chave mestra. Exporte uma cópia para decifrar os backups fora do m2m (comando decrypt).",
+      "exportar-chave": "Exportar a chave de criptografia"
     },
     "verificar": "Verificar",
     "sincronizar": "Sincronizar",
-    "agendamentos-sync": "Agendamentos de sincronização"
+    "agendamentos-sync": "Agendamentos de sincronização",
+    "chave": {
+      "titulo": "Exportar a chave de criptografia?",
+      "mensagem": "Quem tiver este arquivo consegue decifrar os backups do perfil. Guarde-o num cofre de senhas. A exportação fica registrada na auditoria.",
+      "confirmar": "Exportar"
+    }
   },
   "jobs": {
     "titulo": "Acompanhamento",
@@ -550,7 +580,10 @@
     "verificacao-periodica.corrompido": "Backup corrompido: {{ arquivo }} ({{ motivo }}).",
     "verificacao-periodica.ausente": "Backup ausente: {{ arquivo }}.",
     "verificacao-periodica.armazenamento-removido": "Armazenamento removido: {{ arquivo }} não foi verificado.",
-    "verificacao-periodica.criptografado-nao-suportado": "Backup criptografado ainda não verificável: {{ arquivo }}."
+    "verificacao-periodica.criptografado-nao-suportado": "Backup criptografado ainda não verificável: {{ arquivo }}.",
+    "verificacao-periodica.chave-ausente": "Chave de criptografia ausente: {{ arquivo }} não foi verificado.",
+    "reindexacao.chave-nao-encontrada": "Nenhuma chave decifra o manifesto de {{ arquivo }}.",
+    "verificacao-periodica.armazenamento-inacessivel": "Armazenamento inacessível: {{ arquivo }} não foi verificado ({{ detalhe }})."
   },
   "backups": {
     "titulo": "Backups",
@@ -817,6 +850,23 @@
       "smtp": "A configuração de e-mail será substituída.",
       "importar": "Importar",
       "importado": "Configuração importada."
+    },
+    "totp": {
+      "titulo": "Segundo fator (TOTP)",
+      "explicacao": "Adiciona um código temporário do seu aplicativo autenticador ao login. Recomendado: o m2m pode apagar e sobrescrever arquivos em várias máquinas.",
+      "ativar": "Ativar o segundo fator",
+      "escaneie": "Escaneie o QR code com o aplicativo autenticador e confirme com o primeiro código.",
+      "qr-alt": "QR code do segundo fator",
+      "segredo": "Ou digite o segredo",
+      "codigo-de-6-digitos": "Código de 6 dígitos",
+      "confirmar-e-ativar": "Confirmar e ativar",
+      "guarde-os-codigos": "Guarde estes 10 códigos de recuperação num cofre de senhas. Eles aparecem só agora e cada um vale uma vez.",
+      "baixar-codigos": "Baixar os códigos",
+      "guardei": "Guardei os códigos",
+      "ativo": "Segundo fator ativo. Códigos de recuperação restantes: {{ n }}.",
+      "senha": "Senha atual",
+      "codigo": "Código do aplicativo ou de recuperação",
+      "desativar": "Desativar o segundo fator"
     }
   },
   "sincronizacao": {
@@ -1016,7 +1066,8 @@
       "retomado": "Retomada do ponto em que parou.",
       "retomada-recusada-origem-alterada": "A origem mudou desde a interrupção: transferida de novo desde o início.",
       "retomada-recusada-temporario-ausente": "O arquivo parcial não existe mais: transferida de novo desde o início.",
-      "reinicio": "Interrompida pelo reinício do m2m."
+      "reinicio": "Interrompida pelo reinício do m2m.",
+      "retomada-recusada-servidor-sem-suporte": "O servidor de origem não suporta retomada: transferida de novo desde o início."
     }
   }
 }

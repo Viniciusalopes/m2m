@@ -60,6 +60,8 @@ public class RestoreHandler implements JobHandler {
     private static final Logger log = LoggerFactory.getLogger(RestoreHandler.class);
 
     private final BackupArchiveRepository archives;
+    private final ArchiveFiles files;
+    private final br.com.vovolinux.m2m.crypto.ArchiveCrypto crypto;
     private final MachineRepository machines;
     private final GatewayPool pool;
     private final ArchiveValidator validator;
@@ -75,12 +77,14 @@ public class RestoreHandler implements JobHandler {
     private final NotificationService notifications;
     private final Path tmpRoot;
 
-    public RestoreHandler(BackupArchiveRepository archives, MachineRepository machines, GatewayPool pool,
+    public RestoreHandler(ArchiveFiles files, BackupArchiveRepository archives, MachineRepository machines, GatewayPool pool,
             ArchiveValidator validator, ManifestLoader loader, Extractor extractor, ArchiveBuilder builder,
             SourceScanner scanner, TreeComparator comparator, RetentionService retention, RestoreRunRepository runs,
             br.com.vovolinux.m2m.profile.ProfileRepository profiles, JsonMapper json, NotificationService notifications,
-            @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
+            br.com.vovolinux.m2m.crypto.ArchiveCrypto crypto, @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
         this.archives = archives;
+        this.files = files;
+        this.crypto = crypto;
         this.machines = machines;
         this.pool = pool;
         this.validator = validator;
@@ -195,7 +199,7 @@ public class RestoreHandler implements JobHandler {
             // ---- 1. validação do backup antes de qualquer alteração (D6) ----
             progress.step("VALIDATING");
             progress.totals(archive.archiveBytes(), 0);
-            try (InputStream in = new ArchiveBuilder.ProgressInputStream(sto.openRead(ArchiveFiles.path(archive), 0),
+            try (InputStream in = new ArchiveBuilder.ProgressInputStream(files.openArchive(sto, archive),
                     progress)) {
                 validator.validate(in, session.tmpDir, ctx.token());
             } catch (ArchiveValidator.ValidationFailed e) {
@@ -225,7 +229,7 @@ public class RestoreHandler implements JobHandler {
             progress.step("COPYING");
             progress.resetCounters();
             progress.totals(archive.totalBytes(), archive.itemCount());
-            Extractor.Counts c = extractor.extract(ctx, sto.openRead(ArchiveFiles.path(archive), 0), dst,
+            Extractor.Counts c = extractor.extract(ctx, files.openArchive(sto, archive), dst,
                     new Extractor.Options(name -> destinationOf(name, roots), null, true));
             counts.put("created", c.created);
             counts.put("overwritten", c.overwritten);
@@ -292,8 +296,16 @@ public class RestoreHandler implements JobHandler {
                             Map.of("necessario", scan.bytes(), "livre", free.getAsLong()));
                 }
                 ZonedDateTime now = ZonedDateTime.now(BackupNaming.ZONE);
+                // a cópia de segurança é cifrada se o perfil assim exige ou se o backup restaurado já é cifrado
+                boolean encrypted = archive.encrypted() || profile.map(p -> p.encryptionEnabled()).orElse(false);
+                if (archive.encrypted()) {
+                    session.key = crypto.byId(archive.keyId());
+                } else if (encrypted) {
+                    session.key = crypto.forProfile(ctx.ownerId(), profile.get().id(), profile.get().name());
+                }
                 String name = builder.uniqueName(sto, safetyDir,
-                        t -> BackupNaming.safety(archive.profileNameSnapshot(), "pre-restore", dest.name(), t, false),
+                        t -> BackupNaming.safety(archive.profileNameSnapshot(), "pre-restore", dest.name(), t,
+                                encrypted),
                         now);
                 List<Manifest.Directory> dirs = new ArrayList<>();
                 for (int i = 0; i < existing.size(); i++) {
@@ -311,8 +323,9 @@ public class RestoreHandler implements JobHandler {
                         archive.profileNameSnapshot(), "PRE_RESTORE", ArchiveStatus.COMPLETED, true,
                         safetyStorage.id(), safetyStorage.name(), safetyDir, name, dest.name(),
                         dest.protocol().name(), full, v.items(), v.files(), v.bytes(), v.archiveBytes(),
-                        v.archiveSha256(), false, json.writeValueAsString(dirs),
-                        json.writeValueAsString(session.warnings), null, ctx.id(), dest.name()));
+                        v.archiveSha256(), encrypted, json.writeValueAsString(dirs),
+                        json.writeValueAsString(session.warnings), null, ctx.id(), dest.name(),
+                        session.key == null ? null : session.key.keyId()));
                 if (profileId != null) {
                     retention.applySafety(profileId, "PRE_RESTORE", dest.name());
                 }

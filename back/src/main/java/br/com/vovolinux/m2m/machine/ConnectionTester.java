@@ -6,6 +6,7 @@ import br.com.vovolinux.m2m.files.FileGateway;
 import br.com.vovolinux.m2m.files.GatewayException;
 import br.com.vovolinux.m2m.files.GatewayFactory;
 import br.com.vovolinux.m2m.files.GatewayPool;
+import br.com.vovolinux.m2m.files.ftp.FtpFileGateway;
 import br.com.vovolinux.m2m.files.local.LocalFileGateway;
 import br.com.vovolinux.m2m.files.sftp.SftpFileGateway;
 import java.io.IOException;
@@ -163,7 +164,17 @@ public class ConnectionTester {
                 features.add("statvfs");
             }
         }
-        // FTP/FTPS: "mfmt" será detectado pelo gateway FTP (tarefa 15.1)
+        if (gw instanceof FtpFileGateway f) {
+            if (f.mlsdSupported()) {
+                features.add("mlsd");
+            }
+            if (f.mfmtSupported()) {
+                features.add("mfmt");
+            }
+            if (f.supportsResume()) {
+                features.add("rest");
+            }
+        }
     }
 
     private Result finish(Machine m, List<Step> steps, List<String> features, boolean writable, boolean reachable,

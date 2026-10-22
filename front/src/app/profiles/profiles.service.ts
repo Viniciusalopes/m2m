@@ -112,6 +112,13 @@ export class ProfilesService {
     );
   }
 
+  /** Arquivo da chave de criptografia do perfil (JSON); a exportação é auditada. */
+  exportKey(id: number): Promise<string> {
+    return firstValueFrom(
+      this.http.get(`/api/profiles/${id}/encryption-key`, { responseType: 'text' }),
+    );
+  }
+
   startBackup(id: number, complement: string | null): Promise<JobView> {
     return firstValueFrom(this.http.post<JobView>(`/api/profiles/${id}/backup`, { complement }));
   }

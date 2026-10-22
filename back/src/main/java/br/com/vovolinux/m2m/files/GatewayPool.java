@@ -75,7 +75,7 @@ public class GatewayPool {
                 ClientSession cs = s.session();
                 return cs.isOpen() && !cs.isClosing();
             }
-            return true;
+            return gateway.isOpen();
         }
     }
 

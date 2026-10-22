@@ -6,6 +6,7 @@ import br.com.vovolinux.m2m.backup.BackupArchive;
 import br.com.vovolinux.m2m.backup.BackupArchiveRepository;
 import br.com.vovolinux.m2m.backup.Manifest;
 import br.com.vovolinux.m2m.backup.ManifestIO;
+import br.com.vovolinux.m2m.crypto.ArchiveCrypto;
 import br.com.vovolinux.m2m.files.FileEntry;
 import br.com.vovolinux.m2m.files.FileGateway;
 import br.com.vovolinux.m2m.files.GatewayPool;
@@ -49,9 +50,12 @@ public class ReindexHandler implements JobHandler {
     private final ManifestIO manifestIO;
     private final JsonMapper json;
     private final JdbcClient jdbc;
+    private final ArchiveCrypto crypto;
 
     public ReindexHandler(MachineRepository machines, GatewayPool pool, BackupArchiveRepository archives,
-            ProfileRepository profiles, ManifestIO manifestIO, JsonMapper json, JdbcClient jdbc) {
+            ProfileRepository profiles, ManifestIO manifestIO, JsonMapper json, JdbcClient jdbc,
+            ArchiveCrypto crypto) {
+        this.crypto = crypto;
         this.machines = machines;
         this.pool = pool;
         this.archives = archives;
@@ -90,7 +94,7 @@ public class ReindexHandler implements JobHandler {
             } catch (NoSuchFileException e) {
                 throw new JobFailure("reindexacao.diretorio-inexistente", Map.of("diretorio", dir));
             }
-            List<FileEntry> candidatos = entries.stream().filter(e -> !e.isDirectory() && e.name().endsWith(".tar.zst"))
+            List<FileEntry> candidatos = entries.stream().filter(e -> !e.isDirectory() && (e.name().endsWith(".tar.zst") || e.name().endsWith(".tar.zst.enc")))
                     .toList();
             ctx.progress().totals(0, candidatos.size());
             Set<String> conhecidos = new HashSet<>();
@@ -134,26 +138,46 @@ public class ReindexHandler implements JobHandler {
 
     private boolean indexar(JobContext ctx, FileGateway gw, Machine machine, String dir, FileEntry file) {
         String path = dir + "/" + file.name();
+        boolean enc = file.name().endsWith(".enc");
         AtomicLong items = new AtomicLong();
         AtomicLong files = new AtomicLong();
         AtomicLong bytes = new AtomicLong();
-        Manifest.Header header;
+        Manifest.Header header = null;
+        ArchiveCrypto.Key usedKey = null;
         try {
-            header = lerManifesto(gw, path, items, files, bytes);
+            if (!enc) {
+                header = lerManifesto(gw, path, null, items, files, bytes);
+            } else {
+                // a chave não está no arquivo: experimenta as do usuário até uma decifrar o manifesto
+                for (ArchiveCrypto.Key k : crypto.keysOf(ctx.ownerId())) {
+                    try {
+                        header = lerManifesto(gw, path, k, items, files, bytes);
+                        usedKey = k;
+                        break;
+                    } catch (IOException | RuntimeException tentativa) {
+                        // outra chave
+                    }
+                }
+                if (header == null) {
+                    ctx.message("WARN", "reindexacao.chave-nao-encontrada", Map.of("arquivo", file.name()));
+                    return false;
+                }
+            }
         } catch (IOException | RuntimeException e) {
             ctx.message("WARN", "reindexacao.manifesto-ilegivel", Map.of("arquivo", file.name(), "motivo",
                     String.valueOf(e.getMessage())));
             return false;
         }
-        var perfil = profiles.findAll(ctx.ownerId()).stream().filter(p -> p.name().equals(header.profile())).findFirst();
+        final Manifest.Header h = header;
+        var perfil = profiles.findAll(ctx.ownerId()).stream().filter(p -> p.name().equals(h.profile())).findFirst();
         String type = header.type() == null ? "REGULAR" : header.type();
         long id = archives.insert(new BackupArchiveRepository.NewArchive(ctx.ownerId(),
                 perfil.map(ProfileRepository.Row::id).orElse(null), header.profile(), type, ArchiveStatus.COMPLETED,
                 true, machine.id(), machine.name(), dir, file.name(), header.sourceMachine(), header.sourceProtocol(),
-                header.fullFidelity(), items.get(), files.get(), bytes.get(), file.size(), null,
-                file.name().endsWith(".enc"), json.writeValueAsString(header.directories()),
+                header.fullFidelity(), items.get(), files.get(), bytes.get(), file.size(), null, enc,
+                json.writeValueAsString(header.directories()),
                 json.writeValueAsString(header.fidelityWarnings() == null ? List.of() : header.fidelityWarnings()), null,
-                ctx.id(), null));
+                ctx.id(), null, usedKey == null ? null : usedKey.keyId()));
         try {
             jdbc.sql("update backup_archive set created_at = :c where id = :id")
                     .param("c", java.sql.Timestamp.from(Instant.parse(header.createdAt()))).param("id", id).update();
@@ -163,8 +187,11 @@ public class ReindexHandler implements JobHandler {
         return true;
     }
 
-    private Manifest.Header lerManifesto(FileGateway gw, String path, AtomicLong items, AtomicLong files,
-            AtomicLong bytes) throws IOException {
+    private Manifest.Header lerManifesto(FileGateway gw, String path, ArchiveCrypto.Key key, AtomicLong items,
+            AtomicLong files, AtomicLong bytes) throws IOException {
+        items.set(0);
+        files.set(0);
+        bytes.set(0);
         java.util.function.Consumer<Manifest.Item> contar = i -> {
             items.incrementAndGet();
             if ("FILE".equals(i.type())) {
@@ -172,15 +199,18 @@ public class ReindexHandler implements JobHandler {
                 bytes.addAndGet(i.size());
             }
         };
-        try (InputStream side = new ZstdInputStream(gw.openRead(path + ArchiveFiles.MANIFEST_SUFFIX, 0))) {
+        try (InputStream raw = gw.openRead(path + ArchiveFiles.MANIFEST_SUFFIX, 0);
+                InputStream side = new ZstdInputStream(key == null ? raw : crypto.decrypt(key, raw))) {
             return manifestIO.read(side, contar);
         } catch (NoSuchFileException semLateral) {
             items.set(0);
             files.set(0);
             bytes.set(0);
         }
-        try (TarArchiveInputStream tar = new TarArchiveInputStream(new ZstdInputStream(gw.openRead(path, 0)),
-                StandardCharsets.UTF_8.name())) {
+        try (InputStream raw = gw.openRead(path, 0);
+                TarArchiveInputStream tar = new TarArchiveInputStream(
+                        new ZstdInputStream(key == null ? raw : crypto.decrypt(key, raw)),
+                        StandardCharsets.UTF_8.name())) {
             TarArchiveEntry e;
             while ((e = tar.getNextEntry()) != null) {
                 if (e.getName().equals(Manifest.INTERNAL_ENTRY)) {

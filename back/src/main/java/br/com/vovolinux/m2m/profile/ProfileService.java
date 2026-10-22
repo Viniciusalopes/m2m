@@ -315,6 +315,7 @@ public class ProfileService {
         if (e instanceof br.com.vovolinux.m2m.files.GatewayException g) {
             Map<String, Object> p = new HashMap<>(g.parametros());
             p.put("maquina", m.name());
+            p.putIfAbsent("detalhe", String.valueOf(g.getMessage()));
             return new ApiException(g.codigo().startsWith("identidade.") ? HttpStatus.CONFLICT : HttpStatus.BAD_GATEWAY,
                     g.codigo(), p);
         }

@@ -1,0 +1,117 @@
+name: m2m
+
+services:
+  m2m-db:
+    build: ./db
+    image: m2m-db:dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-m2m}
+      POSTGRES_USER: ${POSTGRES_USER:-m2m}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - m2m-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  m2m-queue:
+    build: ./queue
+    image: m2m-queue:dev
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-m2m}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?defina RABBITMQ_PASSWORD no .env}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - m2m-queue-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    restart: unless-stopped
+
+  # Execução única: aplica as migrações de db/migrations e termina (D16)
+  m2m-db-migrate:
+    image: flyway/flyway:11
+    command: >
+      -url=jdbc:postgresql://m2m-db:5432/${POSTGRES_DB:-m2m}
+      -user=${POSTGRES_USER:-m2m}
+      -password=${POSTGRES_PASSWORD}
+      -locations=filesystem:/flyway/sql
+      -connectRetries=10
+      migrate
+    volumes:
+      - ./db/migrations:/flyway/sql:ro
+    depends_on:
+      m2m-db:
+        condition: service_healthy
+    restart: "no"
+
+  m2m-back:
+    build: ./back
+    image: m2m-back:dev
+    user: "1000:1000"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://m2m-db:5432/${POSTGRES_DB:-m2m}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-m2m}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_RABBITMQ_HOST: m2m-queue
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-m2m}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:?defina APP_SECRET_KEY no .env}
+      M2M_LOCAL_ENABLED: ${M2M_LOCAL_ENABLED:-false}
+      HOST_ROOTS: ${HOST_ROOTS:-/home}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      TRANSFER_CONCURRENCY: ${TRANSFER_CONCURRENCY:-2}
+    volumes:
+      - m2m-tmp:/var/lib/m2m-tmp
+      # Máquina LOCAL: HOST_HOME_BIND=/home (com M2M_LOCAL_ENABLED=true). Sem LOCAL (ex.: VPS) nada do host é montado.
+      - ${HOST_HOME_BIND:-m2m-nolocal}:/hostfs/home
+    depends_on:
+      m2m-db-migrate:
+        condition: service_completed_successfully
+      m2m-queue:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+  m2m-front:
+    build: ./front
+    image: m2m-front:dev
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      # Certificado próprio (ex.: Let's Encrypt); vazio → o front gera um autoassinado no primeiro start
+      - ${TLS_CERT_PATH:-/dev/null}:/etc/m2m/tls-ext/tls.crt:ro
+      - ${TLS_KEY_PATH:-/dev/null}:/etc/m2m/tls-ext/tls.key:ro
+    depends_on:
+      m2m-back:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  m2m-db-data:
+  m2m-queue-data:
+  m2m-tmp:
+  m2m-nolocal:

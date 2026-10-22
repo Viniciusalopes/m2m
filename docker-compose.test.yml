@@ -1,0 +1,53 @@
+# Sobreposição para testes e2e: sobe servidores SFTP, FTP e FTPS em container e um sandbox (D19, D36).
+# Uso: docker compose -f docker-compose.yml -f docker-compose.test.yml --env-file .env up -d --build
+# NUNCA aponta para máquinas reais: todos os testes que gravam usam estes servidores e o sandbox.
+services:
+  m2m-test-sftp:
+    image: atmoz/sftp:latest
+    command: "m2m:m2m-teste:1000:1000:dados"
+    volumes:
+      - m2m-test-sftp-data:/home/m2m/dados
+    ports:
+      - "127.0.0.1:2222:22"
+
+  m2m-test-ftp:
+    image: stilliard/pure-ftpd:latest
+    environment:
+      PUBLICHOST: m2m-test-ftp
+      FTP_USER_NAME: m2m
+      FTP_USER_PASS: m2m-teste
+      FTP_USER_HOME: /home/m2m
+      FTP_PASSIVE_PORTS: "30000:30009"
+    volumes:
+      - m2m-test-ftp-data:/home/m2m
+    ports:
+      - "127.0.0.1:2121:21"
+      - "127.0.0.1:30000-30009:30000-30009"
+
+  m2m-test-ftps:
+    image: stilliard/pure-ftpd:latest
+    environment:
+      PUBLICHOST: m2m-test-ftps
+      FTP_USER_NAME: m2m
+      FTP_USER_PASS: m2m-teste
+      FTP_USER_HOME: /home/m2m
+      FTP_PASSIVE_PORTS: "30010:30019"
+      TLS_CN: m2m-test-ftps
+      TLS_ORG: m2m
+      TLS_C: BR
+      ADDED_FLAGS: "--tls=1"
+    volumes:
+      - m2m-test-ftps-data:/home/m2m
+    ports:
+      - "127.0.0.1:2122:21"
+      - "127.0.0.1:30010-30019:30010-30019"
+
+  # Sandbox local: diretório do host onde os testes podem gravar livremente
+  m2m-back:
+    environment:
+      M2M_SANDBOX_DIR: /hostfs/home/usuario/m2m-sandbox
+
+volumes:
+  m2m-test-sftp-data:
+  m2m-test-ftp-data:
+  m2m-test-ftps-data:

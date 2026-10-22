@@ -1,0 +1,94 @@
+{
+  "rabbit_version": "4",
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "m2m.jobs",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "m2m.transfers",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "m2m.progress",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "m2m.jobs.run",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "m2m.transfers",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "m2m.jobs",
+      "vhost": "/",
+      "destination": "m2m.jobs.run",
+      "destination_type": "queue",
+      "routing_key": "run",
+      "arguments": {}
+    },
+    {
+      "source": "m2m.transfers",
+      "vhost": "/",
+      "destination": "m2m.transfers",
+      "destination_type": "queue",
+      "routing_key": "run",
+      "arguments": {}
+    }
+  ],
+  "users": [
+    {
+      "name": "__RABBITMQ_USER__",
+      "password": "__RABBITMQ_PASSWORD__",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "permissions": [
+    {
+      "user": "__RABBITMQ_USER__",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ]
+}

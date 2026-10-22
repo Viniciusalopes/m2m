@@ -1,0 +1,18 @@
+.sobre {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 900px;
+}
+
+.logo {
+  height: 56px;
+  align-self: flex-start;
+}
+
+.avisos {
+  max-height: 360px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font: var(--mat-sys-body-small);
+}

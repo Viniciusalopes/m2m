@@ -1,1 +1,78 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use './theme/theme-colors' as m2m;
+
+// Tema Material 3 do m2m (D34): azul-petróleo, âmbar e vermelho de erro; claro e escuro pelo color-scheme
+html {
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: m2m.$primary-palette,
+        tertiary: m2m.$tertiary-palette,
+        theme-type: color-scheme,
+      ),
+      typography: (
+        plain-family: 'Inter Variable, Inter, system-ui, sans-serif',
+        brand-family: 'Inter Variable, Inter, system-ui, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+  // Estados do sistema: sempre usados com ícone + texto (nunca só cor)
+  --m2m-ok: light-dark(#1b6e3c, #7fd69a);
+  --m2m-ok-container: light-dark(#d4f3de, #0f3a20);
+  --m2m-warn: light-dark(#8a5a00, #ffcf70);
+  --m2m-warn-container: light-dark(#ffeccc, #4a3000);
+  --m2m-suspect: light-dark(#8a4b00, #ffb870);
+  --m2m-suspect-container: light-dark(#ffe0c2, #4a2800);
+  --m2m-fail: light-dark(#b3261e, #ffb4aa);
+  --m2m-fail-container: light-dark(#fddad6, #5c1410);
+  --m2m-corrupt: light-dark(#6a1b9a, #e1b6ff);
+  --m2m-corrupt-container: light-dark(#f1dcfb, #3d1259);
+  --m2m-info: light-dark(#0e5a70, #91cfe9);
+  --m2m-info-container: light-dark(#cfeefa, #00354a);
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--mat-sys-background);
+  color: var(--mat-sys-on-background);
+  font: var(--mat-sys-body-medium);
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'liga';
+}
+
+.m2m-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}

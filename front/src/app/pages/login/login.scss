@@ -1,0 +1,49 @@
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.card {
+  width: min(420px, 100%);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.logo {
+  height: 64px;
+  align-self: center;
+}
+
+h1 {
+  font: var(--mat-sys-title-medium);
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.erro,
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font: var(--mat-sys-body-medium);
+}
+
+.erro {
+  color: var(--m2m-fail);
+}
+
+.aviso {
+  color: var(--m2m-warn);
+}

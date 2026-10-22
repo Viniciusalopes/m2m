@@ -1,0 +1,35 @@
+<section class="m2m-page sobre">
+  <img src="assets/brand/m2m-logo.svg" alt="m2m" class="logo" />
+  <h1>{{ 'app.nome' | transloco }}</h1>
+  <p>{{ 'sobre.versao' | transloco: { versao: versao } }}</p>
+  <p>{{ 'sobre.licenca' | transloco }}</p>
+
+  <mat-card appearance="outlined">
+    <mat-card-header
+      ><mat-card-title>{{ 'sobre.creditos-titulo' | transloco }}</mat-card-title></mat-card-header
+    >
+    <mat-card-content>
+      <p>
+        {{ 'sobre.filezilla-1' | transloco }}
+        <a href="https://filezilla-project.org" target="_blank" rel="noopener noreferrer"
+          >FileZilla Client</a
+        >
+        {{ 'sobre.filezilla-2' | transloco }}
+      </p>
+      <p>{{ 'sobre.filezilla-marca' | transloco }}</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card appearance="outlined">
+    <mat-card-header
+      ><mat-card-title>{{ 'sobre.terceiros-titulo' | transloco }}</mat-card-title></mat-card-header
+    >
+    <mat-card-content>
+      @if (avisos()) {
+        <pre class="avisos">{{ avisos() }}</pre>
+      } @else {
+        <p>{{ 'sobre.terceiros-indisponivel' | transloco }}</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>

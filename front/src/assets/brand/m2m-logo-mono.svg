@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 88" role="img" aria-label="m2m">
+  <title>m2m</title>
+  <g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 62V30M14 42C14 29 22 25 31 25C40 25 46 30 46 42V62M46 42C46 29 54 25 63 25C72 25 78 30 78 42V62" transform="translate(-6 0)"/>
+    <path d="M14 62V30M14 42C14 29 22 25 31 25C40 25 46 30 46 42V62M46 42C46 29 54 25 63 25C72 25 78 30 78 42V62" transform="translate(150 0)"/>
+  </g>
+  <g fill="currentColor" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M92 38H126"/><path d="M126 28L140 38L126 48Z"/>
+    <path d="M148 56H114"/><path d="M114 46L100 56L114 66Z"/>
+  </g>
+</svg>

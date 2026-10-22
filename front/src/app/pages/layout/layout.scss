@@ -1,0 +1,65 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.topo {
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+  gap: 4px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.marca-logo {
+  height: 32px;
+}
+
+.marca-nome {
+  font: var(--mat-sys-title-medium);
+}
+
+.espaco {
+  flex: 1;
+}
+
+.corpo {
+  flex: 1;
+}
+
+.menu {
+  width: 232px;
+}
+
+.ativo {
+  background: var(--mat-sys-secondary-container);
+}
+
+.aviso-chave {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--m2m-warn-container);
+  color: var(--m2m-warn);
+  flex-wrap: wrap;
+
+  p {
+    margin: 0;
+    flex: 1;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 720px) {
+  .marca-nome {
+    display: none;
+  }
+}

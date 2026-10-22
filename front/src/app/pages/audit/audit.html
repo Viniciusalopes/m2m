@@ -1,0 +1,75 @@
+<section class="m2m-page">
+  <h1>{{ 'auditoria.titulo' | transloco }}</h1>
+
+  <form class="filtros" [formGroup]="filtros" (ngSubmit)="filtrar()">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auditoria.de' | transloco }}</mat-label>
+      <input matInput type="datetime-local" formControlName="from" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auditoria.ate' | transloco }}</mat-label>
+      <input matInput type="datetime-local" formControlName="to" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auditoria.usuario' | transloco }}</mat-label>
+      <input matInput formControlName="user" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'auditoria.acao' | transloco }}</mat-label>
+      <input matInput formControlName="action" placeholder="LOGIN" />
+    </mat-form-field>
+    <button mat-flat-button type="submit">
+      <mat-icon>search</mat-icon>{{ 'auditoria.filtrar' | transloco }}
+    </button>
+    <button mat-stroked-button type="button" (click)="exportar()">
+      <mat-icon>download</mat-icon>{{ 'auditoria.exportar' | transloco }}
+    </button>
+  </form>
+
+  <div class="tabela">
+    <table mat-table [dataSource]="itens()">
+      <ng-container matColumnDef="quando">
+        <th mat-header-cell *matHeaderCellDef>{{ 'auditoria.col.quando' | transloco }}</th>
+        <td mat-cell *matCellDef="let e">{{ e.occurredAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="usuario">
+        <th mat-header-cell *matHeaderCellDef>{{ 'auditoria.col.usuario' | transloco }}</th>
+        <td mat-cell *matCellDef="let e">{{ e.username }}</td>
+      </ng-container>
+      <ng-container matColumnDef="ip">
+        <th mat-header-cell *matHeaderCellDef>{{ 'auditoria.col.ip' | transloco }}</th>
+        <td mat-cell *matCellDef="let e">{{ e.ip }}</td>
+      </ng-container>
+      <ng-container matColumnDef="acao">
+        <th mat-header-cell *matHeaderCellDef>{{ 'auditoria.col.acao' | transloco }}</th>
+        <td mat-cell *matCellDef="let e">{{ e.action }}</td>
+      </ng-container>
+      <ng-container matColumnDef="alvo">
+        <th mat-header-cell *matHeaderCellDef>{{ 'auditoria.col.alvo' | transloco }}</th>
+        <td mat-cell *matCellDef="let e">{{ e.target }}</td>
+      </ng-container>
+      <ng-container matColumnDef="resultado">
+        <th mat-header-cell *matHeaderCellDef>{{ 'auditoria.col.resultado' | transloco }}</th>
+        <td mat-cell *matCellDef="let e">
+          <m2m-status [estado]="e.result === 'SUCCESS' ? 'ok' : 'fail'" />
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell vazio" [attr.colspan]="colunas.length">
+          {{ 'auditoria.vazio' | transloco }}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="total()"
+    [pageIndex]="pagina()"
+    [pageSize]="tamanho()"
+    [pageSizeOptions]="[25, 50, 100, 200]"
+    (page)="mudarPagina($event)"
+  />
+</section>

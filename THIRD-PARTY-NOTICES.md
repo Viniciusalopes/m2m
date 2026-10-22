@@ -159,6 +159,8 @@ Lists of 138 third-party dependencies.
 - [@angular/router@22.2.3](https://github.com/angular/angular) - MIT
 - [@babel/code-frame@7.29.7](https://github.com/babel/babel) - MIT
 - [@babel/helper-validator-identifier@7.29.7](https://github.com/babel/babel) - MIT
+- [@fontsource-variable/inter@5.3.0](https://github.com/fontsource/font-files) - OFL-1.1
+- [@fontsource/material-icons@5.3.0](https://github.com/fontsource/font-files) - OFL-1.1
 - [@jsverse/transloco-utils@8.4.0](https://github.com/jsverse/transloco) - MIT
 - [@jsverse/transloco@8.4.0](https://github.com/jsverse/transloco) - MIT
 - [@jsverse/utils@1.0.0-beta.5](https://github.com/jsverse/utils) - MIT

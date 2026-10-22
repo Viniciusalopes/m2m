@@ -1,0 +1,79 @@
+<mat-toolbar class="topo">
+  <button
+    mat-icon-button
+    (click)="menuAberto.set(!menuAberto())"
+    [attr.aria-label]="'layout.menu' | transloco"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <a routerLink="/" class="marca">
+    <img src="assets/brand/m2m-logo.svg" alt="" class="marca-logo" />
+    <span class="marca-nome">{{ 'app.nome' | transloco }}</span>
+  </a>
+  <span class="espaco"></span>
+
+  <button
+    mat-icon-button
+    [attr.aria-label]="'layout.notificacoes' | transloco"
+    [matBadge]="naoLidas()"
+    [matBadgeHidden]="naoLidas() === 0"
+    matBadgeColor="warn"
+  >
+    <mat-icon>notifications</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    (click)="theme.cycle()"
+    [attr.aria-label]="'layout.tema' | transloco"
+    [title]="'tema.' + theme.mode() | transloco"
+  >
+    <mat-icon>{{
+      theme.mode() === 'dark'
+        ? 'dark_mode'
+        : theme.mode() === 'light'
+          ? 'light_mode'
+          : 'brightness_auto'
+    }}</mat-icon>
+  </button>
+  <button mat-button [matMenuTriggerFor]="menuUsuario">
+    <mat-icon>account_circle</mat-icon>
+    {{ auth.me()?.username }}
+  </button>
+  <mat-menu #menuUsuario="matMenu">
+    <a mat-menu-item routerLink="/senha"><mat-icon>key</mat-icon>{{ 'menu.senha' | transloco }}</a>
+    <button mat-menu-item (click)="sair()">
+      <mat-icon>logout</mat-icon>{{ 'menu.sair' | transloco }}
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<mat-sidenav-container class="corpo">
+  <mat-sidenav mode="side" [opened]="menuAberto()" class="menu">
+    <mat-nav-list>
+      @for (item of itens; track item.rota) {
+        <a
+          mat-list-item
+          [routerLink]="item.rota"
+          routerLinkActive="ativo"
+          [routerLinkActiveOptions]="{ exact: item.rota === '/' }"
+        >
+          <mat-icon matListItemIcon>{{ item.icone }}</mat-icon>
+          <span matListItemTitle>{{ item.chave | transloco }}</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    @if (!chaveMestraConfirmada()) {
+      <div class="aviso-chave" role="alert">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <p>{{ 'chave-mestra.aviso' | transloco }}</p>
+        <button mat-flat-button (click)="confirmarChaveMestra()">
+          {{ 'chave-mestra.confirmar' | transloco }}
+        </button>
+      </div>
+    }
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,5 +1,102 @@
 {
   "app": {
     "nome": "m2m - Machine To Machine"
+  },
+  "estado": {
+    "ok": "Sucesso",
+    "warn": "Com avisos",
+    "suspect": "Suspeito",
+    "fail": "Falhou",
+    "corrupt": "Corrompido",
+    "info": "Informação",
+    "running": "Em andamento"
+  },
+  "tema": {
+    "system": "Tema: automático (sistema)",
+    "light": "Tema: claro",
+    "dark": "Tema: escuro"
+  },
+  "menu": {
+    "painel": "Painel",
+    "auditoria": "Auditoria",
+    "sobre": "Sobre",
+    "senha": "Alterar senha / e-mail",
+    "sair": "Sair"
+  },
+  "layout": {
+    "menu": "Abrir ou fechar o menu",
+    "notificacoes": "Notificações",
+    "tema": "Alternar tema claro/escuro"
+  },
+  "chave-mestra": {
+    "aviso": "Guarde o arquivo .env (ou a chave mestra APP_SECRET_KEY) num cofre de senhas. Sem ela, as credenciais salvas e os backups criptografados não poderão ser recuperados.",
+    "confirmar": "Já guardei a chave"
+  },
+  "login": {
+    "usuario": "Usuário",
+    "senha": "Senha",
+    "mostrar-senha": "Mostrar ou ocultar a senha",
+    "entrar": "Entrar",
+    "sessao-expirada": "Sua sessão expirou. Entre novamente."
+  },
+  "home": {
+    "titulo": "Painel",
+    "boas-vindas": "Olá, {{ usuario }}. O painel com perfis, jobs e alertas aparecerá aqui."
+  },
+  "senha": {
+    "titulo": "Minha conta",
+    "trocar-senha": "Alterar senha",
+    "atual": "Senha atual",
+    "nova": "Nova senha",
+    "confirmar": "Confirmar a nova senha",
+    "dica": "Mínimo de 10 caracteres",
+    "diferente": "As senhas não conferem",
+    "salvar": "Salvar",
+    "trocada": "Senha alterada.",
+    "email-titulo": "E-mail",
+    "email": "E-mail da conta",
+    "email-salvo": "E-mail atualizado."
+  },
+  "auditoria": {
+    "titulo": "Auditoria",
+    "de": "De",
+    "ate": "Até",
+    "usuario": "Usuário",
+    "acao": "Ação",
+    "filtrar": "Filtrar",
+    "exportar": "Exportar CSV",
+    "vazio": "Nenhum evento no período.",
+    "col": {
+      "quando": "Data e hora",
+      "usuario": "Usuário",
+      "ip": "IP",
+      "acao": "Ação",
+      "alvo": "Alvo",
+      "resultado": "Resultado"
+    }
+  },
+  "sobre": {
+    "versao": "Versão {{ versao }}",
+    "licenca": "Copyright (c) 2026 Vovolinux. Todos os direitos reservados.",
+    "creditos-titulo": "Créditos",
+    "filezilla-1": "A tela de transferência do m2m tem como referência funcional o",
+    "filezilla-2": "(Tim Kosse e colaboradores, GPL-3.0-or-later). O m2m não contém código do FileZilla.",
+    "filezilla-marca": "\"FileZilla\" é marca registrada de seus titulares e não é usada como nome, logotipo ou funcionalidade do m2m.",
+    "terceiros-titulo": "Avisos de terceiros",
+    "terceiros-indisponivel": "A lista de componentes de terceiros não está disponível nesta compilação."
+  },
+  "erro": {
+    "generico": "Não foi possível concluir a operação. Tente novamente.",
+    "auth": {
+      "credenciais-invalidas": "Usuário ou senha incorretos.",
+      "conta-bloqueada": "Conta bloqueada por tentativas repetidas. Tente novamente em {{ minutos }} minutos.",
+      "nao-autenticado": "Sua sessão expirou. Entre novamente."
+    },
+    "conta": {
+      "senha-atual-incorreta": "A senha atual está incorreta."
+    },
+    "validacao": {
+      "invalida": "Há campos inválidos no formulário."
+    }
   }
 }

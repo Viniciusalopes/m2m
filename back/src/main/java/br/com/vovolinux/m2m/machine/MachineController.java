@@ -35,14 +35,17 @@ public class MachineController {
     private final GatewayPool pool;
     private final SshIdentityService sshIdentity;
     private final CurrentUser currentUser;
+    private final br.com.vovolinux.m2m.config.LocalProperties local;
 
     public MachineController(MachineService service, ConnectionTester tester, GatewayPool pool,
-            SshIdentityService sshIdentity, CurrentUser currentUser) {
+            SshIdentityService sshIdentity, CurrentUser currentUser,
+            br.com.vovolinux.m2m.config.LocalProperties local) {
         this.service = service;
         this.tester = tester;
         this.pool = pool;
         this.sshIdentity = sshIdentity;
         this.currentUser = currentUser;
+        this.local = local;
     }
 
     private long owner() {
@@ -103,7 +106,7 @@ public class MachineController {
                         .map(e -> new BrowseItem(e.name(), e.path(), e.type().name(), e.size(), e.mtime(), e.mode(),
                                 e.linkTarget()))
                         .toList();
-                return new BrowseResult(dir, parent(dir), items);
+                return new BrowseResult(dir, parentOf(m, dir), items);
             } catch (IOException e) {
                 if (!(e instanceof java.nio.file.NoSuchFileException)
                         && !(e instanceof java.nio.file.AccessDeniedException)) {
@@ -117,6 +120,16 @@ public class MachineController {
     @GetMapping("/ssh-identity")
     public SshIdentityService.PublicIdentity sshIdentity() {
         return sshIdentity.ensure(owner());
+    }
+
+    /** Sem "subir" para fora das raízes do host na máquina LOCAL. */
+    private String parentOf(Machine m, String dir) {
+        String parent = parent(dir);
+        if (parent != null && m.protocol() == Protocol.LOCAL && local.roots().stream()
+                .noneMatch(r -> br.com.vovolinux.m2m.profile.Paths.sameOrInside(r, parent))) {
+            return null;
+        }
+        return parent;
     }
 
     static String parent(String dir) {

@@ -40,18 +40,14 @@
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
-      "arguments": {
-        "x-queue-type": "classic"
-      }
+      "arguments": {}
     },
     {
       "name": "m2m.transfers",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
-      "arguments": {
-        "x-queue-type": "classic"
-      }
+      "arguments": {}
     }
   ],
   "bindings": [

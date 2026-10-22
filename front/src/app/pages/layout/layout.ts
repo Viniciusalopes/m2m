@@ -51,6 +51,8 @@ export class Layout implements OnInit {
   readonly itens: ItemMenu[] = [
     { rota: '/', icone: 'dashboard', chave: 'menu.painel' },
     { rota: '/maquinas', icone: 'computer', chave: 'menu.maquinas' },
+    { rota: '/perfis', icone: 'folder_copy', chave: 'menu.perfis' },
+    { rota: '/jobs', icone: 'monitoring', chave: 'menu.acompanhamento' },
     { rota: '/auditoria', icone: 'fact_check', chave: 'menu.auditoria' },
     { rota: '/sobre', icone: 'info', chave: 'menu.sobre' },
   ];

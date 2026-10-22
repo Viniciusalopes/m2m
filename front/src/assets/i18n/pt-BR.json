@@ -22,7 +22,9 @@
     "sobre": "Sobre",
     "senha": "Alterar senha / e-mail",
     "sair": "Sair",
-    "maquinas": "Máquinas"
+    "maquinas": "Máquinas",
+    "perfis": "Perfis",
+    "acompanhamento": "Acompanhamento"
   },
   "layout": {
     "menu": "Abrir ou fechar o menu",
@@ -146,6 +148,35 @@
     },
     "credencial": {
       "invalida": "Não foi possível carregar a credencial (a chave mestra mudou?)."
+    },
+    "perfil": {
+      "nome-duplicado": "Já existe um perfil chamado {{ nome }}.",
+      "nome-obrigatorio": "Informe o nome do perfil.",
+      "complemento-invalido": "O complemento só pode ter letras, números, hífen e sublinhado.",
+      "origem-inexistente": "Máquina de origem inexistente.",
+      "armazenamento-inexistente": "Máquina de armazenamento inexistente.",
+      "maquina-inexistente": "Máquina inexistente.",
+      "diretorio-inexistente": "O diretório {{ diretorio }} não foi encontrado em {{ maquina }}.",
+      "diretorio-raiz": "O diretório {{ diretorio }} é uma raiz e não pode ser usado.",
+      "diretorio-invalido": "Caminho de diretório inválido: {{ caminho }}.",
+      "diretorios-sobrepostos": "O diretório {{ diretorio }} se sobrepõe a {{ conflito }}.",
+      "armazenamento-invalido": "Diretório de armazenamento inválido.",
+      "armazenamento-dentro-da-origem": "O armazenamento ({{ armazenamento }}) fica dentro do diretório de origem {{ diretorio }}; o backup incluiria a si mesmo.",
+      "armazenamento-sem-permissao": "Sem permissão de escrita em {{ diretorio }} na máquina {{ maquina }}.",
+      "horario-invalido": "Horário inválido (use HH:MM).",
+      "mapeamento-invalido": "Caminho de mapeamento inválido: {{ caminho }}.",
+      "mapeamento-duplicado": "Máquina repetida no mapeamento do diretório {{ diretorio }}.",
+      "mapeamento-sobreposto": "O destino {{ caminho }} se sobrepõe a {{ conflito }} na mesma máquina.",
+      "job-ativo": "O perfil tem um job em execução ou na fila ({{ tipo }}, {{ status }}).",
+      "nao-encontrado": "Perfil não encontrado.",
+      "falha-ao-excluir-backups": "Não foi possível excluir o arquivo {{ arquivo }}: {{ detalhe }}"
+    },
+    "job": {
+      "em-andamento": "Já existe um job em andamento ({{ tipo }} — {{ perfil }}, {{ status }}). Aguarde o término ou acompanhe-o.",
+      "nao-encontrado": "Job não encontrado.",
+      "nao-esta-ativo": "O job não está em execução ({{ status }}).",
+      "tipo-sem-handler": "Tipo de job sem executor: {{ tipo }}.",
+      "falha-inesperada": "O job falhou: {{ detalhe }}"
     }
   },
   "comum": {
@@ -252,6 +283,137 @@
       "identidade-explicacao": "Compare a impressão digital abaixo com a do servidor antes de confirmar. Enquanto não for confirmada, o m2m não conecta.",
       "fingerprint-anterior": "Anterior:",
       "confirmar-identidade": "Confirmar esta identidade"
+    }
+  },
+  "navegador": {
+    "titulo": "Escolher diretório — {{ maquina }}",
+    "vazio": "Nenhuma subpasta aqui.",
+    "escolher": "Escolher este diretório"
+  },
+  "perfis": {
+    "titulo": "Perfis",
+    "novo": "Novo perfil",
+    "vazio": "Nenhum perfil cadastrado.",
+    "backup-agora": "Backup agora",
+    "ver-job": "Ver job em andamento",
+    "criptografado": "Backups criptografados",
+    "diario-as": "Diário às {{ hora }}",
+    "sem-agendamento": "Sem agendamento",
+    "col": {
+      "nome": "Nome",
+      "origem": "Origem",
+      "diretorios": "Diretórios",
+      "armazenamento": "Armazenamento",
+      "agendamento": "Backup agendado"
+    },
+    "backup": {
+      "titulo": "Backup agora — {{ nome }}",
+      "explicacao": "O backup entra na fila e roda assim que nenhum outro job estiver em execução.",
+      "complemento": "Complemento do nome (só neste backup)",
+      "iniciar": "Iniciar backup"
+    },
+    "excluir": {
+      "titulo": "Excluir o perfil {{ nome }}?",
+      "explicacao": "Os agendamentos do perfil serão removidos. O que fazer com os backups dele?",
+      "manter": "Manter os backups (ficam como órfãos, ainda restauráveis)",
+      "apagar": "Excluir também os arquivos de backup"
+    },
+    "form": {
+      "novo": "Novo perfil",
+      "editar": "Editar perfil",
+      "dados": "Dados do perfil",
+      "nome": "Nome",
+      "complemento": "Complemento do nome (opcional)",
+      "complemento-dica": "Letras, números, hífen e sublinhado",
+      "limiar": "Limiar de backup suspeito",
+      "limiar-dica": "Abaixo desse % do último backup aceito, o backup é marcado como suspeito",
+      "origem": "Origem e diretórios",
+      "maquina-origem": "Máquina de origem",
+      "diretorios": "Diretórios de origem",
+      "sem-diretorios": "Nenhum diretório selecionado.",
+      "adicionar-diretorio": "Adicionar diretório",
+      "mapeamento": "Mapeamento de caminhos por máquina",
+      "mapeamento-dica": "Caminho correspondente de cada diretório nas outras máquinas (usado em restaurações, sincronizações e verificações). Deixe em branco para não usar a máquina como destino.",
+      "diretorio-origem": "Diretório de origem",
+      "armazenamento": "Armazenamento dos backups",
+      "maquina-armazenamento": "Máquina de armazenamento",
+      "diretorio-armazenamento": "Diretório de armazenamento",
+      "criptografia": "Criptografar os backups deste perfil",
+      "criptografia-recomendada": "Recomendado: o armazenamento é uma máquina remota. Ative a criptografia para proteger os backups.",
+      "agendamento": "Agendamento do backup",
+      "backup-diario": "Backup diário ativo",
+      "horario": "Horário"
+    }
+  },
+  "jobs": {
+    "titulo": "Acompanhamento",
+    "nenhum-ativo": "Nenhum job em execução ou na fila.",
+    "ir-perfis": "Ir para os perfis",
+    "na-fila": "Aguardando na fila a vez de executar.",
+    "progresso": "Progresso do job",
+    "etapa": "Etapa",
+    "arquivo-atual": "Arquivo atual",
+    "arquivos": "Arquivos",
+    "bytes": "Bytes",
+    "avisos": "Avisos",
+    "criado-em": "criado em",
+    "resultado": "Resultado",
+    "voltar": "Voltar aos perfis",
+    "concluido": "Job concluído.",
+    "interrompido-aviso": "O job foi interrompido. Arquivos parciais de backup foram removidos e os backups anteriores foram mantidos.",
+    "tipo": {
+      "BACKUP": "Backup",
+      "RESTORE": "Restauração",
+      "SELECTIVE_RESTORE": "Restauração seletiva",
+      "SYNC": "Sincronização",
+      "VERIFY": "Verificação",
+      "ARCHIVE_VERIFY": "Verificação dos backups",
+      "REINDEX": "Reindexação",
+      "DB_BACKUP": "Backup do banco do m2m",
+      "TEST": "Teste"
+    },
+    "gatilho": {
+      "MANUAL": "Manual",
+      "SCHEDULED": "Agendado",
+      "SYSTEM": "Sistema"
+    },
+    "status": {
+      "QUEUED": "Na fila",
+      "RUNNING": "Em andamento",
+      "COMPLETED": "Concluído",
+      "COMPLETED_WITH_WARNINGS": "Concluído com avisos",
+      "FAILED": "Falhou",
+      "INTERRUPTED": "Interrompido",
+      "CANCELED": "Cancelado",
+      "AWAITING_CONFIRMATION": "Aguardando confirmação"
+    },
+    "nivel": {
+      "INFO": "Informação",
+      "WARN": "Aviso",
+      "ERROR": "Erro"
+    },
+    "emergencia": {
+      "titulo": "Emergência",
+      "explicacao": "Interrompe o job imediatamente, sem esperar o fim do arquivo atual.",
+      "botao": "INTERROMPER AGORA"
+    },
+    "etapas": {
+      "CHECK_CONNECTION": "Verificando conexão",
+      "SCANNING": "Varredura prévia",
+      "BACKING_UP": "Gravando o backup",
+      "VALIDATING": "Validando",
+      "FINALIZING": "Finalizando",
+      "RETENTION": "Aplicando retenção",
+      "COMPARING": "Comparando",
+      "SAFETY_BACKUP": "Backup de segurança",
+      "COPYING": "Copiando",
+      "DELETING_EXTRAS": "Excluindo extras",
+      "TESTE": "Teste"
+    }
+  },
+  "aviso": {
+    "teste": {
+      "aviso": "Aviso de teste: {{ item }}"
     }
   }
 }

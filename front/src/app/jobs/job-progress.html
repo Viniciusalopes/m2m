@@ -1,0 +1,136 @@
+<section class="m2m-page progresso">
+  @if (erro(); as e) {
+    <p class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      {{ 'erro.' + e.codigo | transloco: e.parametros }}
+    </p>
+  }
+
+  @if (job(); as j) {
+    <header class="cabecalho">
+      <div>
+        <h1>
+          {{ 'jobs.tipo.' + j.type | transloco }}
+          @if (j.profileName) {
+            — {{ j.profileName }}
+          }
+        </h1>
+        <p class="sub">
+          {{ 'jobs.gatilho.' + j.trigger | transloco }} · {{ 'jobs.criado-em' | transloco }}
+          {{ j.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}
+        </p>
+      </div>
+      <m2m-status [estado]="estado()" [texto]="'jobs.status.' + status() | transloco" />
+    </header>
+
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        @if (status() === 'QUEUED') {
+          <p>
+            <mat-icon aria-hidden="true">hourglass_top</mat-icon> {{ 'jobs.na-fila' | transloco }}
+          </p>
+        }
+        <div class="barra">
+          <mat-progress-bar
+            [mode]="status() === 'RUNNING' && !percent() ? 'indeterminate' : 'determinate'"
+            [value]="percent()"
+            [attr.aria-label]="'jobs.progresso' | transloco"
+          />
+          <span class="percentual">{{ percent() | number: '1.0-1' : 'pt-BR' }}%</span>
+        </div>
+
+        <dl class="dados">
+          <div>
+            <dt>{{ 'jobs.etapa' | transloco }}</dt>
+            <dd>
+              @if (dados().step) {
+                {{ 'jobs.etapas.' + dados().step | transloco }}
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'jobs.arquivo-atual' | transloco }}</dt>
+            <dd class="caminho">{{ dados().currentPath || '—' }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'jobs.arquivos' | transloco }}</dt>
+            <dd>
+              {{ dados().itemsDone ?? 0 | number: '1.0-0' : 'pt-BR' }} /
+              {{ dados().itemsTotal ?? 0 | number: '1.0-0' : 'pt-BR' }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'jobs.bytes' | transloco }}</dt>
+            <dd>
+              {{ dados().bytesDone ?? 0 | number: '1.0-0' : 'pt-BR' }} /
+              {{ dados().bytesTotal ?? 0 | number: '1.0-0' : 'pt-BR' }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'jobs.avisos' | transloco }}</dt>
+            <dd>{{ dados().warnings ?? 0 }}</dd>
+          </div>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+
+    @if (ativo()) {
+      <section class="emergencia" aria-label="{{ 'jobs.emergencia.titulo' | transloco }}">
+        <p>{{ 'jobs.emergencia.explicacao' | transloco }}</p>
+        <button
+          mat-flat-button
+          class="botao-emergencia"
+          (click)="emergencia()"
+          [disabled]="cancelando()"
+        >
+          <mat-icon>stop_circle</mat-icon>
+          {{ 'jobs.emergencia.botao' | transloco }}
+        </button>
+      </section>
+    }
+
+    @if (!ativo()) {
+      <mat-card appearance="outlined">
+        <mat-card-header
+          ><mat-card-title>{{ 'jobs.resultado' | transloco }}</mat-card-title></mat-card-header
+        >
+        <mat-card-content>
+          @if (erroDoJob(); as e) {
+            <p class="erro" role="alert">
+              <mat-icon aria-hidden="true">error</mat-icon>
+              {{ 'erro.' + e.codigo | transloco: e.parametros }}
+            </p>
+          }
+          @if (interrompidoPeloUsuario()) {
+            <p class="aviso">
+              <mat-icon aria-hidden="true">warning</mat-icon>
+              {{ 'jobs.interrompido-aviso' | transloco }}
+            </p>
+          }
+          @if (status() === 'COMPLETED' || status() === 'COMPLETED_WITH_WARNINGS') {
+            <p class="ok">
+              <mat-icon aria-hidden="true">check_circle</mat-icon>
+              {{ 'jobs.concluido' | transloco }}
+            </p>
+          }
+          @if (mensagens().length) {
+            <ul class="mensagens">
+              @for (m of mensagens(); track m.id) {
+                <li>
+                  <m2m-status
+                    [estado]="m.level === 'WARN' ? 'warn' : m.level === 'ERROR' ? 'fail' : 'info'"
+                    [texto]="'jobs.nivel.' + m.level | transloco"
+                  />
+                  {{ 'aviso.' + m.code | transloco: m.params }}
+                </li>
+              }
+            </ul>
+          }
+          <a mat-button routerLink="/perfis">{{ 'jobs.voltar' | transloco }}</a>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</section>

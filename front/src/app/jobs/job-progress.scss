@@ -1,0 +1,116 @@
+.progresso {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+}
+
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+
+  h1 {
+    margin: 0;
+  }
+
+  .sub {
+    margin: 4px 0 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 16px;
+
+  mat-progress-bar {
+    flex: 1;
+    height: 12px;
+    border-radius: 6px;
+  }
+
+  .percentual {
+    font: var(--mat-sys-title-medium);
+    min-width: 64px;
+    text-align: right;
+  }
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+
+  dt {
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .caminho {
+    font-family: ui-monospace, monospace;
+    word-break: break-all;
+  }
+}
+
+/* Botão de emergência: sempre vermelho e isolado do resto da tela (D34) */
+.emergencia {
+  margin-top: 24px;
+  padding: 16px;
+  border: 2px solid var(--m2m-fail);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  p {
+    margin: 0;
+    flex: 1;
+    min-width: 240px;
+  }
+}
+
+.botao-emergencia {
+  --mat-button-filled-container-color: #c62828;
+  --mat-button-filled-label-text-color: #ffffff;
+  --mat-button-filled-container-height: 56px;
+  font-weight: 700;
+}
+
+.erro,
+.aviso,
+.ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.erro {
+  color: var(--m2m-fail);
+}
+
+.aviso {
+  color: var(--m2m-warn);
+}
+
+.ok {
+  color: var(--m2m-ok);
+}
+
+.mensagens {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

@@ -1,0 +1,100 @@
+<section class="m2m-page">
+  <header class="cabecalho">
+    <h1>{{ 'perfis.titulo' | transloco }}</h1>
+    <a mat-flat-button routerLink="/perfis/novo"
+      ><mat-icon>add</mat-icon>{{ 'perfis.novo' | transloco }}</a
+    >
+  </header>
+
+  @if (erro(); as e) {
+    <div class="erro" role="alert">
+      <mat-icon aria-hidden="true">error</mat-icon>
+      <p>{{ 'erro.' + e.codigo | transloco: e.parametros }}</p>
+      @if (e.jobId) {
+        <a mat-button [routerLink]="['/jobs', e.jobId]">{{ 'perfis.ver-job' | transloco }}</a>
+      }
+    </div>
+  }
+
+  <div class="tabela">
+    <table mat-table [dataSource]="perfis()">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>{{ 'perfis.col.nome' | transloco }}</th>
+        <td mat-cell *matCellDef="let p">
+          <strong>{{ p.name }}</strong>
+          @if (p.complement) {
+            <div class="descricao">{{ p.complement }}</div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="origem">
+        <th mat-header-cell *matHeaderCellDef>{{ 'perfis.col.origem' | transloco }}</th>
+        <td mat-cell *matCellDef="let p">{{ p.sourceMachineName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="diretorios">
+        <th mat-header-cell *matHeaderCellDef>{{ 'perfis.col.diretorios' | transloco }}</th>
+        <td mat-cell *matCellDef="let p">
+          @for (d of p.directories; track d.id) {
+            <div class="caminho">{{ d.path }}</div>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="armazenamento">
+        <th mat-header-cell *matHeaderCellDef>{{ 'perfis.col.armazenamento' | transloco }}</th>
+        <td mat-cell *matCellDef="let p">
+          {{ p.storageMachineName }}<span class="caminho">: {{ p.storage.path }}</span>
+          @if (p.encryptionEnabled) {
+            <mat-icon
+              class="cadeado"
+              [attr.aria-label]="'perfis.criptografado' | transloco"
+              [title]="'perfis.criptografado' | transloco"
+              >lock</mat-icon
+            >
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="agendamento">
+        <th mat-header-cell *matHeaderCellDef>{{ 'perfis.col.agendamento' | transloco }}</th>
+        <td mat-cell *matCellDef="let p">
+          @if (p.backupSchedule?.enabled) {
+            <m2m-status
+              estado="ok"
+              [texto]="'perfis.diario-as' | transloco: { hora: p.backupSchedule.time }"
+            />
+          } @else {
+            <m2m-status estado="info" [texto]="'perfis.sem-agendamento' | transloco" />
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let p" class="acoes">
+          <button mat-flat-button (click)="backup(p)">
+            <mat-icon>backup</mat-icon>{{ 'perfis.backup-agora' | transloco }}
+          </button>
+          <a
+            mat-icon-button
+            [routerLink]="['/perfis', p.id]"
+            [attr.aria-label]="'comum.editar' | transloco"
+            ><mat-icon>edit</mat-icon></a
+          >
+          <button
+            mat-icon-button
+            (click)="excluir(p)"
+            [attr.aria-label]="'comum.excluir' | transloco"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell vazio" [attr.colspan]="colunas.length">
+          {{ 'perfis.vazio' | transloco }}
+        </td>
+      </tr>
+    </table>
+  </div>
+</section>

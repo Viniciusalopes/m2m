@@ -1,0 +1,208 @@
+<section class="m2m-page perfil">
+  <h1>{{ (id ? 'perfis.form.editar' : 'perfis.form.novo') | transloco }}</h1>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()">
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>{{ 'perfis.form.dados' | transloco }}</mat-card-title></mat-card-header
+      >
+      <mat-card-content class="grade">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'perfis.form.nome' | transloco }}</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'perfis.form.complemento' | transloco }}</mat-label>
+          <input matInput formControlName="complement" />
+          <mat-hint>{{ 'perfis.form.complemento-dica' | transloco }}</mat-hint>
+          @if (form.controls.complement.hasError('pattern')) {
+            <mat-error>{{ 'erro.perfil.complemento-invalido' | transloco }}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'perfis.form.limiar' | transloco }}</mat-label>
+          <input matInput type="number" formControlName="thresholdPercent" min="1" max="100" />
+          <span matTextSuffix>%</span>
+          <mat-hint>{{ 'perfis.form.limiar-dica' | transloco }}</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>{{ 'perfis.form.origem' | transloco }}</mat-card-title></mat-card-header
+      >
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="largo">
+          <mat-label>{{ 'perfis.form.maquina-origem' | transloco }}</mat-label>
+          <mat-select formControlName="sourceMachineId">
+            @for (m of maquinas(); track m.id) {
+              <mat-option [value]="m.id"
+                >{{ m.name }} ({{ 'maquinas.protocolo.' + m.protocol | transloco }})</mat-option
+              >
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <h3>{{ 'perfis.form.diretorios' | transloco }}</h3>
+        <ul class="diretorios">
+          @for (d of dirs(); track $index) {
+            <li>
+              <mat-icon aria-hidden="true">folder</mat-icon>
+              <span class="caminho">{{ d.path }}</span>
+              <button
+                mat-icon-button
+                type="button"
+                (click)="removerDiretorio($index)"
+                [attr.aria-label]="'comum.excluir' | transloco"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </li>
+          } @empty {
+            <li class="vazio">{{ 'perfis.form.sem-diretorios' | transloco }}</li>
+          }
+        </ul>
+        <button mat-stroked-button type="button" (click)="adicionarDiretorio()">
+          <mat-icon>create_new_folder</mat-icon>{{ 'perfis.form.adicionar-diretorio' | transloco }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    @if (dirs().length && destinos().length) {
+      <mat-card appearance="outlined">
+        <mat-card-header
+          ><mat-card-title>{{
+            'perfis.form.mapeamento' | transloco
+          }}</mat-card-title></mat-card-header
+        >
+        <mat-card-content>
+          <p>{{ 'perfis.form.mapeamento-dica' | transloco }}</p>
+          <div class="tabela-mapa">
+            <table class="mapa">
+              <thead>
+                <tr>
+                  <th>{{ 'perfis.form.diretorio-origem' | transloco }}</th>
+                  @for (m of destinos(); track m.id) {
+                    <th>{{ m.name }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of dirs(); track $index; let i = $index) {
+                  <tr>
+                    <td class="caminho">{{ d.path }}</td>
+                    @for (m of destinos(); track m.id) {
+                      <td>
+                        <mat-form-field
+                          appearance="outline"
+                          subscriptSizing="dynamic"
+                          class="celula"
+                        >
+                          <input
+                            matInput
+                            [value]="mapeamentoDe(i, m.id)"
+                            (change)="definirMapeamento(i, m.id, $any($event.target).value)"
+                            [attr.aria-label]="d.path + ' → ' + m.name"
+                            placeholder="/caminho/em/{{ m.name }}"
+                          />
+                          <button
+                            matSuffix
+                            mat-icon-button
+                            type="button"
+                            (click)="escolherMapeamento(i, m)"
+                            [attr.aria-label]="'navegador.escolher' | transloco"
+                          >
+                            <mat-icon>folder_open</mat-icon>
+                          </button>
+                        </mat-form-field>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>{{
+          'perfis.form.armazenamento' | transloco
+        }}</mat-card-title></mat-card-header
+      >
+      <mat-card-content class="grade">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'perfis.form.maquina-armazenamento' | transloco }}</mat-label>
+          <mat-select formControlName="storageMachineId">
+            @for (m of maquinas(); track m.id) {
+              <mat-option [value]="m.id">{{ m.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'perfis.form.diretorio-armazenamento' | transloco }}</mat-label>
+          <input matInput formControlName="storagePath" />
+          <button
+            matSuffix
+            mat-icon-button
+            type="button"
+            (click)="escolherArmazenamento()"
+            [attr.aria-label]="'navegador.escolher' | transloco"
+          >
+            <mat-icon>folder_open</mat-icon>
+          </button>
+        </mat-form-field>
+        <mat-checkbox formControlName="encryptionEnabled">{{
+          'perfis.form.criptografia' | transloco
+        }}</mat-checkbox>
+        @if (armazenamentoRemoto() && !form.controls.encryptionEnabled.value) {
+          <p class="recomendacao">
+            <mat-icon aria-hidden="true">lightbulb</mat-icon>
+            {{ 'perfis.form.criptografia-recomendada' | transloco }}
+          </p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header
+        ><mat-card-title>{{
+          'perfis.form.agendamento' | transloco
+        }}</mat-card-title></mat-card-header
+      >
+      <mat-card-content class="agenda">
+        <mat-slide-toggle formControlName="scheduleEnabled">{{
+          'perfis.form.backup-diario' | transloco
+        }}</mat-slide-toggle>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'perfis.form.horario' | transloco }}</mat-label>
+          <input matInput type="time" formControlName="scheduleTime" />
+          <mat-hint>America/Sao_Paulo</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    @if (erro(); as e) {
+      <p class="erro" role="alert">
+        <mat-icon aria-hidden="true">error</mat-icon>
+        {{ 'erro.' + e.codigo | transloco: e.parametros }}
+      </p>
+    }
+
+    <div class="acoes">
+      <button mat-button type="button" (click)="router.navigate(['/perfis'])">
+        {{ 'comum.cancelar' | transloco }}
+      </button>
+      <button
+        mat-flat-button
+        type="submit"
+        [disabled]="form.invalid || !dirs().length || salvando()"
+      >
+        {{ 'comum.salvar' | transloco }}
+      </button>
+    </div>
+  </form>
+</section>

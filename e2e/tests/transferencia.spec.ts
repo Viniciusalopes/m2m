@@ -38,8 +38,11 @@ test.describe('transferência pela interface', () => {
     // máquina SFTP de teste: OpenSSH completo, com a home /config gravável
     await page.getByRole('link', { name: 'Máquinas' }).click();
     await page.getByRole('button', { name: 'Nova máquina' }).click();
+    // o formulário termina de carregar com a chave pública; preencher antes disso perdia valores
+    await expect(page.getByText('Chave pública do m2m')).toBeVisible();
     await page.getByLabel('Nome', { exact: true }).fill(nome);
     await page.getByLabel('Host (IP ou nome DNS)').fill(sshHost);
+    await expect(page.getByLabel('Host (IP ou nome DNS)')).toHaveValue(sshHost);
     await page.getByLabel('Porta').fill('2222');
     await page.getByLabel('Usuário', { exact: true }).fill('m2m');
     await page.getByRole('combobox', { name: 'Autenticação' }).click();
@@ -99,16 +102,24 @@ test.describe('transferência pela interface', () => {
     await expect(fila.getByText('Pulada').first()).toBeVisible({ timeout: 30_000 });
 
     // criar pasta pelo menu de contexto, comparar e excluir (a confirmação informa a contagem)
+    await expect(caminhoDir).toHaveValue(`/config/${pasta}`);
     await direito.locator('.rolagem').click({ button: 'right', position: { x: 40, y: 150 } });
     await page.getByRole('menuitem', { name: 'Criar pasta' }).click();
     await dialogo.getByLabel('Nome da pasta').fill('pasta-nova');
     await dialogo.getByRole('button', { name: 'Confirmar' }).click();
     await expect(direito.getByRole('row', { name: /pasta-nova/ })).toBeVisible();
 
-    await page.getByRole('switch', { name: 'Comparar pastas' }).click({ force: true });
+    // confirma o estado do switch e repete o clique se ele se perder (flaky quando a legenda desloca o layout)
+    const comparar = page.getByRole('switch', { name: 'Comparar pastas' });
+    await comparar.click({ force: true });
+    await expect(comparar).toHaveAttribute('aria-checked', 'true');
     await expect(page.getByLabel('Legenda da comparação')).toBeVisible();
     await expect(direito.getByRole('row', { name: /pasta-nova/ })).toContainText('Só neste lado');
-    await page.getByRole('switch', { name: 'Comparar pastas' }).click({ force: true });
+    await expect(async () => {
+      if ((await comparar.getAttribute('aria-checked')) === 'true') await comparar.click({ force: true });
+      await expect(comparar).toHaveAttribute('aria-checked', 'false', { timeout: 1000 });
+    }).toPass({ timeout: 15_000 });
+    await expect(page.getByLabel('Legenda da comparação')).toHaveCount(0);
 
     await direito.getByRole('row', { name: /pasta-nova/ }).click();
     await direito.getByRole('row', { name: /pasta-nova/ }).click({ button: 'right' });

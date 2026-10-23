@@ -5,6 +5,8 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.NoSuchFileException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(ApiException.class)
     ResponseEntity<ApiError> negocio(ApiException e) {
@@ -23,6 +27,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(GatewayException.class)
     ResponseEntity<ApiError> gateway(GatewayException e) {
         String c = e.codigo();
+        log.warn("Falha de acesso a máquina/arquivo [{}]: {}", c, e.getMessage(), e.getCause());
         HttpStatus status = c.startsWith("identidade.") ? HttpStatus.CONFLICT
                 : c.equals("local.fora-das-raizes") || c.equals("local.caminho-invalido") ? HttpStatus.FORBIDDEN
                 : c.equals("local.desativado") ? HttpStatus.BAD_REQUEST : HttpStatus.BAD_GATEWAY;

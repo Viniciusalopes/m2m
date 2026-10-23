@@ -17,6 +17,7 @@ Desenvolvido para manter os arquivos de trabalho do notebook **NOTEBOOK-REMOTO**
 1. [Pré-requisitos](#pré-requisitos)
 2. [Configuração (`.env`)](#configuração-env)
 3. [Subir e derrubar (`m2m-up` / `m2m-down`)](#subir-e-derrubar-m2m-up--m2m-down)
+   - [Certificado HTTPS](#certificado-https)
 4. [Primeiro acesso e chave mestra](#primeiro-acesso-e-chave-mestra)
 5. [E-mail (SMTP) pela tela](#e-mail-smtp-pela-tela)
 6. [Cadastro de máquinas](#cadastro-de-máquinas)
@@ -52,7 +53,7 @@ cp .env.example .env
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `ADMIN_EMAIL` | Administrador criado no primeiro start. |
 | `APP_SECRET_KEY` | **Chave mestra**: cifra senhas de máquinas, chaves privadas, SMTP e as chaves de criptografia dos backups. Gere com `openssl rand -base64 32`. |
 | `M2M_LOCAL_ENABLED`, `HOST_HOME_BIND`, `HOST_ROOTS` | Máquina **LOCAL** (o próprio host). |
-| `PUBLIC_URL`, `HTTP_PORT`, `HTTPS_PORT`, `TLS_CERT_PATH`, `TLS_KEY_PATH` | Endereço e certificado. Em branco, o m2m gera um certificado autoassinado no primeiro start. |
+| `PUBLIC_URL`, `HTTP_PORT`, `HTTPS_PORT`, `TLS_CERT_PATH`, `TLS_KEY_PATH` | Endereço e certificado. O `m2m-up` preenche `TLS_CERT_PATH`/`TLS_KEY_PATH` com o certificado gerado por `scripts/gerar-certificado-tls.sh` (veja [Certificado HTTPS](#certificado-https)). Em branco, o m2m gera um certificado autoassinado no primeiro start. |
 | `TRANSFER_CONCURRENCY` | Transferências simultâneas na tela de transferência (padrão 2). |
 | `POSTGRES_*`, `RABBITMQ_*` | Banco e fila (rede interna do Compose). |
 
@@ -80,7 +81,7 @@ Nada do host é montado. Armazene os backups em outra máquina cadastrada (SFTP/
 No NOTEBOOK existem dois atalhos no shell (bloco `# m2m` do arquivo de aliases):
 
 ```bash
-alias m2m-up="docker compose -f $M2M_HOME/docker-compose.yml --env-file $M2M_HOME/.env up -d --build"
+alias m2m-up="$M2M_HOME/scripts/m2m-up.sh"
 alias m2m-down="docker compose -f $M2M_HOME/docker-compose.yml --env-file $M2M_HOME/.env down"
 ```
 
@@ -88,7 +89,22 @@ alias m2m-down="docker compose -f $M2M_HOME/docker-compose.yml --env-file $M2M_H
 - `m2m-down` remove containers e rede e **preserva os volumes** (banco e fila).
 - Sem os aliases, rode os mesmos comandos `docker compose` dentro do diretório do projeto.
 
-A interface fica em **https://localhost** (ou no `PUBLIC_URL`). O navegador avisa do certificado autoassinado: aceite a exceção. A documentação da API está em `/api/docs` (exige login).
+A interface fica em **https://localhost** (ou no `PUBLIC_URL`). Com o certificado gerado pelo `m2m-up`, o navegador mostra o site como seguro. A documentação da API está em `/api/docs` (exige login).
+
+## Certificado HTTPS
+
+O `m2m-up` (`scripts/m2m-up.sh`) chama `scripts/gerar-certificado-tls.sh` antes de subir os serviços. Na primeira execução ele:
+
+1. cria uma **CA local** em `~/.config/m2m/tls/` (a chave dela nunca vai para os containers e a CA só vale para `localhost`, loopback, redes privadas e `.local`/`.lan`);
+2. emite o certificado do servidor, válido por 397 dias, com SAN para `localhost`, `127.0.0.1`, `::1` e o host do `PUBLIC_URL`;
+3. grava `TLS_CERT_PATH` e `TLS_KEY_PATH` no `.env`;
+4. instala a CA no sistema (`sudo`, uma única vez) e no Chrome/Chromium (precisa de `libnss3-tools`: `sudo apt install libnss3-tools`). Feche e reabra o navegador depois.
+
+Nas execuções seguintes nada é regerado nem pede `sudo`, exceto se o certificado vencer em menos de 30 dias ou se o host do `PUBLIC_URL` mudar (só o certificado é reemitido). Se a instalação falhar, o m2m sobe mesmo assim e o script avisa o que ficou pendente.
+
+- **Firefox e outros dispositivos** (celular, outro PC): importe `~/.config/m2m/tls/ca.crt` como autoridade confiável.
+- **Só gerar os arquivos**, sem instalar a CA: `scripts/gerar-certificado-tls.sh --sem-sistema`.
+- **VPS ou domínio público**: use um certificado válido (ex.: Let's Encrypt) em `TLS_CERT_PATH` / `TLS_KEY_PATH` e não rode o gerador.
 
 ## Primeiro acesso e chave mestra
 

@@ -113,6 +113,9 @@ test.describe('transferência pela interface', () => {
     const comparar = page.getByRole('switch', { name: 'Comparar pastas' });
     await expect(comparar).toHaveAttribute('aria-checked', 'true');
     await expect(page.getByLabel('Legenda da comparação')).toBeVisible();
+    // valores padrão dos campos: "Comparar por" em data de modificação e filtro em "Todos"
+    await expect(page.getByRole('combobox', { name: 'Comparar por' })).toContainText('Data de modificação');
+    await expect(page.getByRole('combobox', { name: 'Filtrar diferenças' })).toContainText('Todos');
     const linhaNova = direito.getByRole('row', { name: /pasta-nova/ });
     await expect(linhaNova).toContainText('Só neste lado');
     await expect(linhaNova.locator('td.cor-dif-so-aqui')).toBeVisible();

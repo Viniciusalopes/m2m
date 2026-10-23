@@ -194,10 +194,10 @@ import {
       align-items: center;
     }
     .modo {
-      width: 200px;
+      width: 12.5rem;
     }
     .tolerancia {
-      width: 160px;
+      width: 10rem;
     }
     .legenda {
       display: flex;
@@ -214,8 +214,8 @@ import {
     }
     .cor {
       display: inline-block;
-      width: 14px;
-      height: 14px;
+      width: 0.875rem;
+      height: 0.875rem;
       border-radius: 3px;
     }
     .so-aqui {
@@ -260,7 +260,7 @@ import {
     .ok {
       color: var(--m2m-ok);
     }
-    @media (max-width: 900px) {
+    @media (max-width: 56.25em) {
       .paineis {
         grid-template-columns: 1fr;
       }
@@ -463,7 +463,7 @@ export class TransferPage implements AfterViewInit {
           this.dialog
             .open(FilterConfirmDialog, {
               data: { request: req },
-              width: '520px',
+              width: '32.5rem',
               maxWidth: '95vw',
             })
             .afterClosed(),
@@ -509,7 +509,7 @@ export class TransferPage implements AfterViewInit {
         this.dialog
           .open<ConflictDialog, unknown, ConflictAnswer>(ConflictDialog, {
             data: { conflict: conflitos[i], indice: i + 1, total: conflitos.length },
-            width: '560px',
+            width: '35rem',
             maxWidth: '95vw',
           })
           .afterClosed(),

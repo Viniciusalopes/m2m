@@ -170,7 +170,7 @@ const ESTADOS: Record<string, Estado> = {
       padding: 4px 8px;
     }
     .caminho {
-      max-width: 260px;
+      max-width: 16.25rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

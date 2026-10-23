@@ -81,7 +81,7 @@ export class SelectiveDialog implements OnInit {
       this.dialog
         .open(DirBrowser, {
           data: { machineId: m.id, machineName: m.name },
-          width: '640px',
+          width: '40rem',
           maxWidth: '95vw',
         })
         .afterClosed(),

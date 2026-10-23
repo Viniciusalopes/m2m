@@ -10,6 +10,7 @@
 
 table {
   width: 100%;
+  min-width: 45rem;
 }
 
 .num {
@@ -20,14 +21,14 @@ table {
   font-family: ui-monospace, monospace;
   font-size: 0.8rem;
   color: var(--mat-sys-on-surface-variant);
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .fixado {
   vertical-align: middle;
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+  font-size: 1.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
   margin-left: 4px;
 }
 

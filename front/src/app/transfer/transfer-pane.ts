@@ -288,14 +288,14 @@ const MIME = 'application/x-m2m-transfer';
       display: flex;
       align-items: center;
       gap: 6px;
-      max-width: 320px;
+      max-width: 20rem;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .nome mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
     }
     .alvo {
       color: var(--mat-sys-on-surface-variant);
@@ -449,7 +449,7 @@ export class TransferPane {
       this.dialog
         .open(FilterDialog, {
           data: { definition: this.filtro() },
-          width: '720px',
+          width: '45rem',
           maxWidth: '95vw',
         })
         .afterClosed(),
@@ -509,7 +509,7 @@ export class TransferPane {
             titulo: 'transferencia.criar-pasta.titulo',
             rotulo: 'transferencia.criar-pasta.nome',
           },
-          width: '420px',
+          width: '26.25rem',
         })
         .afterClosed(),
     );
@@ -532,7 +532,7 @@ export class TransferPane {
             rotulo: 'transferencia.renomear.nome',
             valor: e.name,
           },
-          width: '420px',
+          width: '26.25rem',
         })
         .afterClosed(),
     );

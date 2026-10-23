@@ -50,9 +50,9 @@ import { Fidelity } from './machines.service';
     }
     td mat-icon {
       vertical-align: middle;
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
       margin-right: 4px;
     }
     .sim {

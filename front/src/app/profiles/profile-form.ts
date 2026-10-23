@@ -125,7 +125,7 @@ export class ProfileForm implements OnInit {
     }
     const data: DirBrowserData = { machineId: origem.id, machineName: origem.name };
     const path = await firstValueFrom(
-      this.dialog.open(DirBrowser, { data, width: '640px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(DirBrowser, { data, width: '40rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (path) {
       this.dirs.update((l) => [...l, { path, mappings: {} }]);
@@ -143,7 +143,7 @@ export class ProfileForm implements OnInit {
     }
     const data: DirBrowserData = { machineId: m.id, machineName: m.name };
     const path = await firstValueFrom(
-      this.dialog.open(DirBrowser, { data, width: '640px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(DirBrowser, { data, width: '40rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (path) {
       this.form.controls.storagePath.setValue(path);
@@ -153,7 +153,7 @@ export class ProfileForm implements OnInit {
   async escolherMapeamento(i: number, machine: Machine): Promise<void> {
     const data: DirBrowserData = { machineId: machine.id, machineName: machine.name };
     const path = await firstValueFrom(
-      this.dialog.open(DirBrowser, { data, width: '640px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(DirBrowser, { data, width: '40rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (path) {
       this.definirMapeamento(i, machine.id, path);

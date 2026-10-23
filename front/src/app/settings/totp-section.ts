@@ -127,7 +127,7 @@ interface TotpStatus {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-width: 360px;
+      max-width: 22.5rem;
     }
     .acoes {
       display: flex;
@@ -136,8 +136,8 @@ interface TotpStatus {
       margin-top: 8px;
     }
     .qr {
-      width: 220px;
-      height: 220px;
+      width: 13.75rem;
+      height: 13.75rem;
       background: #fff;
       padding: 8px;
       border-radius: 8px;

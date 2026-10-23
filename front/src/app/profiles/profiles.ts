@@ -51,7 +51,7 @@ export class Profiles implements OnInit {
   async backup(p: Profile): Promise<void> {
     this.erro.set(null);
     const r = await firstValueFrom(
-      this.dialog.open(BackupDialog, { data: p, width: '480px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(BackupDialog, { data: p, width: '30rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (r === undefined) {
       return;
@@ -68,7 +68,7 @@ export class Profiles implements OnInit {
   async verificar(p: Profile): Promise<void> {
     this.erro.set(null);
     const r = await firstValueFrom(
-      this.dialog.open(VerifyDialog, { data: p, width: '520px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(VerifyDialog, { data: p, width: '32.5rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (!r) {
       return;
@@ -85,7 +85,7 @@ export class Profiles implements OnInit {
   async sincronizar(p: Profile): Promise<void> {
     this.erro.set(null);
     const r = await firstValueFrom(
-      this.dialog.open(SyncDialog, { data: p, width: '620px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(SyncDialog, { data: p, width: '38.75rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (!r) {
       return;
@@ -100,14 +100,14 @@ export class Profiles implements OnInit {
   }
 
   agendamentosSync(p: Profile): void {
-    this.dialog.open(SyncSchedulesDialog, { data: p, width: '620px', maxWidth: '95vw' });
+    this.dialog.open(SyncSchedulesDialog, { data: p, width: '38.75rem', maxWidth: '95vw' });
   }
 
   async excluir(p: Profile): Promise<void> {
     this.erro.set(null);
     const keep = await firstValueFrom(
       this.dialog
-        .open(DeleteProfileDialog, { data: p, width: '520px', maxWidth: '95vw' })
+        .open(DeleteProfileDialog, { data: p, width: '32.5rem', maxWidth: '95vw' })
         .afterClosed(),
     );
     if (keep === undefined) {

@@ -138,7 +138,7 @@ interface SmtpView {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      max-width: 560px;
+      max-width: 35rem;
     }
     .linha {
       display: flex;
@@ -148,7 +148,7 @@ interface SmtpView {
       flex: 1;
     }
     .porta {
-      width: 120px;
+      width: 7.5rem;
     }
     .acoes {
       display: flex;

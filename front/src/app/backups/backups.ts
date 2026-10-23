@@ -115,14 +115,14 @@ export class Backups implements OnInit {
 
   async verConteudo(b: Backup): Promise<void> {
     const itens = await firstValueFrom(
-      this.dialog.open(BackupTree, { data: b, width: '820px', maxWidth: '95vw' }).afterClosed(),
+      this.dialog.open(BackupTree, { data: b, width: '51.25rem', maxWidth: '95vw' }).afterClosed(),
     );
     if (itens?.length) {
       const jobId = await firstValueFrom(
         this.dialog
           .open(SelectiveDialog, {
             data: { backup: b, items: itens },
-            width: '760px',
+            width: '47.5rem',
             maxWidth: '95vw',
           })
           .afterClosed(),

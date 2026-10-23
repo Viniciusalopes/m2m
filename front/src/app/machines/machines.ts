@@ -64,7 +64,7 @@ export class Machines implements OnInit {
   private abrirFormulario(machine: Machine | null): void {
     const data: MachineFormData = { machine, localDisponivel: !this.temLocal() };
     this.dialog
-      .open(MachineForm, { data, width: '640px', maxWidth: '95vw' })
+      .open(MachineForm, { data, width: '40rem', maxWidth: '95vw' })
       .afterClosed()
       .subscribe((salva?: Machine) => {
         if (salva) {
@@ -75,7 +75,7 @@ export class Machines implements OnInit {
 
   testar(m: Machine): void {
     this.dialog
-      .open(MachineTest, { data: m, width: '640px', maxWidth: '95vw' })
+      .open(MachineTest, { data: m, width: '40rem', maxWidth: '95vw' })
       .afterClosed()
       .subscribe(() => void this.carregar());
   }

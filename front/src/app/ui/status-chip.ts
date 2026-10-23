@@ -35,9 +35,9 @@ const ICONES: Record<Estado, string> = {
       white-space: nowrap;
     }
     .chip mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
     }
     .ok {
       color: var(--m2m-ok);

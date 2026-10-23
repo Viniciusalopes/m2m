@@ -35,7 +35,7 @@
 }
 
 .menu {
-  width: 232px;
+  width: 14.5rem;
 }
 
 .ativo {
@@ -54,11 +54,11 @@
   p {
     margin: 0;
     flex: 1;
-    min-width: 240px;
+    min-width: 15rem;
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 45em) {
   .marca-nome {
     display: none;
   }

@@ -69,7 +69,7 @@ export interface DirBrowserData {
   `,
   styles: `
     mat-dialog-content {
-      min-width: min(520px, 80vw);
+      min-width: min(32.5rem, 80vw);
       max-height: 60vh;
     }
     .caminho {

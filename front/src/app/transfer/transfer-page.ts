@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -24,6 +24,8 @@ import {
   PlanRequest,
   TransferService,
 } from './transfer.service';
+
+type FiltroDif = 'TODOS' | 'ONLY_HERE' | 'NEWER' | 'OLDER' | 'SIZE_DIFFERENT';
 
 /** Tela de transferência (D22): dois painéis, ➜/⬅, arrastar, comparação, navegação sincronizada e fila. */
 @Component({
@@ -72,6 +74,30 @@ import {
               }}</mat-option>
             </mat-select>
           </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="dif">
+            <mat-label>{{ 'transferencia.comparacao.filtrar' | transloco }}</mat-label>
+            <mat-select
+              [ngModel]="filtroDif()"
+              (ngModelChange)="filtroDif.set($event)"
+              panelWidth=""
+            >
+              <mat-option value="TODOS">{{
+                'transferencia.comparacao.TODOS' | transloco
+              }}</mat-option>
+              <mat-option value="ONLY_HERE" class="cor-dif-so-aqui">{{
+                'transferencia.comparacao.ONLY_HERE' | transloco
+              }}</mat-option>
+              <mat-option value="NEWER" class="cor-dif-mais-novo">{{
+                'transferencia.comparacao.NEWER' | transloco
+              }}</mat-option>
+              <mat-option value="OLDER" class="cor-dif-mais-velho">{{
+                'transferencia.comparacao.OLDER' | transloco
+              }}</mat-option>
+              <mat-option value="SIZE_DIFFERENT" class="cor-dif-tamanho">{{
+                'transferencia.comparacao.SIZE_DIFFERENT' | transloco
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
           @if (modo() === 'MTIME') {
             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="tolerancia">
               <mat-label>{{ 'transferencia.comparacao.tolerancia' | transloco }}</mat-label>
@@ -95,16 +121,19 @@ import {
       @if (comparar()) {
         <ul class="legenda" [attr.aria-label]="'transferencia.comparacao.legenda' | transloco">
           <li>
-            <span class="cor so-aqui"></span>{{ 'transferencia.comparacao.ONLY_HERE' | transloco }}
+            <span class="cor cor-dif-so-aqui"></span
+            >{{ 'transferencia.comparacao.ONLY_HERE' | transloco }}
           </li>
           <li>
-            <span class="cor mais-novo"></span>{{ 'transferencia.comparacao.NEWER' | transloco }}
+            <span class="cor cor-dif-mais-novo"></span
+            >{{ 'transferencia.comparacao.NEWER' | transloco }}
           </li>
           <li>
-            <span class="cor mais-velho"></span>{{ 'transferencia.comparacao.OLDER' | transloco }}
+            <span class="cor cor-dif-mais-velho"></span
+            >{{ 'transferencia.comparacao.OLDER' | transloco }}
           </li>
           <li>
-            <span class="cor tamanho"></span
+            <span class="cor cor-dif-tamanho"></span
             >{{ 'transferencia.comparacao.SIZE_DIFFERENT' | transloco }}
           </li>
         </ul>
@@ -137,6 +166,7 @@ import {
           [titulo]="'transferencia.painel-esquerdo' | transloco"
           [maquinas]="maquinas()"
           [estados]="estadosEsq()"
+          [nomesDif]="nomesDif()"
           [ocultarIdenticos]="ocultarIdenticos()"
           [mostrarOcultos]="mostrarOcultos()"
           (navegou)="aoNavegar('esq', $event)"
@@ -168,6 +198,7 @@ import {
           [titulo]="'transferencia.painel-direito' | transloco"
           [maquinas]="maquinas()"
           [estados]="estadosDir()"
+          [nomesDif]="nomesDif()"
           [ocultarIdenticos]="ocultarIdenticos()"
           [mostrarOcultos]="mostrarOcultos()"
           (navegou)="aoNavegar('dir', $event)"
@@ -194,7 +225,10 @@ import {
       align-items: center;
     }
     .modo {
-      width: 12.5rem;
+      width: 15rem;
+    }
+    .dif {
+      width: 15rem;
     }
     .tolerancia {
       width: 10rem;
@@ -217,18 +251,7 @@ import {
       width: 0.875rem;
       height: 0.875rem;
       border-radius: 3px;
-    }
-    .so-aqui {
-      background: var(--m2m-ok);
-    }
-    .mais-novo {
-      background: var(--m2m-info, #1f6feb);
-    }
-    .mais-velho {
-      background: var(--m2m-warn);
-    }
-    .tamanho {
-      background: var(--m2m-fail);
+      border: 1px solid var(--mat-sys-outline-variant);
     }
     .paineis {
       display: grid;
@@ -282,10 +305,11 @@ export class TransferPage implements AfterViewInit {
 
   readonly maquinas = signal<Machine[]>([]);
   readonly mostrarOcultos = signal(true);
-  readonly comparar = signal(false);
+  readonly comparar = signal(true);
   readonly modo = signal<'SIZE' | 'MTIME'>('MTIME');
   readonly tolerancia = signal(0);
   readonly ocultarIdenticos = signal(false);
+  readonly filtroDif = signal<FiltroDif>('TODOS');
   readonly sincronizada = signal(false);
   readonly estadosEsq = signal<Record<string, CompareState> | null>(null);
   readonly estadosDir = signal<Record<string, CompareState> | null>(null);
@@ -355,8 +379,30 @@ export class TransferPage implements AfterViewInit {
 
   // ---- comparação ----
 
+  /** Nomes que casam com o filtro de diferenças em qualquer dos lados; {@code null} = sem filtro. */
+  readonly nomesDif = computed<ReadonlySet<string> | null>(() => {
+    const f = this.filtroDif();
+    const esq = this.estadosEsq();
+    const dir = this.estadosDir();
+    if (f === 'TODOS' || !this.comparar() || !esq || !dir) {
+      return null;
+    }
+    const casa = (s: CompareState | undefined) =>
+      s === f || (f === 'SIZE_DIFFERENT' && s === 'TYPE_DIFFERENT');
+    const nomes = new Set<string>();
+    new Set([...Object.keys(esq), ...Object.keys(dir)]).forEach((n) => {
+      if (casa(esq[n]) || casa(dir[n])) {
+        nomes.add(n);
+      }
+    });
+    return nomes;
+  });
+
   alternarComparacao(ligar: boolean): void {
     this.comparar.set(ligar);
+    if (!ligar) {
+      this.filtroDif.set('TODOS');
+    }
     void this.atualizarComparacao();
   }
 

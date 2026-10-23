@@ -109,12 +109,41 @@ test.describe('transferência pela interface', () => {
     await dialogo.getByRole('button', { name: 'Confirmar' }).click();
     await expect(direito.getByRole('row', { name: /pasta-nova/ })).toBeVisible();
 
-    // confirma o estado do switch e repete o clique se ele se perder (flaky quando a legenda desloca o layout)
+    // a comparação já vem ligada por padrão, com legenda, e a coluna "Diferença" colorida
     const comparar = page.getByRole('switch', { name: 'Comparar pastas' });
-    await comparar.click({ force: true });
     await expect(comparar).toHaveAttribute('aria-checked', 'true');
     await expect(page.getByLabel('Legenda da comparação')).toBeVisible();
-    await expect(direito.getByRole('row', { name: /pasta-nova/ })).toContainText('Só neste lado');
+    const linhaNova = direito.getByRole('row', { name: /pasta-nova/ });
+    await expect(linhaNova).toContainText('Só neste lado');
+    await expect(linhaNova.locator('td.cor-dif-so-aqui')).toBeVisible();
+
+    // os campos mostram o texto inteiro das opções (sem reticências)
+    const semCorte = async (loc: import('@playwright/test').Locator) =>
+      expect(await loc.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
+    await page.getByRole('combobox', { name: 'Comparar por' }).click();
+    for (const op of await page.getByRole('option').all()) await semCorte(op.locator('.mdc-list-item__primary-text'));
+    await page.getByRole('option', { name: 'Data de modificação' }).click();
+    await semCorte(page.getByRole('combobox', { name: 'Comparar por' }).locator('.mat-mdc-select-min-line'));
+
+    // filtro das diferenças: opções coloridas e filtragem nos dois painéis
+    await page.getByRole('combobox', { name: 'Filtrar diferenças' }).click();
+    await expect(page.getByRole('option')).toHaveText([
+      'Todos',
+      'Só neste lado',
+      'Mais novo',
+      'Mais antigo',
+      'Tamanho diferente',
+    ]);
+    for (const op of await page.getByRole('option').all()) await semCorte(op.locator('.mdc-list-item__primary-text'));
+    await page.getByRole('option', { name: 'Mais novo' }).click();
+    await expect(linhaNova).toHaveCount(0);
+    await page.getByRole('combobox', { name: 'Filtrar diferenças' }).click();
+    await page.getByRole('option', { name: 'Só neste lado' }).click();
+    await expect(linhaNova).toBeVisible();
+    await page.getByRole('combobox', { name: 'Filtrar diferenças' }).click();
+    await page.getByRole('option', { name: 'Todos' }).click();
+    await expect(linhaNova).toBeVisible();
+
     await expect(async () => {
       if ((await comparar.getAttribute('aria-checked')) === 'true') await comparar.click({ force: true });
       await expect(comparar).toHaveAttribute('aria-checked', 'false', { timeout: 1000 });

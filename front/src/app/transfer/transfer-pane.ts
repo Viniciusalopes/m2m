@@ -153,7 +153,7 @@ const MIME = 'application/x-m2m-transfer';
                 <td>{{ e.mtime | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="perm">{{ permissoes(e.mode) }}</td>
                 @if (estados()) {
-                  <td>
+                  <td [class]="rotuloEstado(e) ? 'diferenca cor-' + classeEstado(e) : 'diferenca'">
                     @if (rotuloEstado(e); as r) {
                       <span class="estado">{{ 'transferencia.comparacao.' + r | transloco }}</span>
                     }
@@ -323,19 +323,22 @@ const MIME = 'application/x-m2m-transfer';
       height: 0;
     }
     tr.dif-so-aqui {
-      box-shadow: inset 4px 0 0 var(--m2m-ok);
+      box-shadow: inset 4px 0 0 var(--m2m-ok-container);
     }
     tr.dif-mais-novo {
-      box-shadow: inset 4px 0 0 var(--m2m-info, #1f6feb);
+      box-shadow: inset 4px 0 0 var(--m2m-info-container);
     }
     tr.dif-mais-velho {
-      box-shadow: inset 4px 0 0 var(--m2m-warn);
+      box-shadow: inset 4px 0 0 var(--m2m-warn-container);
     }
     tr.dif-tamanho {
-      box-shadow: inset 4px 0 0 var(--m2m-fail);
+      box-shadow: inset 4px 0 0 var(--m2m-fail-container);
     }
     .estado {
       font-size: 0.85em;
+    }
+    td.diferenca {
+      color: var(--mat-sys-on-surface);
     }
   `,
 })
@@ -347,6 +350,8 @@ export class TransferPane {
   readonly maquinas = input.required<Machine[]>();
   readonly estados = input<Record<string, CompareState> | null>(null);
   readonly ocultarIdenticos = input(false);
+  /** Nomes visíveis pelo filtro de diferenças (nulo = sem filtro). */
+  readonly nomesDif = input<ReadonlySet<string> | null>(null);
   readonly mostrarOcultos = input(true);
 
   /** Navegação feita pelo usuário (não a sincronizada): alimenta a navegação sincronizada. */
@@ -374,8 +379,12 @@ export class TransferPane {
       return [];
     }
     const estados = this.estados();
+    const nomes = this.nomesDif();
     return l.items.filter((e) => {
       if (!this.mostrarOcultos() && e.name.startsWith('.')) {
+        return false;
+      }
+      if (nomes && !nomes.has(e.name)) {
         return false;
       }
       return !(this.ocultarIdenticos() && estados?.[e.name] === 'SAME');

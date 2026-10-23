@@ -963,6 +963,8 @@
       "por-tamanho": "Tamanho",
       "tolerancia": "Tolerância (minutos)",
       "ocultar-identicos": "Ocultar idênticos",
+      "filtrar": "Filtrar diferenças",
+      "TODOS": "Todos",
       "legenda": "Legenda da comparação",
       "ONLY_HERE": "Só neste lado",
       "NEWER": "Mais novo",

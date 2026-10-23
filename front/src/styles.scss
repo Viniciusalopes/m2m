@@ -71,6 +71,24 @@ a {
   font-feature-settings: 'liga';
 }
 
+// Cores pastéis das diferenças da comparação de pastas (legenda, combo e coluna "Diferença")
+.cor-dif-so-aqui,
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item.cor-dif-so-aqui {
+  background: var(--m2m-ok-container);
+}
+.cor-dif-mais-novo,
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item.cor-dif-mais-novo {
+  background: var(--m2m-info-container);
+}
+.cor-dif-mais-velho,
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item.cor-dif-mais-velho {
+  background: var(--m2m-warn-container);
+}
+.cor-dif-tamanho,
+.mat-mdc-select-panel .mat-mdc-option.mdc-list-item.cor-dif-tamanho {
+  background: var(--m2m-fail-container);
+}
+
 .m2m-page {
   // Largura total da área ao lado do menu; formulários e leitura limitam a própria largura
   margin: 0 auto;

@@ -69,7 +69,7 @@ test.describe('transferência pela interface', () => {
     await caminhoDir.press('Enter');
     await expect(esquerdo.getByRole('row', { name: /a\.txt/ })).toBeVisible();
 
-    // pasta exclusiva da execução no servidor (o volume do servidor persiste entre execuções)
+    // pasta exclusiva da execução no servidor (o volume do servidor é apagado ao fim do e2e, mas uma execução interrompida o deixa para trás)
     const pasta = `e2e-${id}`;
     const dialogo = page.getByRole('dialog');
     await direito.locator('.rolagem').click({ button: 'right', position: { x: 40, y: 150 } });

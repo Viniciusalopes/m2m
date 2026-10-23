@@ -17,8 +17,10 @@ test.describe('máquinas', () => {
   });
 
   test('mostra as máquinas iniciais do NOTEBOOK', async ({ page }) => {
-    await expect(page.getByRole('cell', { name: /NOTEBOOK/ })).toBeVisible();
-    await expect(page.getByRole('cell', { name: /NOTEBOOK-REMOTO/ })).toBeVisible();
+    // Ancorado no início: perfis e jobs de outros testes também citam "NOTEBOOK" em suas células
+    await expect(page).toHaveURL(/\/maquinas$/);
+    await expect(page.getByRole('cell', { name: /^NOTEBOOK/ }).first()).toBeVisible();
+    await expect(page.getByRole('cell', { name: /^NOTEBOOK-REMOTO/ }).first()).toBeVisible();
     await expect(page.getByRole('cell', { name: '192.168.0.10:22' })).toBeVisible();
   });
 

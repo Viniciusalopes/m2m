@@ -1,16 +1,16 @@
 .passos {
   list-style: none;
-  margin: 0 0 12px;
+  margin: 0 0 0.75rem;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 
   li {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
   }
 }
 
@@ -20,7 +20,7 @@
 
 .codigo {
   flex-basis: 100%;
-  padding-left: 8px;
+  padding-left: 0.5rem;
   font: var(--mat-sys-body-small);
   color: var(--m2m-fail);
 }
@@ -30,7 +30,7 @@
 .aviso {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .erro {
@@ -46,12 +46,12 @@
 .identidade {
   border: 1px solid var(--m2m-warn);
   background: var(--m2m-warn-container);
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin: 12px 0;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0;
 
   h3 {
-    margin: 0 0 4px;
+    margin: 0 0 0.25rem;
   }
 }
 
@@ -62,8 +62,8 @@
 
 .recurso {
   display: inline-block;
-  margin-left: 8px;
-  padding: 0 8px;
-  border-radius: 999px;
+  margin-left: 0.5rem;
+  padding: 0 0.5rem;
+  border-radius: 62.4375rem;
   background: var(--mat-sys-secondary-container);
 }

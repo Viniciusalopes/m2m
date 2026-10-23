@@ -1,13 +1,13 @@
 .painel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .grade {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
 }
 
 .vazio {
@@ -17,7 +17,7 @@
 .ok {
   color: var(--m2m-ok);
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
 }
 
@@ -43,21 +43,21 @@
   th,
   td {
     text-align: left;
-    padding: 8px;
+    padding: 0.5rem;
     border-bottom: 1px solid var(--mat-sys-outline-variant);
     vertical-align: top;
   }
 }
 
 .espaco {
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 
   .titulo {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
   }
 
   .detalhe {

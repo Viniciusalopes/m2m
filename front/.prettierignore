@@ -1,2 +1,6 @@
 src/app/api/
 src/assets/THIRD-PARTY-NOTICES.md
+
+# Gerados por scripts/gerar-escala-material.mjs
+src/theme/_escala.scss
+src/theme/_escala-material.scss

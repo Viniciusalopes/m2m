@@ -215,13 +215,13 @@ type FiltroDif = 'TODOS' | 'ONLY_HERE' | 'NEWER' | 'OLDER' | 'SIZE_DIFFERENT';
     .transferencia {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0.75rem;
       max-width: none;
     }
     .barra {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 1rem;
       align-items: center;
     }
     .modo {
@@ -235,7 +235,7 @@ type FiltroDif = 'TODOS' | 'ONLY_HERE' | 'NEWER' | 'OLDER' | 'SIZE_DIFFERENT';
     }
     .legenda {
       display: flex;
-      gap: 16px;
+      gap: 1rem;
       flex-wrap: wrap;
       list-style: none;
       margin: 0;
@@ -244,25 +244,25 @@ type FiltroDif = 'TODOS' | 'ONLY_HERE' | 'NEWER' | 'OLDER' | 'SIZE_DIFFERENT';
     .legenda li {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.375rem;
     }
     .cor {
       display: inline-block;
       width: 0.875rem;
       height: 0.875rem;
-      border-radius: 3px;
+      border-radius: 0.1875rem;
       border: 1px solid var(--mat-sys-outline-variant);
     }
     .paineis {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      gap: 8px;
+      gap: 0.5rem;
       align-items: start;
     }
     .controles {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
       justify-content: center;
       align-self: center;
     }
@@ -271,7 +271,7 @@ type FiltroDif = 'TODOS' | 'ONLY_HERE' | 'NEWER' | 'OLDER' | 'SIZE_DIFFERENT';
     .ok {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.375rem;
       margin: 0;
     }
     .aviso {

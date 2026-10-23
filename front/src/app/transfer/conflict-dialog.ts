@@ -96,17 +96,17 @@ export const ACOES: ConflictAction[] = [
     }
     .comparativo {
       border-collapse: collapse;
-      margin-bottom: 12px;
+      margin-bottom: 0.75rem;
     }
     .comparativo th,
     .comparativo td {
-      padding: 4px 16px 4px 0;
+      padding: 0.25rem 1rem 0.25rem 0;
       text-align: left;
     }
     .acoes {
       display: flex;
       flex-direction: column;
-      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
     }
     .progresso {
       color: var(--mat-sys-on-surface-variant);

@@ -137,12 +137,12 @@ interface SmtpView {
     .form {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 0.25rem;
       max-width: 35rem;
     }
     .linha {
       display: flex;
-      gap: 12px;
+      gap: 0.75rem;
     }
     .host {
       flex: 1;
@@ -152,14 +152,14 @@ interface SmtpView {
     }
     .acoes {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       justify-content: flex-end;
-      margin-top: 8px;
+      margin-top: 0.5rem;
     }
     .ok,
     .erro {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
       margin: 0;
     }

@@ -7,19 +7,19 @@
 .topo {
   background: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .marca {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   text-decoration: none;
   color: inherit;
 }
 
 .marca-logo {
-  height: 32px;
+  height: 2rem;
 }
 
 .marca-nome {
@@ -45,8 +45,8 @@
 .aviso-chave {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
   background: var(--m2m-warn-container);
   color: var(--m2m-warn);
   flex-wrap: wrap;

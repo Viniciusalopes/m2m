@@ -126,18 +126,18 @@ interface ImportPreview {
     .form {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
     }
     .acoes {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       justify-content: flex-end;
       flex-wrap: wrap;
     }
     .ok,
     .erro {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
     }
     .ok {

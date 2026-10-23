@@ -116,15 +116,15 @@ export interface VerifyResult {
     .relatorio h4 {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
     h5 {
-      margin: 12px 0 4px;
+      margin: 0.75rem 0 0.25rem;
     }
     ul {
       margin: 0;
-      padding-left: 20px;
+      padding-left: 1.25rem;
       font-family: ui-monospace, monospace;
       font-size: 0.85rem;
       word-break: break-all;
@@ -132,13 +132,13 @@ export interface VerifyResult {
     .aviso {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
       color: var(--m2m-warn);
     }
     .diretorio {
       border-top: 1px solid var(--mat-sys-outline-variant);
-      padding-top: 8px;
-      margin-top: 8px;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
     }
   `,
 })

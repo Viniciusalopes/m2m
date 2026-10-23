@@ -125,7 +125,7 @@ import { Profile } from './profiles.service';
       font-weight: 600;
     }
     .amostra {
-      max-height: 120px;
+      max-height: 7.5rem;
       overflow: auto;
       font-family: monospace;
     }

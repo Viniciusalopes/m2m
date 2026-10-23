@@ -7,7 +7,10 @@ export interface GrafanaConfig {
  * Endereço do Grafana: HTTPS, no mesmo host pelo qual o m2m foi aberto (coberto pelo mesmo certificado) e na porta configurada.
  * Sem porta válida devolve null e o botão não aparece.
  */
-export function grafanaUrl(hostname: string, config: GrafanaConfig | null | undefined): string | null {
+export function grafanaUrl(
+  hostname: string,
+  config: GrafanaConfig | null | undefined,
+): string | null {
   const porta = Number(config?.port);
   if (!hostname || !Number.isInteger(porta) || porta < 1 || porta > 65535) return null;
   const host = hostname.includes(':') && !hostname.startsWith('[') ? `[${hostname}]` : hostname;

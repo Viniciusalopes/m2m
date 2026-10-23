@@ -1,8 +1,13 @@
 @use '@angular/material' as mat;
 @use './theme/theme-colors' as m2m;
+@use './theme/escala';
+@use './theme/escala-material';
 
 // Tema Material 3 do m2m (D34): azul-petróleo, âmbar e vermelho de erro; claro e escuro pelo color-scheme
 html {
+  // Escala das telas (issue reduzir-proporcoes): com o navegador em 100% o m2m aparece como em 90%.
+  // Este é o único ponto do fator: tudo em rem (tipografia, tokens de _escala.scss, medidas do app) acompanha.
+  font-size: 90%;
   color-scheme: light dark;
   @include mat.theme(
     (
@@ -18,6 +23,8 @@ html {
       density: 0,
     )
   );
+  // Tamanhos dos componentes do Material em rem; depois do tema para prevalecer sobre ele
+  @include escala.tokens;
   // Estados do sistema: sempre usados com ícone + texto (nunca só cor)
   --m2m-ok: light-dark(#1b6e3c, #7fd69a);
   --m2m-ok-container: light-dark(#d4f3de, #0f3a20);
@@ -92,7 +99,7 @@ a {
 .m2m-page {
   // Largura total da área ao lado do menu; formulários e leitura limitam a própria largura
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 1.5rem 1rem;
 }
 
 // O texto do rótulo não pode interceptar o clique no campo (select abre ao clicar em qualquer ponto)

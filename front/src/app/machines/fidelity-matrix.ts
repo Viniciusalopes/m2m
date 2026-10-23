@@ -38,12 +38,12 @@ import { Fidelity } from './machines.service';
     caption {
       text-align: left;
       font: var(--mat-sys-label-large);
-      padding-bottom: 4px;
+      padding-bottom: 0.25rem;
     }
     th {
       text-align: left;
       font-weight: 500;
-      padding: 2px 16px 2px 0;
+      padding: 2px 1rem 2px 0;
     }
     td {
       padding: 2px 0;
@@ -53,7 +53,7 @@ import { Fidelity } from './machines.service';
       font-size: 1.125rem;
       width: 1.125rem;
       height: 1.125rem;
-      margin-right: 4px;
+      margin-right: 0.25rem;
     }
     .sim {
       color: var(--m2m-ok);

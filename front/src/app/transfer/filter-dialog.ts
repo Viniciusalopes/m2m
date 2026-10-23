@@ -144,17 +144,17 @@ const OPERADORES: Record<string, string[]> = {
     .combinacao {
       display: flex;
       flex-direction: column;
-      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
     }
     .condicao,
     .conjuntos {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
       flex-wrap: wrap;
     }
     .valor {
-      flex: 1 1 160px;
+      flex: 1 1 10rem;
     }
   `,
 })

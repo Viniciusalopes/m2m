@@ -1,13 +1,13 @@
 .campos {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.25rem;
   min-width: min(32.5rem, 80vw);
 }
 
 .linha {
   display: flex;
-  gap: 12px;
+  gap: 0.75rem;
 
   .host {
     flex: 1;
@@ -22,8 +22,8 @@
 .erro {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 8px;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
 }
 
 .alerta {
@@ -36,11 +36,11 @@
 
 .chave {
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 12px;
-  padding: 12px 16px;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: flex-start;
 
   h3 {
@@ -60,7 +60,7 @@
     word-break: break-all;
     font: var(--mat-sys-body-small);
     background: var(--mat-sys-surface-container);
-    padding: 8px;
-    border-radius: 8px;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
   }
 }

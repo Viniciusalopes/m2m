@@ -5,32 +5,32 @@
 form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .grade {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 8px 16px;
-  padding-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem 1rem;
+  padding-top: 1rem;
 }
 
 .largo {
   width: 100%;
   max-width: 26.25rem;
-  margin-top: 16px;
+  margin-top: 1rem;
 }
 
 .diretorios {
   list-style: none;
-  margin: 0 0 12px;
+  margin: 0 0 0.75rem;
   padding: 0;
 
   li {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 0;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
   }
 
   .vazio {
@@ -55,7 +55,7 @@ form {
   th,
   td {
     text-align: left;
-    padding: 4px 8px 4px 0;
+    padding: 0.25rem 0.5rem 0.25rem 0;
     vertical-align: middle;
   }
 
@@ -67,14 +67,14 @@ form {
 .agenda {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 1rem;
   align-items: center;
-  padding-top: 16px;
+  padding-top: 1rem;
 }
 
 .recomendacao {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
   color: var(--m2m-info);
   margin: 0;
@@ -82,7 +82,7 @@ form {
 
 .erro {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
   color: var(--m2m-fail);
   margin: 0;
@@ -91,5 +91,5 @@ form {
 .acoes {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 0.5rem;
 }

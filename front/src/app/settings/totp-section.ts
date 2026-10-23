@@ -126,21 +126,21 @@ interface TotpStatus {
     .form {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
       max-width: 22.5rem;
     }
     .acoes {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       flex-wrap: wrap;
-      margin-top: 8px;
+      margin-top: 0.5rem;
     }
     .qr {
       width: 13.75rem;
       height: 13.75rem;
       background: #fff;
-      padding: 8px;
-      border-radius: 8px;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
     }
     .codigos {
       columns: 2;
@@ -153,7 +153,7 @@ interface TotpStatus {
     .ok,
     .erro {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
     }
     .aviso {

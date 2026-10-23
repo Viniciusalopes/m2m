@@ -140,19 +140,19 @@ interface MaintenanceSettings {
     .form {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
     }
     .acoes {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       justify-content: flex-end;
       flex-wrap: wrap;
-      margin-top: 8px;
+      margin-top: 0.5rem;
     }
     .ok,
     .erro {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
       margin: 0;
     }

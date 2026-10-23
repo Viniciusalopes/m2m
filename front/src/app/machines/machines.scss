@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .tabela {
@@ -26,23 +26,23 @@ table {
 
 .vazio {
   text-align: center;
-  padding: 24px;
+  padding: 1.5rem;
   color: var(--mat-sys-on-surface-variant);
 }
 
 .erro {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   color: var(--m2m-fail);
   background: var(--m2m-fail-container);
-  padding: 8px 16px;
-  border-radius: 12px;
-  margin-bottom: 12px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
 
   p {
     margin: 0;
   }
   ul {
-    margin: 4px 0 0;
+    margin: 0.25rem 0 0;
   }
 }

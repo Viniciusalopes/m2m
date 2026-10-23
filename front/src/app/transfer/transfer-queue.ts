@@ -130,16 +130,16 @@ const ESTADOS: Record<string, Estado> = {
   styles: `
     .fila {
       border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: 12px;
+      border-radius: 0.75rem;
       background: var(--mat-sys-surface);
-      padding: 8px 12px;
+      padding: 0.5rem 0.75rem;
     }
     .cabecalho {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 0.5rem;
     }
     .cabecalho h2 {
       margin: 0;
@@ -147,11 +147,11 @@ const ESTADOS: Record<string, Estado> = {
     }
     .acoes {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
     .rolagem {
-      max-height: 260px;
+      max-height: 16.25rem;
       overflow: auto;
     }
     .tabela {
@@ -163,11 +163,11 @@ const ESTADOS: Record<string, Estado> = {
       top: 0;
       background: var(--mat-sys-surface-container);
       text-align: left;
-      padding: 4px 8px;
+      padding: 0.25rem 0.5rem;
       font: var(--mat-sys-label-large);
     }
     .tabela td {
-      padding: 4px 8px;
+      padding: 0.25rem 0.5rem;
     }
     .caminho {
       max-width: 16.25rem;
@@ -185,13 +185,13 @@ const ESTADOS: Record<string, Estado> = {
     }
     .vazio {
       text-align: center;
-      padding: 16px;
+      padding: 1rem;
       color: var(--mat-sys-on-surface-variant);
     }
     .erro {
       color: var(--m2m-fail);
       display: flex;
-      gap: 6px;
+      gap: 0.375rem;
       align-items: center;
     }
   `,

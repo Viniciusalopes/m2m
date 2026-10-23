@@ -75,19 +75,19 @@ export interface DirBrowserData {
     .caminho {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
       font-family: ui-monospace, monospace;
       word-break: break-all;
     }
     .erro {
       color: var(--m2m-fail);
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
     }
     .vazio {
       color: var(--mat-sys-on-surface-variant);
-      padding: 8px 16px;
+      padding: 0.5rem 1rem;
     }
   `,
 })

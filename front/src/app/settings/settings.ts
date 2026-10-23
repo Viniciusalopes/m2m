@@ -22,7 +22,7 @@ import { TotpSection } from './totp-section';
     .config {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 1rem;
     }
   `,
 })

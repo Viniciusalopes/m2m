@@ -211,12 +211,12 @@ const MIME = 'application/x-m2m-transfer';
       flex-direction: column;
       height: 100%;
       border: 1px solid var(--mat-sys-outline-variant);
-      border-radius: 12px;
+      border-radius: 0.75rem;
       background: var(--mat-sys-surface);
       overflow: hidden;
     }
     .topo {
-      padding: 8px 12px 0;
+      padding: 0.5rem 0.75rem 0;
     }
     .maquina {
       width: 100%;
@@ -224,14 +224,14 @@ const MIME = 'application/x-m2m-transfer';
     .barra {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 0.25rem;
     }
     .caminho {
       flex: 1;
       min-width: 0;
-      padding: 6px 10px;
+      padding: 0.375rem 0.625rem;
       border: 1px solid var(--mat-sys-outline);
-      border-radius: 6px;
+      border-radius: 0.375rem;
       background: transparent;
       color: inherit;
       font: inherit;
@@ -243,8 +243,8 @@ const MIME = 'application/x-m2m-transfer';
     .erro {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin: 4px 0;
+      gap: 0.375rem;
+      margin: 0.25rem 0;
       font-size: 0.9em;
     }
     .indicador {
@@ -255,7 +255,7 @@ const MIME = 'application/x-m2m-transfer';
     }
     .rolagem {
       flex: 1;
-      min-height: 280px;
+      min-height: 17.5rem;
       max-height: 56vh;
       overflow: auto;
     }
@@ -268,11 +268,11 @@ const MIME = 'application/x-m2m-transfer';
       top: 0;
       background: var(--mat-sys-surface-container);
       text-align: left;
-      padding: 6px 10px;
+      padding: 0.375rem 0.625rem;
       font: var(--mat-sys-label-large);
     }
     .lista td {
-      padding: 4px 10px;
+      padding: 0.25rem 0.625rem;
       white-space: nowrap;
     }
     .lista tr {
@@ -287,7 +287,7 @@ const MIME = 'application/x-m2m-transfer';
     .nome {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.375rem;
       max-width: 20rem;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -310,10 +310,10 @@ const MIME = 'application/x-m2m-transfer';
     .vazio {
       text-align: center;
       color: var(--mat-sys-on-surface-variant);
-      padding: 24px;
+      padding: 1.5rem;
     }
     .rodape {
-      padding: 4px 12px;
+      padding: 0.25rem 0.75rem;
       font-size: 0.85em;
       color: var(--mat-sys-on-surface-variant);
     }
@@ -323,16 +323,16 @@ const MIME = 'application/x-m2m-transfer';
       height: 0;
     }
     tr.dif-so-aqui {
-      box-shadow: inset 4px 0 0 var(--m2m-ok-container);
+      box-shadow: inset 0.25rem 0 0 var(--m2m-ok-container);
     }
     tr.dif-mais-novo {
-      box-shadow: inset 4px 0 0 var(--m2m-info-container);
+      box-shadow: inset 0.25rem 0 0 var(--m2m-info-container);
     }
     tr.dif-mais-velho {
-      box-shadow: inset 4px 0 0 var(--m2m-warn-container);
+      box-shadow: inset 0.25rem 0 0 var(--m2m-warn-container);
     }
     tr.dif-tamanho {
-      box-shadow: inset 4px 0 0 var(--m2m-fail-container);
+      box-shadow: inset 0.25rem 0 0 var(--m2m-fail-container);
     }
     .estado {
       font-size: 0.85em;

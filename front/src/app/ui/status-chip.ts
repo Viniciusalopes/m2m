@@ -28,9 +28,9 @@ const ICONES: Record<Estado, string> = {
     .chip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 2px 10px 2px 6px;
-      border-radius: 999px;
+      gap: 0.375rem;
+      padding: 2px 0.625rem 2px 0.375rem;
+      border-radius: 62.4375rem;
       font: var(--mat-sys-label-large);
       white-space: nowrap;
     }

@@ -1,0 +1,455 @@
+// GERADO por scripts/gerar-escala-material.mjs (npm run escala); não edite à mão.
+// Medidas fixas em px dos componentes do Material convertidas para rem. O prefixo `html` na frente do seletor vence a regra
+// original do componente (mesma ordem de grandeza, um elemento a mais) sem precisar de !important.
+
+html .mat-form-field-appearance-fill .mat-mdc-select-arrow-wrapper {
+  transform: var(--mat-select-arrow-transform, translateY(-0.5rem));
+}
+
+html .mat-horizontal-content-container {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+html .mat-horizontal-stepper-header {
+  padding: 0 1.5rem;
+}
+
+html .mat-horizontal-stepper-header .mat-step-icon {
+  margin-right: 0.5rem;
+}
+
+html .mat-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+html .mat-internal-form-field > label,
+html .mat-internal-form-field > .mat-internal-form-field-label {
+  padding-left: 0.25rem;
+}
+
+html .mat-mdc-card-actions {
+  min-height: 3.25rem;
+  padding: 0.5rem;
+}
+
+html .mat-mdc-card-avatar {
+  height: 2.5rem;
+  width: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+html .mat-mdc-card-avatar ~ .mat-mdc-card-header-text .mat-mdc-card-title,
+html .mat-mdc-card-avatar ~ .mat-mdc-card-header-text .mat-mdc-card-subtitle {
+  padding: 1rem 1rem 0;
+}
+
+html .mat-mdc-card-content {
+  padding: 0 1rem;
+}
+
+html .mat-mdc-card-content:first-child {
+  padding-top: 1rem;
+}
+
+html .mat-mdc-card-content:last-child {
+  padding-bottom: 1rem;
+}
+
+html .mat-mdc-card-header {
+  padding: 1rem 1rem 0;
+}
+
+html .mat-mdc-card-lg-image {
+  width: 9.5rem;
+  height: 9.5rem;
+}
+
+html .mat-mdc-card-md-image {
+  width: 7rem;
+  height: 7rem;
+}
+
+html .mat-mdc-card-sm-image {
+  width: 5rem;
+  height: 5rem;
+}
+
+html .mat-mdc-card-xl-image {
+  width: 15rem;
+  height: 15rem;
+}
+
+html .mat-mdc-dialog-actions {
+  min-height: 3.25rem;
+}
+
+html .mat-mdc-dialog-actions .mat-button-base + .mat-button-base,
+html .mat-mdc-dialog-actions .mat-mdc-button-base + .mat-mdc-button-base {
+  margin-left: 0.5rem;
+}
+
+html .mat-mdc-dialog-title::before {
+  height: 2.5rem;
+}
+
+html .mat-mdc-form-field-bottom-align::before {
+  height: 1rem;
+}
+
+html .mat-mdc-form-field-hint-wrapper,
+html .mat-mdc-form-field-error-wrapper {
+  padding: 0 1rem;
+}
+
+html .mat-mdc-form-field-icon-prefix > .mat-icon,
+html .mat-mdc-form-field-icon-suffix > .mat-icon {
+  padding: 0 0.75rem;
+}
+
+html .mat-mdc-form-field-infix {
+  width: 11.25rem;
+}
+
+html .mat-mdc-form-field-type-mat-native-select .mat-mdc-form-field-infix::after {
+  border-left: 0.3125rem solid transparent;
+  border-right: 0.3125rem solid transparent;
+  border-top: 0.3125rem solid;
+  margin-top: -0.1563rem;
+}
+
+html .mat-mdc-form-field-type-mat-native-select .mat-mdc-form-field-input-control {
+  padding-right: 0.9375rem;
+}
+
+html .mat-mdc-form-field-type-mat-select.mat-form-field-appearance-fill .mat-mdc-floating-label {
+  max-width: calc(100% - 1.125rem);
+}
+
+html .mat-mdc-form-field-type-mat-select.mat-form-field-appearance-fill .mdc-floating-label--float-above {
+  max-width: calc(100% / 0.75 - 1.5rem);
+}
+
+html .mat-mdc-form-field-type-mat-select.mat-form-field-appearance-outline .mdc-notched-outline__notch {
+  max-width: calc(100% - 3.75rem);
+}
+
+html .mat-mdc-form-field-type-mat-select.mat-form-field-appearance-outline .mdc-text-field--label-floating .mdc-notched-outline__notch {
+  max-width: calc(100% - 1.5rem);
+}
+
+html .mat-mdc-menu-content {
+  padding: 0.5rem 0;
+}
+
+html .mat-mdc-menu-item {
+  min-height: 3rem;
+}
+
+html .mat-mdc-menu-panel {
+  min-width: 7rem;
+  max-width: 17.5rem;
+}
+
+html .mat-mdc-menu-submenu-icon {
+  height: 0.625rem;
+}
+
+html .mat-mdc-optgroup .mat-mdc-option:not(.mat-mdc-option-multiple) {
+  padding-left: 2rem;
+}
+
+html .mat-mdc-option {
+  min-height: 3rem;
+  padding: 0 1rem;
+}
+
+html .mat-mdc-option .mat-icon,
+html .mat-mdc-option .mat-pseudo-checkbox-full {
+  margin-right: 1rem;
+}
+
+html .mat-mdc-option .mat-pseudo-checkbox-minimal {
+  margin-left: 1rem;
+}
+
+html .mat-mdc-outlined-button .mat-focus-indicator::before {
+  margin: calc(calc(var(--mat-focus-indicator-border-width, 0.1875rem) + 0.1875rem) * -1);
+}
+
+html .mat-mdc-paginator-container {
+  padding: 0 0.5rem;
+}
+
+html .mat-mdc-paginator-icon {
+  width: 1.75rem;
+}
+
+html .mat-mdc-paginator-page-size {
+  margin-right: 0.5rem;
+}
+
+html .mat-mdc-paginator-page-size-label {
+  margin: 0 0.25rem;
+}
+
+html .mat-mdc-paginator-page-size-select {
+  margin: 0 0.25rem;
+}
+
+html .mat-mdc-paginator-range-label {
+  margin: 0 2rem 0 1.5rem;
+}
+
+html .mat-mdc-radio-button .mdc-radio {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: calc((var(--mat-radio-state-layer-size, 2.5rem) - 1.25rem) / 2);
+}
+
+html .mat-mdc-radio-button .mdc-radio__background {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+html .mat-mdc-radio-button .mdc-radio__background::before {
+  top: calc(-1 * (var(--mat-radio-state-layer-size, 2.5rem) - 1.25rem) / 2);
+  left: calc(-1 * (var(--mat-radio-state-layer-size, 2.5rem) - 1.25rem) / 2);
+}
+
+html .mat-mdc-select-arrow {
+  width: 0.625rem;
+  height: 0.3125rem;
+}
+
+html .mat-mdc-select-arrow-wrapper {
+  height: 1.5rem;
+}
+
+html .mat-mdc-select-panel-above div.mat-mdc-select-panel {
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+html .mat-mdc-text-field-wrapper .mat-mdc-form-field-input-control.mdc-text-field__input[type=color] {
+  height: 1.4375rem;
+}
+
+html .mat-mdc-tooltip-panel-above .mat-mdc-tooltip::before {
+  bottom: -0.5rem;
+}
+
+html .mat-mdc-tooltip-panel-below .mat-mdc-tooltip::before {
+  top: -0.5rem;
+}
+
+html .mat-mdc-tooltip-panel-left .mat-mdc-tooltip::before {
+  right: -0.5rem;
+}
+
+html .mat-mdc-tooltip-panel-right .mat-mdc-tooltip::before {
+  left: -0.5rem;
+}
+
+html .mat-mdc-tooltip-surface {
+  padding: 0.25rem 0.5rem;
+  min-width: 2.5rem;
+  max-width: 12.5rem;
+  min-height: 1.5rem;
+}
+
+html .mat-pseudo-checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+html .mat-pseudo-checkbox-full.mat-pseudo-checkbox-checked::after {
+  width: 0.625rem;
+  height: 0.25rem;
+  top: -0.1768rem;
+}
+
+html .mat-pseudo-checkbox-full.mat-pseudo-checkbox-indeterminate::after {
+  top: 0.375rem;
+  width: 0.75rem;
+}
+
+html .mat-pseudo-checkbox-minimal.mat-pseudo-checkbox-checked::after {
+  width: 0.875rem;
+  height: 0.375rem;
+  top: -0.2652rem;
+}
+
+html .mat-pseudo-checkbox-minimal.mat-pseudo-checkbox-indeterminate::after {
+  top: 0.5rem;
+  width: 1rem;
+}
+
+html .mat-step-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+html .mat-step-icon .mat-icon {
+  font-size: 1rem;
+  height: 1rem;
+  width: 1rem;
+}
+
+html .mat-step-icon-state-error .mat-icon {
+  font-size: 1.5rem;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+html .mat-step-label {
+  min-width: 3.125rem;
+}
+
+html .mat-step-optional {
+  font-size: 0.75rem;
+}
+
+html .mat-step-sub-label-error {
+  font-size: 0.75rem;
+}
+
+html .mat-stepper-header-position-bottom .mat-horizontal-content-container {
+  padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
+html .mat-stepper-horizontal-line {
+  margin: 0 -1rem;
+  min-width: 2rem;
+}
+
+html .mat-stepper-label-position-bottom .mat-horizontal-stepper-header {
+  padding: calc((var(--mat-stepper-header-height, 4.5rem) - 1.5rem) / 2) 1.5rem;
+}
+
+html .mat-stepper-label-position-bottom .mat-horizontal-stepper-header .mat-step-label {
+  padding: 1rem 0 0 0;
+}
+
+html .mat-stepper-label-position-bottom .mat-horizontal-stepper-header::before,
+html .mat-stepper-label-position-bottom .mat-horizontal-stepper-header::after {
+  top: calc(calc((var(--mat-stepper-header-height, 4.5rem) - 1.5rem) / 2) + 0.75rem);
+}
+
+html .mat-stepper-label-position-bottom .mat-stepper-horizontal-line {
+  top: calc(calc((var(--mat-stepper-header-height, 4.5rem) - 1.5rem) / 2) + 0.75rem);
+}
+
+html .mat-stepper-vertical-line::before {
+  top: calc(0.5rem - calc((var(--mat-stepper-header-height, 4.5rem) - 1.5rem) / 2));
+  bottom: calc(0.5rem - calc((var(--mat-stepper-header-height, 4.5rem) - 1.5rem) / 2));
+}
+
+html .mat-toolbar-row,
+html .mat-toolbar-single-row {
+  padding: 0 1rem;
+}
+
+html .mat-vertical-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+html .mat-vertical-content-container {
+  margin-left: 2.25rem;
+}
+
+html .mat-vertical-stepper-header {
+  height: 1.5rem;
+  padding: calc((var(--mat-stepper-header-height, 4.5rem) - 1.5rem) / 2) 1.5rem;
+}
+
+html .mat-vertical-stepper-header .mat-step-icon {
+  margin-right: 0.75rem;
+}
+
+html .mdc-button {
+  min-width: 4rem;
+  padding: 0 0.5rem;
+}
+
+html .mdc-checkbox {
+  flex: 0 0 1.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  padding: calc((var(--mat-checkbox-state-layer-size, 2.5rem) - 1.125rem) / 2);
+}
+
+html .mdc-checkbox__background {
+  width: 1.125rem;
+  height: 1.125rem;
+  top: calc((var(--mat-checkbox-state-layer-size, 2.5rem) - 1.125rem) / 2);
+  left: calc((var(--mat-checkbox-state-layer-size, 2.5rem) - 1.125rem) / 2);
+}
+
+html .mdc-data-table__cell,
+html .mdc-data-table__header-cell {
+  padding: 0 1rem;
+}
+
+html .mdc-form-field--align-end > label,
+html .mdc-form-field--align-end > .mat-internal-form-field-label {
+  padding-right: 0.25rem;
+}
+
+html .mdc-notched-outline--notched .mdc-notched-outline__notch {
+  padding-right: 0.5rem;
+}
+
+html .mdc-text-field {
+  padding: 0 1rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+html .mdc-text-field__input {
+  height: 1.75rem;
+}
+
+html .mdc-text-field--filled {
+  height: 3.5rem;
+}
+
+html .mdc-text-field--filled .mdc-floating-label {
+  left: 1rem;
+}
+
+html .mdc-text-field--outlined {
+  height: 3.5rem;
+  padding-right: max(1rem, var(--mat-form-field-outlined-container-shape, var(--mat-sys-corner-extra-small)));
+  padding-left: max(1rem, var(--mat-form-field-outlined-container-shape, var(--mat-sys-corner-extra-small)) + 0.25rem);
+}
+
+html .mdc-text-field--outlined .mdc-floating-label {
+  left: 0.25rem;
+}
+
+html .mdc-text-field--outlined .mdc-floating-label--float-above {
+  transform: translateY(-2.3281rem) scale(1);
+}
+
+html .mdc-text-field--outlined .mdc-notched-outline .mdc-notched-outline__leading {
+  width: max(0.75rem, var(--mat-form-field-outlined-container-shape, var(--mat-sys-corner-extra-small)));
+}
+
+html .mdc-text-field--outlined .mdc-notched-outline .mdc-notched-outline__notch {
+  max-width: min(var(--mat-form-field-notch-max-width, 100%), calc(100% - max(0.75rem, var(--mat-form-field-outlined-container-shape, var(--mat-sys-corner-extra-small))) * 2));
+}
+
+html .mdc-text-field--outlined .mdc-notched-outline--notched .mdc-notched-outline__notch {
+  max-width: min(100%, calc(100% - max(0.75rem, var(--mat-form-field-outlined-container-shape, var(--mat-sys-corner-extra-small))) * 2));
+}
+
+html .mdc-text-field--outlined.mdc-notched-outline--upgraded .mdc-floating-label--float-above,
+html .mdc-text-field--outlined .mdc-notched-outline--upgraded .mdc-floating-label--float-above {
+  transform: translateY(-2.1719rem) scale(0.75);
+}
+
+html div.mat-mdc-select-panel {
+  max-height: 17.1875rem;
+  padding: 0.5rem 0;
+  border-radius: 0 0 0.25rem 0.25rem;
+}

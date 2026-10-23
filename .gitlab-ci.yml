@@ -36,6 +36,7 @@ lint-compose:
     POSTGRES_PASSWORD: ci
     RABBITMQ_PASSWORD: ci
     APP_SECRET_KEY: chave-de-ci-com-mais-de-16-caracteres
+    GRAFANA_ADMIN_PASSWORD: ci
   script:
     - docker compose -f docker-compose.yml config -q
     - docker compose -f docker-compose.yml -f docker-compose.test.yml config -q

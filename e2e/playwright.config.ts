@@ -23,6 +23,8 @@ export const credenciais = {
 export default defineConfig({
   testDir: './tests',
   timeout: 30_000,
+  globalSetup: './global-setup.ts',
+  globalTeardown: './global-teardown.ts',
   fullyParallel: false,
   workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],

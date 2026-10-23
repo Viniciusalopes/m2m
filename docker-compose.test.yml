@@ -1,8 +1,11 @@
-# Sobreposição para testes e2e: sobe servidores SFTP, FTP e FTPS em container e um sandbox (D19, D36).
-# Uso: docker compose -f docker-compose.yml -f docker-compose.test.yml --env-file .env up -d --build
-# NUNCA aponta para máquinas reais: todos os testes que gravam usam estes servidores e o sandbox.
+# Sobreposição para testes e2e: define servidores SFTP, FTP, FTPS, OpenSSH e SMTP em container (D19, D36).
+# Os servidores ficam no profile "test": não sobem com o stack; o global-setup do e2e os sobe (E2E_SERVERS=1) e o global-teardown os derruba.
+# NUNCA aponta para máquinas reais: todos os testes que gravam usam estes servidores e o diretório sandbox do host.
+# Convenção: todo container de teste se chama m2m-test-*; é por esse prefixo que o Alloy (logs/alloy/config.alloy) deixa os logs deles fora do Grafana.
 services:
   m2m-test-sftp:
+    container_name: m2m-test-sftp-e2e
+    profiles: ["test"]
     image: atmoz/sftp:latest
     command: "m2m:m2m-teste:1000:1000:dados"
     volumes:
@@ -12,6 +15,8 @@ services:
 
   # OpenSSH completo (sem chroot, home gravável em /config): destino das transferências e2e (D19)
   m2m-test-ssh:
+    container_name: m2m-test-ssh-e2e
+    profiles: ["test"]
     image: lscr.io/linuxserver/openssh-server:latest
     environment:
       PUID: "1000"
@@ -26,6 +31,8 @@ services:
       - "127.0.0.1:2223:2222"
 
   m2m-test-ftp:
+    container_name: m2m-test-ftp-e2e
+    profiles: ["test"]
     image: stilliard/pure-ftpd:latest
     environment:
       PUBLICHOST: m2m-test-ftp
@@ -40,6 +47,8 @@ services:
       - "127.0.0.1:30000-30009:30000-30009"
 
   m2m-test-ftps:
+    container_name: m2m-test-ftps-e2e
+    profiles: ["test"]
     image: stilliard/pure-ftpd:latest
     environment:
       PUBLICHOST: m2m-test-ftps
@@ -53,20 +62,23 @@ services:
       ADDED_FLAGS: "--tls=1"
     volumes:
       - m2m-test-ftps-data:/home/m2m
+    # O pure-ftpd só abre a porta depois de gerar os parâmetros DH (~25 s); o e2e espera por isso (--wait)
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/21"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
     ports:
       - "127.0.0.1:2122:21"
       - "127.0.0.1:30010-30019:30010-30019"
 
   # Servidor SMTP de teste (MailDev): recebe os e-mails do m2m; interface em http://127.0.0.1:1080
   m2m-test-smtp:
+    container_name: m2m-test-smtp-e2e
+    profiles: ["test"]
     image: maildev/maildev:latest
     ports:
       - "127.0.0.1:1080:1080"
-
-  # Sandbox local: diretório do host onde os testes podem gravar livremente
-  m2m-back:
-    environment:
-      M2M_SANDBOX_DIR: /hostfs/home/usuario/m2m-sandbox
 
 volumes:
   m2m-test-ssh-data:

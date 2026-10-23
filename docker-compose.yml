@@ -2,6 +2,7 @@ name: m2m
 
 services:
   m2m-db:
+    container_name: m2m-db-postgresql
     build: ./db
     image: m2m-db:dev
     environment:
@@ -19,6 +20,7 @@ services:
     restart: unless-stopped
 
   m2m-queue:
+    container_name: m2m-queue-rabbitmq
     build: ./queue
     image: m2m-queue:dev
     environment:
@@ -36,6 +38,7 @@ services:
 
   # Execução única: aplica as migrações de db/migrations e termina (D16)
   m2m-db-migrate:
+    container_name: m2m-db-pg-migrate
     image: flyway/flyway:11
     command: >
       -url=jdbc:postgresql://m2m-db:5432/${POSTGRES_DB:-m2m}
@@ -52,6 +55,7 @@ services:
     restart: "no"
 
   m2m-back:
+    container_name: m2m-back-java
     build: ./back
     image: m2m-back:dev
     user: "1000:1000"
@@ -89,6 +93,7 @@ services:
     restart: unless-stopped
 
   m2m-front:
+    container_name: m2m-front-angular
     build: ./front
     image: m2m-front:dev
     ports:
@@ -105,10 +110,95 @@ services:
       m2m-back:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/healthz"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/healthz"]
       interval: 10s
       timeout: 5s
       retries: 10
+    restart: unless-stopped
+
+  # --- Logs: Alloy coleta os containers m2m (exceto m2m-test-* e a própria stack), Loki armazena, Grafana exibe (HTTPS) ---
+  # Sobem junto com a aplicação (sem profile); nenhuma aplicação depende deles.
+  # Execução única: o volume do Loki nasce como root e a imagem (sem shell) roda como 10001
+  m2m-loki-init:
+    container_name: m2m-logs-loki-init
+    image: busybox:1.37
+    command: ["chown", "-R", "10001:10001", "/loki"]
+    volumes:
+      - m2m-loki-data:/loki
+    restart: "no"
+
+  m2m-loki:
+    container_name: m2m-logs-loki
+    image: grafana/loki:3.6.0
+    command: ["-config.file=/etc/loki/loki.yaml", "-config.expand-env=true"]
+    environment:
+      LOKI_RETENTION: ${LOKI_RETENTION:-168h}
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./logs/loki/loki.yaml:/etc/loki/loki.yaml:ro
+      - m2m-loki-data:/loki
+    mem_limit: 512m
+    depends_on:
+      m2m-loki-init:
+        condition: service_completed_successfully
+    # Sem healthcheck: a imagem não tem shell nem wget/curl
+    restart: unless-stopped
+
+  m2m-alloy:
+    container_name: m2m-logs-alloy
+    image: grafana/alloy:v1.11.0
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+    volumes:
+      - ./logs/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      # Somente leitura, mas ainda dá visibilidade ao daemon: não publicar a porta do Alloy
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - m2m-alloy-data:/var/lib/alloy/data
+    mem_limit: 256m
+    depends_on:
+      - m2m-loki
+    restart: unless-stopped
+
+  m2m-grafana:
+    container_name: m2m-logs-grafana
+    build: ./logs/grafana
+    image: m2m-grafana:dev
+    environment:
+      TZ: ${TZ:-America/Sao_Paulo}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?defina GRAFANA_ADMIN_PASSWORD no .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/dashboards/logs-m2m.json
+      GF_SERVER_PROTOCOL: https
+      GF_SERVER_CERT_FILE: /etc/m2m/tls/tls.crt
+      GF_SERVER_CERT_KEY: /etc/m2m/tls/tls.key
+    ports:
+      # Só a interface local por padrão; GRAFANA_BIND amplia o acesso (expõe o Grafana na rede)
+      - "${GRAFANA_BIND:-127.0.0.1}:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - m2m-grafana-data:/var/lib/grafana
+      # Mesmo certificado do front; vazio → o Grafana gera um autoassinado no start
+      - ${TLS_CERT_PATH:-/dev/null}:/etc/m2m/tls-ext/tls.crt:ro
+      - ${TLS_KEY_PATH:-/dev/null}:/etc/m2m/tls-ext/tls.key:ro
+    mem_limit: 512m
+    depends_on:
+      - m2m-loki
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "--no-check-certificate", "https://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     restart: unless-stopped
 
 volumes:
@@ -116,3 +206,6 @@ volumes:
   m2m-queue-data:
   m2m-tmp:
   m2m-nolocal:
+  m2m-loki-data:
+  m2m-alloy-data:
+  m2m-grafana-data:

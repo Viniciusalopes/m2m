@@ -1,0 +1,57 @@
+// Coleta os logs dos containers do projeto compose "m2m" pelo socket do Docker e envia ao Loki.
+
+// Só containers do projeto m2m
+discovery.docker "m2m" {
+  host = "unix:///var/run/docker.sock"
+
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=m2m"]
+  }
+}
+
+// Containers de teste (m2m-test-*) ficam fora; a própria stack de logs (m2m-logs-*) também, para não realimentar.
+// O filtro é nos alvos: esses containers nem chegam a ser acompanhados.
+discovery.relabel "filtro" {
+  targets = discovery.docker.m2m.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(m2m-test-.*|m2m-logs-.*)"
+    action        = "drop"
+  }
+}
+
+// Rótulos finais dos logs, derivados dos metadados do Docker
+discovery.relabel "m2m" {
+  targets = []
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "project"
+  }
+}
+
+loki.source.docker "m2m" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.relabel.filtro.output
+  relabel_rules = discovery.relabel.m2m.rules
+  forward_to    = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://m2m-loki:3100/loki/api/v1/push"
+  }
+}

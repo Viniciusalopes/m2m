@@ -1,5 +1,12 @@
 <section class="m2m-page">
-  <h1>{{ 'auditoria.titulo' | transloco }}</h1>
+  <div class="topo">
+    <h1>{{ 'auditoria.titulo' | transloco }}</h1>
+    @if (grafana(); as url) {
+      <a mat-stroked-button class="grafana" [href]="url" target="_blank" rel="noopener noreferrer">
+        <mat-icon>monitoring</mat-icon>{{ 'auditoria.grafana' | transloco }}
+      </a>
+    }
+  </div>
 
   <form class="filtros" [formGroup]="filtros" (ngSubmit)="filtrar()">
     <mat-form-field appearance="outline">

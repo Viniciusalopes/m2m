@@ -79,6 +79,7 @@
     "acao": "Ação",
     "filtrar": "Filtrar",
     "exportar": "Exportar CSV",
+    "grafana": "Abrir logs no Grafana",
     "vazio": "Nenhum evento no período.",
     "col": {
       "quando": "Data e hora",

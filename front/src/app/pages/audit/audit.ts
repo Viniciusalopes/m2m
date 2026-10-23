@@ -10,6 +10,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { GrafanaConfig, grafanaUrl } from '../../core/grafana-url';
 import { StatusChip } from '../../ui/status-chip';
 
 interface Evento {
@@ -56,9 +57,21 @@ export class Audit implements OnInit {
   readonly pagina = signal(0);
   readonly tamanho = signal(50);
   readonly carregando = signal(false);
+  /** Endereço do Grafana (null enquanto a configuração não chega ou se ela faltar: o botão fica oculto). */
+  readonly grafana = signal<string | null>(null);
 
   ngOnInit(): void {
     void this.carregar();
+    void this.carregarGrafana();
+  }
+
+  private async carregarGrafana(): Promise<void> {
+    try {
+      const c = await firstValueFrom(this.http.get<GrafanaConfig>('/config/grafana.json'));
+      this.grafana.set(grafanaUrl(window.location.hostname, c));
+    } catch {
+      this.grafana.set(null);
+    }
   }
 
   private params(): HttpParams {

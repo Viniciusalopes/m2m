@@ -18,6 +18,7 @@ Desenvolvido para manter os arquivos de trabalho do notebook **NOTEBOOK-REMOTO**
 2. [Configuração (`.env`)](#configuração-env)
 3. [Subir e derrubar (`m2m-up` / `m2m-down`)](#subir-e-derrubar-m2m-up--m2m-down)
    - [Certificado HTTPS](#certificado-https)
+   - [Logs no Grafana](#logs-no-grafana)
 4. [Primeiro acesso e chave mestra](#primeiro-acesso-e-chave-mestra)
 5. [E-mail (SMTP) pela tela](#e-mail-smtp-pela-tela)
 6. [Cadastro de máquinas](#cadastro-de-máquinas)
@@ -54,6 +55,7 @@ cp .env.example .env
 | `APP_SECRET_KEY` | **Chave mestra**: cifra senhas de máquinas, chaves privadas, SMTP e as chaves de criptografia dos backups. Gere com `openssl rand -base64 32`. |
 | `M2M_LOCAL_ENABLED`, `HOST_HOME_BIND`, `HOST_ROOTS` | Máquina **LOCAL** (o próprio host). |
 | `PUBLIC_URL`, `HTTP_PORT`, `HTTPS_PORT`, `TLS_CERT_PATH`, `TLS_KEY_PATH` | Endereço e certificado. O `m2m-up` preenche `TLS_CERT_PATH`/`TLS_KEY_PATH` com o certificado gerado por `scripts/gerar-certificado-tls.sh` (veja [Certificado HTTPS](#certificado-https)). Em branco, o m2m gera um certificado autoassinado no primeiro start. |
+| `GRAFANA_ADMIN_PASSWORD`, `GRAFANA_PORT`, `GRAFANA_BIND`, `LOKI_RETENTION` | Logs no Grafana (veja [Logs no Grafana](#logs-no-grafana)). A senha é obrigatória; porta padrão 3000, `GRAFANA_BIND` padrão `127.0.0.1` e retenção padrão `168h` (7 dias). |
 | `TRANSFER_CONCURRENCY` | Transferências simultâneas na tela de transferência (padrão 2). |
 | `POSTGRES_*`, `RABBITMQ_*` | Banco e fila (rede interna do Compose). |
 
@@ -88,6 +90,8 @@ alias m2m-down="docker compose -f $M2M_HOME/docker-compose.yml --env-file $M2M_H
 - `m2m-up` sobe `m2m-db`, `m2m-queue`, `m2m-db-migrate`, `m2m-back` e `m2m-front`.
 - `m2m-down` remove containers e rede e **preserva os volumes** (banco e fila).
 - Sem os aliases, rode os mesmos comandos `docker compose` dentro do diretório do projeto.
+- Os containers têm nome fixo: `m2m-db-postgresql`, `m2m-queue-rabbitmq`, `m2m-db-pg-migrate`, `m2m-back-java` e `m2m-front-angular`. Os comandos `docker compose` continuam usando o nome do serviço (`m2m-db`, `m2m-back` etc.).
+- Ao atualizar de uma versão anterior, o `m2m-up` recria os containers com os nomes novos e mantém os volumes; não use `down -v`. Scripts com `docker exec m2m-m2m-*` devem usar os nomes novos.
 
 A interface fica em **https://localhost** (ou no `PUBLIC_URL`). Com o certificado gerado pelo `m2m-up`, o navegador mostra o site como seguro. A documentação da API está em `/api/docs` (exige login).
 
@@ -105,6 +109,18 @@ Nas execuções seguintes nada é regerado nem pede `sudo`, exceto se o certific
 - **Firefox e outros dispositivos** (celular, outro PC): importe `~/.config/m2m/tls/ca.crt` como autoridade confiável.
 - **Só gerar os arquivos**, sem instalar a CA: `scripts/gerar-certificado-tls.sh --sem-sistema`.
 - **VPS ou domínio público**: use um certificado válido (ex.: Let's Encrypt) em `TLS_CERT_PATH` / `TLS_KEY_PATH` e não rode o gerador.
+
+## Logs no Grafana
+
+O stack sobe junto com um **Grafana**, um **Loki** (armazenamento) e um **Alloy** (coletor), que reúnem os logs de back, front, fila, banco e migração em um só lugar. A configuração fica em `logs/` e é versionada com o projeto.
+
+- **Acesso:** `https://localhost:3000` (porta em `GRAFANA_PORT`), com usuário `admin` e a senha de `GRAFANA_ADMIN_PASSWORD` do `.env`. Na página **Auditoria** há o botão **Abrir logs no Grafana**, que abre o mesmo endereço em uma nova aba. O dashboard inicial, **Logs m2m**, filtra por serviço e por texto.
+- **HTTPS:** o Grafana usa o mesmo `TLS_CERT_PATH`/`TLS_KEY_PATH` do front (veja [Certificado HTTPS](#certificado-https)), então o navegador o reconhece como seguro. Sem certificado configurado, ele gera um autoassinado. Quando o certificado for renovado ou reemitido, recrie o Grafana: `docker compose up -d --force-recreate m2m-grafana` (o `m2m-up` já recria o que mudou).
+- **Rede:** por padrão o Grafana só escuta em `127.0.0.1`. Com o m2m aberto em outro dispositivo, o botão da Auditoria não alcança o Grafana; para isso defina `GRAFANA_BIND=0.0.0.0`, sabendo que ele passa a ficar exposto na rede. O Loki e o Alloy não publicam portas.
+- **Retenção:** os logs ficam `LOKI_RETENTION` (padrão 7 dias) no volume `m2m-loki-data`; os mais antigos são apagados sozinhos.
+- **O que entra:** só containers do projeto `m2m`. Containers de teste (`m2m-test-*`) e a própria stack de logs (`m2m-logs-*`) ficam de fora; por isso todo container de teste novo deve se chamar `m2m-test-*`.
+- **Independência:** nada depende da stack de logs. Se ela parar, o m2m segue funcionando e `docker logs` continua valendo.
+- **Segurança:** o Alloy lê os logs pelo socket do Docker (`/var/run/docker.sock`, montado somente leitura). Mesmo assim, quem controla o Alloy enxerga o daemon, por isso a porta dele não é publicada. Em uma máquina de uso único o risco é aceito.
 
 ## Primeiro acesso e chave mestra
 
@@ -229,7 +245,7 @@ Quatro peças permitem reconstruir o m2m do zero:
 2. **Backup diário do banco:** o job `DB_BACKUP` roda todo dia (padrão 01:30, em **Configurações → Manutenção**) e grava `m2m-db_AAAAMMDD-HHMMSS.sql.zst` (pg_dump compactado) no armazenamento configurado (padrão `/home/backup/m2m-db/`), mantendo os 7 mais recentes. Para restaurar num banco novo:
 
    ```bash
-   zstd -dc m2m-db_20261022-013000.sql.zst | docker exec -i m2m-m2m-db-1 psql -U m2m -d m2m
+   zstd -dc m2m-db_20261022-013000.sql.zst | docker exec -i m2m-db-postgresql psql -U m2m -d m2m
    ```
 
 3. **Exportar/importar configuração:** em **Configurações → Exportar e importar configuração**, um arquivo cifrado por senha (Argon2id + AES-256-GCM) com máquinas (e credenciais), identidades de servidor, chave SSH, perfis, mapeamentos, agendamentos e SMTP. A importação mostra uma **prévia** (o que será criado e substituído) antes de aplicar. Máquinas e perfis são casados pelo nome.
@@ -244,7 +260,7 @@ Em **Configurações → Segundo fator (TOTP)**: escaneie o QR code com um aplic
 Se perder o aplicativo e os códigos de recuperação, remova o segundo fator direto no banco (acesso ao servidor):
 
 ```bash
-docker exec m2m-m2m-db-1 psql -U m2m -d m2m -c "delete from user_totp where user_id = (select id from app_user where username = 'admin');"
+docker exec m2m-db-postgresql psql -U m2m -d m2m -c "delete from user_totp where user_id = (select id from app_user where username = 'admin');"
 ```
 
 ## Desenvolvimento e testes
@@ -256,8 +272,9 @@ cd back && ./mvnw verify
 # frontend
 cd front && npm ci && npm run lint && npx ng test --watch=false && npx ng build
 
-# stack de teste (SFTP, OpenSSH, FTP, FTPS e SMTP em container) + e2e (Playwright)
-docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build
+# e2e (Playwright): o stack principal precisa estar no ar; com E2E_SERVERS=1 o próprio e2e sobe os
+# servidores de teste (SFTP, OpenSSH, FTP, FTPS e SMTP em container) e os derruba ao terminar
+docker compose up -d --build
 cd e2e && npm ci && E2E_SERVERS=1 npx playwright test
 ```
 

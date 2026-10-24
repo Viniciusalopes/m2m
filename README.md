@@ -480,8 +480,8 @@ Para desenvolver o instalador: módulo Go em `installer/` (código em `internal/
 
 ### Manutenção do repositório (autor)
 
-- **Rulesets no GitHub:** a `main` só recebe atualizações do administrador do repositório (sem exclusão e sem *force push*), e só ele cria, altera ou apaga tags `v*`, que disparam a release. Contribuições externas chegam por *fork* e *pull request*.
-- **Token do Claude (`m2m-claude`):** as operações que o Claude Code faz no GitHub por este projeto (ler logs e artefatos do CI, pushes, tags e rulesets) usam um token *fine-grained* só deste repositório, com as permissões Actions (leitura), Administration, Contents e Workflows (escrita). Ele fica em `~/.config/m2m-github-token`, com modo `0600`, fora do repositório, e é lido só no momento de cada chamada: o valor nunca vai para o chat, para a configuração do Git nem para commits.
+- **Proteção no GitHub:** a `main` tem uma regra clássica de proteção (*Settings → Branches*) que a deixa somente leitura (*Lock branch*), sem exclusão e sem *force push*, com exceção só para o administrador do repositório; as tags `v*`, que disparam a release, ficam num ruleset (*Settings → Rulesets*) em que só ele cria, altera ou apaga. Contribuições externas chegam por *fork* e *pull request*.
+- **Token do Claude (`m2m-claude`):** as operações que o Claude Code faz no GitHub por este projeto (ler logs e artefatos do CI, pushes, tags e proteções) usam um token *fine-grained* só deste repositório, com as permissões Actions (leitura), Administration, Contents e Workflows (escrita). Ele fica em `~/.config/m2m-github-token`, com modo `0600`, fora do repositório, e é lido só no momento de cada chamada: o valor nunca vai para o chat, para a configuração do Git nem para commits.
   - **Revogar:** GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → `m2m-claude` → **Delete**; depois `rm ~/.config/m2m-github-token`.
   - **Recriar:** gere outro token com o mesmo nome, só para este repositório e com as mesmas permissões, e grave-o com `install -m 600 /dev/null ~/.config/m2m-github-token && nano ~/.config/m2m-github-token`.
 

@@ -388,3 +388,25 @@ func TestExportarComFalhaNoBack(t *testing.T) {
 		t.Fatalf("erro esperado com o motivo do back: %v", err)
 	}
 }
+
+func TestApagarCloneComArquivosDeOutroDonoExplicaComoTerminar(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("como root a permissão não falha")
+	}
+	c := montarClone(t)
+	// simula o front/dist que um build em container deixava como root: sem permissão de escrita, o RemoveAll falha
+	travado := filepath.Join(c.dir, "front", "dist")
+	os.MkdirAll(filepath.Join(travado, "instalador"), 0o755)
+	os.Chmod(travado, 0o555)
+	t.Cleanup(func() { os.Chmod(travado, 0o755) })
+	l := Localizar(context.Background(), c.ex, c.home, c.dir)
+	res := Executar(context.Background(), c.cfg(), l, append(todos(l), "diretorio"))
+	for _, it := range res.Itens {
+		if it.ID == "diretorio" && (it.Estado != instalacao.Falhou || !strings.Contains(it.Erro, "sudo rm -rf "+c.dir)) {
+			t.Errorf("a falha deveria explicar como apagar o resto: %+v", it)
+		}
+	}
+	if c.ex.Chamou("docker volume rm m2m-instalador-") {
+		t.Error("com o clone ainda no disco, o cache do ./instalar.sh fica")
+	}
+}

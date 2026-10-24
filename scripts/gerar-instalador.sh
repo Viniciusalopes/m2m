@@ -43,9 +43,10 @@ printf '%s\n' "$VERSAO" > "$CONTEUDO/versao"
 
 echo "m2m: construindo o quiz"
 if [ "$DOCKER" = 1 ]; then
-    # node_modules num volume: não mexe no node_modules do host
+    # node_modules num volume: não mexe no node_modules do host. O container roda como root: o build e o cache do
+    # Angular voltam para o usuário, senão o clone fica com arquivos que ele não consegue apagar
     docker run --rm -v "$RAIZ/front:/front" -v m2m-instalador-node-modules:/front/node_modules -w /front "$NODE_IMAGEM" \
-        sh -c "npm ci --no-audit --no-fund >/dev/null && npx ng build instalador && chown -R $(id -u):$(id -g) dist/instalador"
+        sh -c "npm ci --no-audit --no-fund >/dev/null && npx ng build instalador && chown -R $(id -u):$(id -g) dist .angular"
 else
     (cd front && npm ci --no-audit --no-fund >/dev/null && npx ng build instalador)
 fi

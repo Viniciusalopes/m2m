@@ -405,7 +405,14 @@ func removerDiretorio(home string, l Localizada) error {
 	if b := backupDentro(dir); b != "" {
 		return fmt.Errorf("há arquivos de backup dentro de %s (%s); mova-os e apague o diretório manualmente", dir, b)
 	}
-	return os.RemoveAll(dir)
+	if err := os.RemoveAll(dir); err != nil {
+		if errors.Is(err, fs.ErrPermission) {
+			// o ./instalar.sh da v1.0.0 deixava no clone arquivos do build criados como root
+			return fmt.Errorf("%w; parte de %s pertence a outro usuário (em geral, arquivos de build criados como root por um container); apague o resto com: sudo rm -rf %s", err, dir, dir)
+		}
+		return err
+	}
+	return nil
 }
 
 // removerDiretorioECache apaga o diretório e, se ele era um clone, os volumes de cache do ./instalar.sh, que só servem

@@ -1,0 +1,4 @@
+# Falsos positivos do gitleaks, conferidos um a um.
+# Senha do administrador do stack descartável do e2e no antigo .gitlab-ci.yml (removido): valor de teste, nunca usado
+# numa instalação real. O workflow atual gera essa senha a cada execução.
+edecf1719755127d870436379e03449c99e18fd0:.gitlab-ci.yml:generic-api-key:104

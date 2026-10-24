@@ -1,0 +1,49 @@
+# e2e (Playwright), disparado à mão: sobe o stack com os servidores de teste (SFTP, OpenSSH, FTP, FTPS e SMTP) e roda
+# os testes de interface. Os testes com máquina real ficam de fora (sem E2E_MAQUINA_REAL_*).
+name: e2e
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-24.04
+    env:
+      POSTGRES_PASSWORD: ci-postgres
+      RABBITMQ_PASSWORD: ci-rabbit
+      APP_SECRET_KEY: chave-de-ci-com-mais-de-16-caracteres
+      GRAFANA_ADMIN_PASSWORD: ci-grafana
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: ci@exemplo.test
+      E2E_BASE_URL: https://localhost
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+      # senha do administrador descartável, gerada a cada execução
+      - name: Senha do administrador
+        run: echo "ADMIN_PASSWORD=$(openssl rand -hex 16)" >> "$GITHUB_ENV"
+      - name: Subir o stack
+        run: |
+          mkdir -p "$HOME/m2m-sandbox"
+          docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build --wait
+      - name: Playwright
+        working-directory: e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+      - name: Derrubar o stack
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml down -v

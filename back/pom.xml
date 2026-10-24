@@ -15,7 +15,8 @@
 	<description>m2m - Machine To Machine (backend)</description>
 	<licenses>
 		<license>
-			<name>Proprietária - Vovolinux</name>
+			<name>MIT</name>
+			<url>https://opensource.org/license/mit</url>
 		</license>
 	</licenses>
 	<properties>

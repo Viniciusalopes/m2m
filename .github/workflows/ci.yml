@@ -1,0 +1,123 @@
+# CI do m2m: lint, testes (back, front, instalador), licenças de terceiros e build das imagens, a cada push e PR.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    env:
+      POSTGRES_PASSWORD: ci
+      RABBITMQ_PASSWORD: ci
+      APP_SECRET_KEY: chave-de-ci-com-mais-de-16-caracteres
+      GRAFANA_ADMIN_PASSWORD: ci
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - name: Prettier do front
+        run: cd front && npm ci && npm run lint
+      - name: Compose válido
+        run: |
+          docker compose -f docker-compose.yml config -q
+          docker compose -f docker-compose.yml -f docker-compose.test.yml config -q
+
+  test-back:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+      # Testcontainers usa o Docker do próprio runner (PostgreSQL, RabbitMQ, OpenSSH, pure-ftpd)
+      - name: Testes do back
+        run: cd back && ./mvnw -B verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorios-back
+          path: |
+            back/target/surefire-reports/
+            back/target/site/jacoco/
+
+  test-front:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - name: Testes e build do front e do quiz do instalador
+        run: |
+          cd front && npm ci
+          npx ng test front --watch=false
+          npx ng test instalador --watch=false
+          npx ng build --configuration production
+          npx ng build instalador
+
+  test-installer:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: installer/go.mod
+          cache-dependency-path: installer/go.sum
+      - name: gofmt, vet e testes do instalador
+        working-directory: installer
+        run: |
+          test -z "$(gofmt -l .)" || { gofmt -l .; echo "rode gofmt -w nos arquivos acima"; exit 1; }
+          go vet ./...
+          go test ./...
+
+  license-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: maven
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - name: Licenças de terceiros
+        run: |
+          (cd front && npm ci)
+          ./scripts/gerar-third-party-notices.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: third-party-notices
+          path: THIRD-PARTY-NOTICES.md
+
+  build-images:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build das imagens
+        run: |
+          docker build -t m2m-db:ci db
+          docker build -t m2m-queue:ci queue
+          docker build -t m2m-back:ci back
+          docker build -t m2m-front:ci front
+          docker build -t m2m-grafana:ci logs/grafana

@@ -5,6 +5,12 @@
       "nome": "PayPal",
       "descricao": "Cartão de crédito ou saldo PayPal, em reais.",
       "valor": "https://www.paypal.com/donate/?business=RELWG6ZBS4D4U&no_recurring=0&item_name=O+m2m+%C3%A9+gratuito+e+de+c%C3%B3digo+aberto.+Sua+doa%C3%A7%C3%A3o+ajuda+a+manter+backups%2C+sincroniza%C3%A7%C3%A3o+e+transfer%C3%AAncias+evoluindo.&currency_code=BRL"
+    },
+    {
+      "tipo": "pix",
+      "nome": "Pix",
+      "descricao": "Chave aleatória: copie e cole no app do seu banco.",
+      "valor": "38743a63-f228-4426-927e-e439ca6fa767"
     }
   ]
 }

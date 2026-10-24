@@ -114,7 +114,7 @@ func itens(l Localizada, home string) []Item {
 			Item{ID: "env", Titulo: "Arquivos gerados no clone", Padrao: true,
 				Descricao: "Apaga o .env de " + l.Diretorio + " (chave mestra e senhas). O clone do repositório fica."},
 			Item{ID: "diretorio", Titulo: "Apagar o clone do repositório", Padrao: false,
-				Descricao: "Apaga " + l.Diretorio + " inteiro: o código clonado e o .env.",
+				Descricao: "Apaga " + l.Diretorio + " inteiro: o código clonado e o .env, e os volumes de cache que o ./instalar.sh usa para compilar o instalador.",
 				Aviso:     "Alterações locais no clone (arquivos editados, commits não enviados) serão perdidas."})
 	case l.Diretorio != "":
 		its = append(its, Item{ID: "diretorio", Titulo: "Diretório de instalação", Padrao: true,
@@ -258,7 +258,7 @@ func Executar(ctx context.Context, cfg Config, l Localizada, escolhidos []string
 		{"certificados", func() error { return removerCertificados(ctx, cfg) }},
 		{"atalhos", func() error { return removerAtalhos(cfg.Home, l) }},
 		{"env", func() error { return removerEnv(cfg.Home, l) }},
-		{"diretorio", func() error { return removerDiretorio(cfg.Home, l) }},
+		{"diretorio", func() error { return removerDiretorioECache(ctx, cfg, l) }},
 	}
 	for _, a := range acoes {
 		if !quer[a.id] {
@@ -406,6 +406,36 @@ func removerDiretorio(home string, l Localizada) error {
 		return fmt.Errorf("há arquivos de backup dentro de %s (%s); mova-os e apague o diretório manualmente", dir, b)
 	}
 	return os.RemoveAll(dir)
+}
+
+// removerDiretorioECache apaga o diretório e, se ele era um clone, os volumes de cache do ./instalar.sh, que só servem
+// para compilar o instalador a partir do clone.
+func removerDiretorioECache(ctx context.Context, cfg Config, l Localizada) error {
+	if err := removerDiretorio(cfg.Home, l); err != nil || !l.Clone {
+		return err
+	}
+	return removerCacheDoInstalador(ctx, cfg.Exec)
+}
+
+// prefixoCacheInstalador nomeia os volumes de cache do scripts/gerar-instalador.sh (node_modules e caches do Go).
+const prefixoCacheInstalador = "m2m-instalador-"
+
+func removerCacheDoInstalador(ctx context.Context, ex executor.Executor) error {
+	out, err := ex.Rodar(ctx, executor.Comando{Programa: "docker", Args: []string{"volume", "ls", "-q", "--filter", "name=" + prefixoCacheInstalador}})
+	if err != nil {
+		return err
+	}
+	var vs []string
+	for _, v := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		if v = strings.TrimSpace(v); strings.HasPrefix(v, prefixoCacheInstalador) { // o filtro do Docker casa no meio do nome
+			vs = append(vs, v)
+		}
+	}
+	if len(vs) == 0 {
+		return nil
+	}
+	_, err = ex.Rodar(ctx, executor.Comando{Programa: "docker", Args: append([]string{"volume", "rm"}, vs...)})
+	return err
 }
 
 // Protegido recusa caminhos que nunca podem ser apagados: relativos, a raiz, /home, o home e seus ancestrais.

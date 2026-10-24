@@ -155,7 +155,9 @@ func TestInstalacaoCompleta(t *testing.T) {
 	if err != nil || info.Mode().Perm() != 0o600 {
 		t.Fatalf(".env: %v %v", info, err)
 	}
-	if !strings.Contains(string(env), "ADMIN_PASSWORD='Senha$com#especiais'") || !strings.Contains(string(env), "# modelo") {
+	// a versão instalada vai para o .env: o front a mostra na tela Sobre
+	if !strings.Contains(string(env), "ADMIN_PASSWORD='Senha$com#especiais'") || !strings.Contains(string(env), "# modelo") ||
+		!strings.Contains(string(env), "M2M_VERSION=v1.0.0\n") {
 		t.Errorf(".env inesperado:\n%s", env)
 	}
 	reg, err := LerRegistro(home)

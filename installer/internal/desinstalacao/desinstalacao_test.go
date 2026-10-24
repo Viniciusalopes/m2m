@@ -47,8 +47,9 @@ func montar(t *testing.T) cenario {
 	instalacao.AdicionarAtalhos(home, dir, true)
 
 	ex := executor.NovoFalso(map[string]executor.Resposta{
-		"docker ps":                {Saida: "m2m-db-postgresql\trunning\t" + dir + "\nm2m-back-java\trunning\t" + dir + "\n"},
-		"docker volume ls":         {Saida: "m2m_m2m-db-data\nm2m_m2m-queue-data\n"},
+		"docker ps":        {Saida: "m2m-db-postgresql\trunning\t" + dir + "\nm2m-back-java\trunning\t" + dir + "\n"},
+		"docker volume ls": {Saida: "m2m_m2m-db-data\nm2m_m2m-queue-data\n"},
+		"docker volume ls -q --filter name=m2m-instalador-": {Saida: "m2m-instalador-go-mod\nm2m-instalador-node-modules\noutro-m2m-instalador-x\n"},
 		"docker network ls":        {Saida: "abc123\n"},
 		"docker image ls":          {Saida: "m2m-back:dev\nm2m-front:dev\n"},
 		"docker exec -e PGOPTIONS": {Saida: "Fotos\tNOTEBOOK\tLOCAL\tlocalhost\t/home/backups-m2m\nDocs\tNAS\tSFTP\t192.168.0.5\t/dados/m2m\n"},
@@ -141,6 +142,16 @@ func TestDesinstalacaoTotal(t *testing.T) {
 	if len(res.Opcionais) != 3 || !strings.Contains(res.Opcionais[0].Texto, "grafana/loki:3.6.0") || strings.Contains(res.Opcionais[0].Texto, "m2m-back") {
 		t.Errorf("opcionais: %+v", res.Opcionais)
 	}
+}
+
+// chamouExato diz se o comando foi chamado exatamente assim (Chamou casa só o prefixo).
+func chamouExato(ex *executor.Falso, comando string) bool {
+	for _, c := range ex.Chamadas {
+		if c == comando {
+			return true
+		}
+	}
+	return false
 }
 
 func TestManterVolumes(t *testing.T) {
@@ -324,6 +335,9 @@ func TestDesinstalarCloneMantendoOClone(t *testing.T) {
 			t.Errorf("o clone deveria ficar (%s): %v", f, err)
 		}
 	}
+	if c.ex.Chamou("docker volume rm m2m-instalador-") {
+		t.Errorf("com o clone mantido, o cache do ./instalar.sh fica: %v", c.ex.Chamadas)
+	}
 }
 
 func TestDesinstalarApagandoOClone(t *testing.T) {
@@ -337,6 +351,9 @@ func TestDesinstalarApagandoOClone(t *testing.T) {
 	}
 	if _, err := os.Stat(c.dir); err == nil {
 		t.Error("o clone deveria ter sido apagado")
+	}
+	if !chamouExato(c.ex, "docker volume rm m2m-instalador-go-mod m2m-instalador-node-modules") {
+		t.Errorf("os volumes de cache do ./instalar.sh deveriam sair junto com o clone: %v", c.ex.Chamadas)
 	}
 	if _, err := os.Stat(filepath.Join(c.backups, "perfil-2026.tar.zst")); err != nil {
 		t.Errorf("o destino de backup deveria continuar: %v", err)

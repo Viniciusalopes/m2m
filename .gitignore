@@ -20,3 +20,5 @@ installer/embed/conteudo/*
 installer/embed/conteudo/ui/*
 !installer/embed/conteudo/ui/.gitkeep
 dist/
+# log do instalador iniciado no clone (README e docs/instalacao-com-claude.md)
+instalador.log

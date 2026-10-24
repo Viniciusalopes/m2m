@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
-import { APP_VERSION } from '../../core/version';
+import { VersaoConfig, versaoInstalada } from '../../core/version';
 import { FormaDoacao, formasDoacao } from './doacao';
 
 @Component({
@@ -16,14 +16,24 @@ import { FormaDoacao, formasDoacao } from './doacao';
 })
 export class About implements OnInit {
   private http = inject(HttpClient);
-  readonly versao = APP_VERSION;
+  readonly versao = signal('');
   readonly avisos = signal('');
   readonly doacoes = signal<FormaDoacao[]>([]);
   /** Nome da forma de doação copiada há pouco, para o rótulo "Copiado!". */
   readonly copiada = signal('');
 
   async ngOnInit(): Promise<void> {
-    await Promise.all([this.carregarAvisos(), this.carregarDoacoes()]);
+    await Promise.all([this.carregarVersao(), this.carregarAvisos(), this.carregarDoacoes()]);
+  }
+
+  private async carregarVersao(): Promise<void> {
+    try {
+      this.versao.set(
+        versaoInstalada(await firstValueFrom(this.http.get<VersaoConfig>('/config/versao.json'))),
+      );
+    } catch {
+      this.versao.set('');
+    }
   }
 
   private async carregarAvisos(): Promise<void> {

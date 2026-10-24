@@ -263,7 +263,8 @@ func (i *Instalacao) gravarEnv(_ context.Context, p *Passo) error {
 	if err != nil {
 		return fmt.Errorf("modelo .env.example ausente no código: %w", err)
 	}
-	conteudo := dotenv.Gerar(modelo, respostas.Env(i.cfg.Respostas, i.cfg.Segredos))
+	pares := append(respostas.Env(i.cfg.Respostas, i.cfg.Segredos), dotenv.Par{Chave: "M2M_VERSION", Valor: i.cfg.Versao})
+	conteudo := dotenv.Gerar(modelo, pares)
 	destino := filepath.Join(i.dir(), ".env")
 	if err := os.WriteFile(destino, conteudo, 0o600); err != nil {
 		return err

@@ -184,7 +184,7 @@ Rode o instalador (o executável ou `./instalar.sh`) e escolha **Desinstalar o m
 
 - localiza a instalação pelo registro, pelo diretório padrão (`~/m2m`) ou pelos containers do projeto Compose `m2m`;
 - lista os **destinos de backup** dos perfis, consultados no banco só para leitura. Eles **nunca são removidos**;
-- deixa escolher o que remover: containers e rede (sempre), imagens `m2m-*:dev`, volumes de dados, diretório de instalação, certificados e CA local e atalhos de shell. Numa instalação pelo clone, o item do diretório vira dois: o `.env` gerado (marcado) e **apagar o clone** (desmarcado, porque apaga também alterações locais no código). Ao marcar os volumes, lembra que o banco tem o catálogo dos backups e as chaves dos perfis, guardados no arquivo de reinstalação. Volumes mantidos impedem uma nova instalação até serem removidos;
+- deixa escolher o que remover: containers e rede (sempre), imagens `m2m-*:dev`, volumes de dados, diretório de instalação, certificados e CA local e atalhos de shell. Numa instalação pelo clone, o item do diretório vira dois: o `.env` gerado (marcado) e **apagar o clone** (desmarcado, porque apaga também alterações locais no código; leva junto os volumes de cache `m2m-instalador-*` que o `./instalar.sh` usa para compilar o instalador). Ao marcar os volumes, lembra que o banco tem o catálogo dos backups e as chaves dos perfis, guardados no arquivo de reinstalação. Volumes mantidos impedem uma nova instalação até serem removidos;
 - oferece o download do **arquivo de reinstalação** antes de remover: as respostas do quiz, a chave mestra e as senhas e, com o m2m no ar, a configuração do m2m do administrador (máquinas e credenciais, identidades de servidor, chave SSH, perfis com as chaves de criptografia, agendamentos e e-mail), tudo cifrado com a senha que você escolher. Importado numa nova instalação, ele restaura a configuração e reindexa os backups que ficaram no disco. Com o m2m fora do ar, o arquivo leva só a parte da instalação, e o quiz avisa;
 - exige digitar `DESINSTALAR` para confirmar e mostra o resultado de cada item. A falha de um item não impede os demais.
 
@@ -229,6 +229,7 @@ O quiz gera o `.env` no diretório de instalação, com modo `0600` (legível s�
 | `M2M_LOCAL_NAME` | Nome da máquina LOCAL criada no primeiro start, que é a única máquina inicial. Em branco, ela se chama `LOCAL`. |
 | `PUBLIC_URL`, `HTTP_PORT`, `HTTPS_PORT`, `TLS_CERT_PATH`, `TLS_KEY_PATH` | Endereço e certificado. O `m2m-up` preenche `TLS_CERT_PATH`/`TLS_KEY_PATH` com o certificado gerado por `scripts/gerar-certificado-tls.sh` (veja [Certificado HTTPS](#certificado-https)). Em branco, o m2m gera um certificado autoassinado no primeiro start. |
 | `GRAFANA_ADMIN_PASSWORD`, `GRAFANA_PORT`, `GRAFANA_BIND`, `LOKI_RETENTION` | Logs no Grafana (veja [Logs no Grafana](#logs-no-grafana)). A senha é obrigatória; porta padrão 3000, `GRAFANA_BIND` padrão `127.0.0.1` e retenção padrão `168h` (7 dias). |
+| `M2M_VERSION` | Versão mostrada na tela **Sobre**, gravada pelo instalador (ex.: `v1.0.1`). Em branco, a tela não mostra versão. |
 | `TRANSFER_CONCURRENCY` | Transferências simultâneas na tela de transferência (padrão 2). |
 | `POSTGRES_*`, `RABBITMQ_*` | Banco e fila (rede interna do Compose). |
 

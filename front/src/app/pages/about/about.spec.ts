@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { TranslocoTestingModule } from '@jsverse/transloco';
 import { About } from './about';
 import { formasDoacao } from './doacao';
+import { versaoInstalada } from '../../core/version';
 
 const sobre = {
   versao: 'Versão {{ versao }}',
@@ -16,7 +17,10 @@ const sobre = {
   'doacao-copiado': 'Copiado!',
 };
 
-async function abrir(doacao: object | 'erro'): Promise<HTMLElement> {
+async function abrir(
+  doacao: object | 'erro',
+  versao: object | 'erro' = 'erro',
+): Promise<HTMLElement> {
   TestBed.configureTestingModule({
     imports: [
       About,
@@ -30,6 +34,12 @@ async function abrir(doacao: object | 'erro'): Promise<HTMLElement> {
   const fixture = TestBed.createComponent(About);
   fixture.detectChanges();
   const http = TestBed.inject(HttpTestingController);
+  const v = http.expectOne('/config/versao.json');
+  if (versao === 'erro') {
+    v.flush('não encontrado', { status: 404, statusText: 'Not Found' });
+  } else {
+    v.flush(versao);
+  }
   http.expectOne('assets/THIRD-PARTY-NOTICES.md').flush('avisos');
   const req = http.expectOne('assets/doacao.json');
   if (doacao === 'erro') {
@@ -46,6 +56,18 @@ describe('About', () => {
   it('informa a licença MIT', async () => {
     const el = await abrir({ formas: [] });
     expect(el.textContent).toContain('Distribuído sob a licença MIT.');
+  });
+
+  it('mostra a versão instalada e a omite quando ela falta ou é inválida', async () => {
+    expect((await abrir({ formas: [] }, { versao: 'v1.0.1' })).textContent).toContain(
+      'Versão v1.0.1',
+    );
+    TestBed.resetTestingModule();
+    expect((await abrir({ formas: [] })).textContent).not.toContain('Versão');
+    TestBed.resetTestingModule();
+    expect((await abrir({ formas: [] }, { versao: '<b>x</b>' })).textContent).not.toContain(
+      'Versão',
+    );
   });
 
   it('sem formas de doação mostra o convite e o aviso de em breve', async () => {
@@ -113,5 +135,15 @@ describe('formasDoacao', () => {
         ],
       }),
     ).toEqual([{ tipo: 'pix', nome: 'Pix', descricao: '', valor: 'chave' }]);
+  });
+});
+
+describe('versaoInstalada', () => {
+  it('aceita só versões no formato do git describe', () => {
+    expect(versaoInstalada({ versao: ' v1.0.0-1-g8f02829 ' })).toBe('v1.0.0-1-g8f02829');
+    expect(versaoInstalada({ versao: '' })).toBe('');
+    expect(versaoInstalada({ versao: 7 })).toBe('');
+    expect(versaoInstalada({ versao: 'v1 2' })).toBe('');
+    expect(versaoInstalada(null)).toBe('');
   });
 });

@@ -1,7 +1,9 @@
 <section class="m2m-page sobre">
   <img src="assets/brand/m2m-logo.svg" alt="m2m" class="logo" />
   <h1>{{ 'app.nome' | transloco }}</h1>
-  <p>{{ 'sobre.versao' | transloco: { versao: versao } }}</p>
+  @if (versao()) {
+    <p>{{ 'sobre.versao' | transloco: { versao: versao() } }}</p>
+  }
   <p>{{ 'sobre.licenca' | transloco }}</p>
 
   <mat-card appearance="outlined" class="doacao">

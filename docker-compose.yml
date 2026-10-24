@@ -103,6 +103,8 @@ services:
     environment:
       TZ: ${TZ:-America/Sao_Paulo}
       PUBLIC_URL: ${PUBLIC_URL:-}
+      GRAFANA_PORT: ${GRAFANA_PORT:-3000}
+      M2M_VERSION: ${M2M_VERSION:-}
     volumes:
       # Certificado próprio (ex.: Let's Encrypt); vazio → o front gera um autoassinado no primeiro start
       - ${TLS_CERT_PATH:-/dev/null}:/etc/m2m/tls-ext/tls.crt:ro

@@ -99,6 +99,7 @@ public class BackupController {
         if (!ArchiveStatus.usable(a.status())) {
             throw new ApiException(HttpStatus.CONFLICT, "backup.arquivo-indisponivel", Map.of("status", a.status()));
         }
+        ArchiveFiles.requireStorage(a);
         Machine storage = files.storageOf(a)
                 .orElseThrow(() -> new ApiException(HttpStatus.CONFLICT, "backup.arquivo-indisponivel"));
         String path = ArchiveFiles.path(a);

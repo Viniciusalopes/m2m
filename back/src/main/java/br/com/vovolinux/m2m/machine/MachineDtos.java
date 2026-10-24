@@ -56,6 +56,10 @@ public final class MachineDtos {
             String lastTest) {
     }
 
+    /** Backups ligados à máquina, mostrados na confirmação da remoção: todos permanecem no disco. */
+    public record ArchiveCounts(long fromMachine, long storedOnMachine) {
+    }
+
     public record ConfirmIdentityRequest(@NotBlank String fingerprint) {
     }
 

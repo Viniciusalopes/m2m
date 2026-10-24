@@ -73,6 +73,11 @@ public class MachineController {
         return service.update(owner(), id, req);
     }
 
+    @GetMapping("/machines/{id}/backups")
+    public MachineDtos.ArchiveCounts archiveCounts(@PathVariable long id) {
+        return service.archiveCounts(owner(), id);
+    }
+
     @DeleteMapping("/machines/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {

@@ -1,6 +1,7 @@
 package br.com.vovolinux.m2m.restore;
 
 import br.com.vovolinux.m2m.audit.AuditService;
+import br.com.vovolinux.m2m.backup.ArchiveFiles;
 import br.com.vovolinux.m2m.backup.ArchiveStatus;
 import br.com.vovolinux.m2m.backup.BackupArchive;
 import br.com.vovolinux.m2m.backup.BackupArchiveRepository;
@@ -97,6 +98,7 @@ public class RestoreService {
         if (!ArchiveStatus.usable(a.status())) {
             throw new ApiException(HttpStatus.CONFLICT, "backup.arquivo-indisponivel", Map.of("status", a.status()));
         }
+        ArchiveFiles.requireStorage(a);
         return a;
     }
 

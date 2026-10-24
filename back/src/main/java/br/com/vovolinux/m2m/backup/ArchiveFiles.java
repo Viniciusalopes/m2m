@@ -6,11 +6,13 @@ import br.com.vovolinux.m2m.files.GatewayException;
 import br.com.vovolinux.m2m.files.GatewayPool;
 import br.com.vovolinux.m2m.machine.Machine;
 import br.com.vovolinux.m2m.machine.MachineRepository;
+import br.com.vovolinux.m2m.web.ApiException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 /** Operações sobre os arquivos de um backup no armazenamento (arquivo e manifesto lateral). */
@@ -56,6 +58,17 @@ public class ArchiveFiles {
 
     public static String path(BackupArchive a) {
         return a.storageDir() + "/" + a.fileName();
+    }
+
+    /**
+     * Recusa usar um backup cuja máquina de armazenamento foi removida: o arquivo continua no disco dela e volta a ficar
+     * disponível quando uma máquina com o mesmo nome é cadastrada de novo.
+     */
+    public static void requireStorage(BackupArchive a) {
+        if (a.storageMachineId() == null) {
+            throw new ApiException(HttpStatus.CONFLICT, "backup.armazenamento-indisponivel",
+                    Map.of("maquina", String.valueOf(a.storageMachineName())));
+        }
     }
 
     public Optional<Machine> storageOf(BackupArchive a) {

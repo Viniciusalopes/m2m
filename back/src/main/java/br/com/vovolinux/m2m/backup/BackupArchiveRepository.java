@@ -44,7 +44,8 @@ public class BackupArchiveRepository {
 
     /** Backups cujo arquivo deve existir: tudo que não é ausente nem falha de gravação (D30). */
     public List<BackupArchive> verifiable(long ownerId) {
-        return jdbc.sql("select " + COLUMNS + " from backup_archive where owner_id = :o"
+        // sem máquina de armazenamento (removida) não há o que verificar: o backup não pode virar "ausente"
+        return jdbc.sql("select " + COLUMNS + " from backup_archive where owner_id = :o and storage_machine_id is not null"
                 + " and status in ('COMPLETED', 'COMPLETED_WITH_WARNINGS', 'SUSPECT', 'CORRUPTED') order by id")
                 .param("o", ownerId).query(BackupArchiveRepository::map).list();
     }
@@ -131,11 +132,14 @@ public class BackupArchiveRepository {
                 .param("p", profileId).query(BackupArchiveRepository::map).optional();
     }
 
-    /** Aceitos e não fixados do perfil/tipo, do mais novo ao mais antigo (candidatos à retenção). */
+    /**
+     * Aceitos e não fixados do perfil/tipo, do mais novo ao mais antigo (candidatos à retenção). Os de armazenamento
+     * removido ficam de fora: não contam nem são apagados.
+     */
     public List<BackupArchive> acceptedUnpinned(long profileId, String type) {
         return jdbc.sql("select " + COLUMNS + """
                  from backup_archive where profile_id = :p and type = :t and accepted and not pinned
-                   and status in ('COMPLETED', 'COMPLETED_WITH_WARNINGS') order by created_at desc, id desc""")
+                   and storage_machine_id is not null and status in ('COMPLETED', 'COMPLETED_WITH_WARNINGS') order by created_at desc, id desc""")
                 .param("p", profileId).param("t", type).query(BackupArchiveRepository::map).list();
     }
 
@@ -143,7 +147,7 @@ public class BackupArchiveRepository {
     public List<BackupArchive> safetyCandidates(long profileId, String type, String destMachineName) {
         return jdbc.sql("select " + COLUMNS + """
                  from backup_archive where profile_id = :p and type = :t and dest_machine_name = :d and not pinned
-                   and status in ('COMPLETED', 'COMPLETED_WITH_WARNINGS') order by created_at desc, id desc""")
+                   and storage_machine_id is not null and status in ('COMPLETED', 'COMPLETED_WITH_WARNINGS') order by created_at desc, id desc""")
                 .param("p", profileId).param("t", type).param("d", destMachineName)
                 .query(BackupArchiveRepository::map).list();
     }

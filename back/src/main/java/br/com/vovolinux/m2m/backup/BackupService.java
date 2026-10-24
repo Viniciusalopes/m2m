@@ -46,7 +46,8 @@ public class BackupService {
 
     public BackupView view(BackupArchive a) {
         return new BackupView(a.id(), a.profileId(), a.profileNameSnapshot(), a.profileId() == null, a.type(),
-                a.status(), a.accepted(), a.pinned(), a.storageMachineName(), a.storageDir(), a.fileName(),
+                a.status(), a.accepted(), a.pinned(), a.storageMachineName(), a.storageMachineId() != null,
+                a.storageDir(), a.fileName(),
                 a.sourceMachineName(), a.sourceProtocol(), a.fullFidelity(), a.itemCount(), a.fileCount(),
                 a.totalBytes(), a.archiveBytes(), a.sha256(), a.encrypted(),
                 a.warnings() == null ? null : json.readTree(a.warnings()), a.error(), a.jobId(), a.destMachineName(),
@@ -95,6 +96,8 @@ public class BackupService {
         }
         boolean hasFile = ArchiveStatus.usable(a.status()) || ArchiveStatus.CORRUPTED.equals(a.status());
         if (hasFile) {
+            // sem a máquina de armazenamento não há como apagar o arquivo: o backup fica até ela ser cadastrada de novo
+            ArchiveFiles.requireStorage(a);
             try {
                 files.delete(a);
             } catch (IOException e) {
@@ -118,6 +121,7 @@ public class BackupService {
         if (!ArchiveStatus.usable(a.status())) {
             throw new ApiException(HttpStatus.CONFLICT, "backup.arquivo-indisponivel", Map.of("status", a.status()));
         }
+        ArchiveFiles.requireStorage(a);
         String virtual = path == null ? "" : path.replaceAll("^/+|/+$", "");
         List<TreeNode> children = new ArrayList<>();
         Machine storage = files.storageOf(a)

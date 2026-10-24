@@ -10,6 +10,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -107,6 +108,10 @@ public class ConfigTransferService {
                     k.put("privada", b64(decryptMaster((byte[]) r.get("private_key_enc"))));
                 });
 
+        // nome da LOCAL nesta instalação: os perfis a citam pelo nome, e o destino pode ter outro nome para ela
+        jdbc.sql("select name from machine where owner_id = :o and protocol = 'LOCAL'").param("o", ownerId)
+                .query(String.class).optional().ifPresent(nome -> root.put("maquinaLocal", nome));
+
         ArrayNode profiles = root.putArray("perfis");
         for (Map<String, Object> p : jdbc.sql("""
                 select p.id, p.name, p.complement, sm.name as source, st.name as storage, p.storage_dir,
@@ -156,6 +161,18 @@ public class ConfigTransferService {
                 sn.put("limitePercentual", ((Number) s.get("max_deletions_percent")).intValue());
                 sn.put("limiteAbsoluto", ((Number) s.get("max_deletions_abs")).intValue());
             }
+        }
+
+        // chaves de criptografia dos perfis (inclusive de perfis excluídos): sem elas, backups cifrados não abrem
+        ArrayNode chaves = root.putArray("chavesPerfis");
+        for (Map<String, Object> k : jdbc.sql("""
+                select key_id, profile_name, keyset_enc, active from profile_key where owner_id = :o order by id""")
+                .param("o", ownerId).query().listOfRows()) {
+            ObjectNode kn = chaves.addObject();
+            kn.put("idChave", (String) k.get("key_id"));
+            kn.put("perfil", (String) k.get("profile_name"));
+            kn.put("chave", b64(decryptMaster((byte[]) k.get("keyset_enc"))));
+            kn.put("ativa", (Boolean) k.get("active"));
         }
 
         jdbc.sql("select host, port, security, username, password_enc, from_address, enabled from user_smtp_setting where owner_id = :o")
@@ -230,9 +247,13 @@ public class ConfigTransferService {
                     .param("o", ownerId).param("a", k.path("algoritmo").asText()).param("pub", k.path("publica").asText())
                     .param("priv", priv).update();
         }
+        UnaryOperator<String> nome = nomeDaLocal(ownerId, root);
         List<Long> profileIds = new ArrayList<>();
         for (JsonNode p : root.path("perfis")) {
-            profileIds.add(importProfile(ownerId, p));
+            profileIds.add(importProfile(ownerId, p, nome));
+        }
+        for (JsonNode k : root.path("chavesPerfis")) {
+            importProfileKey(ownerId, k);
         }
         if (root.has("smtp")) {
             JsonNode s = root.get("smtp");
@@ -299,6 +320,28 @@ public class ConfigTransferService {
         }
     }
 
+    /**
+     * Importa uma chave de perfil que ainda não existe (pelo id da chave), ligada ao perfil de mesmo nome. Fica ativa
+     * só se estava ativa e o perfil não tem outra chave ativa; inativa, ainda decifra os backups antigos.
+     */
+    private void importProfileKey(long ownerId, JsonNode k) {
+        String keyId = k.path("idChave").asText();
+        if (jdbc.sql("select count(*) from profile_key where key_id = :k").param("k", keyId).query(Long.class).single() > 0) {
+            return;
+        }
+        String perfil = k.path("perfil").asText();
+        Long profileId = jdbc.sql("select id from profile where owner_id = :o and lower(name) = lower(:n)")
+                .param("o", ownerId).param("n", perfil).query(Long.class).optional().orElse(null);
+        boolean ativa = k.path("ativa").asBoolean(false) && profileId != null
+                && jdbc.sql("select count(*) from profile_key where profile_id = :p and active").param("p", profileId)
+                        .query(Long.class).single() == 0;
+        jdbc.sql("""
+                insert into profile_key (key_id, owner_id, profile_id, profile_name, keyset_enc, active)
+                values (:k, :o, :p, :n, :e, :a)""").param("k", keyId).param("o", ownerId).param("p", profileId)
+                .param("n", perfil).param("e", crypto.encrypt(Base64.getDecoder().decode(k.path("chave").asText())))
+                .param("a", ativa).update();
+    }
+
     private long machineId(long ownerId, String name) {
         return jdbc.sql("select id from machine where owner_id = :o and name = :n").param("o", ownerId)
                 .param("n", name).query(Long.class).optional()
@@ -306,10 +349,24 @@ public class ConfigTransferService {
                         Map.of("maquina", name)));
     }
 
-    private long importProfile(long ownerId, JsonNode p) {
+    /**
+     * Traduz o nome da máquina LOCAL do arquivo ({@code maquinaLocal}) para o da LOCAL desta instalação, que pode ter
+     * outro nome (ex.: reinstalação com outro M2M_LOCAL_NAME). Os demais nomes passam como estão.
+     */
+    private UnaryOperator<String> nomeDaLocal(long ownerId, JsonNode root) {
+        String doArquivo = root.path("maquinaLocal").asString(null);
+        String daqui = jdbc.sql("select name from machine where owner_id = :o and protocol = 'LOCAL'").param("o", ownerId)
+                .query(String.class).optional().orElse(null);
+        if (doArquivo == null || daqui == null || doArquivo.equals(daqui)) {
+            return UnaryOperator.identity();
+        }
+        return n -> doArquivo.equals(n) ? daqui : n;
+    }
+
+    private long importProfile(long ownerId, JsonNode p, UnaryOperator<String> nome) {
         String name = p.path("nome").asText();
-        long source = machineId(ownerId, p.path("origem").asText());
-        long storage = machineId(ownerId, p.path("armazenamento").asText());
+        long source = machineId(ownerId, nome.apply(p.path("origem").asText()));
+        long storage = machineId(ownerId, nome.apply(p.path("armazenamento").asText()));
         Long id = jdbc.sql("select id from profile where owner_id = :o and lower(name) = lower(:n)").param("o", ownerId)
                 .param("n", name).query(Long.class).optional().orElse(null);
         Map<String, Object> v = new HashMap<>();
@@ -343,7 +400,7 @@ public class ConfigTransferService {
                     .single();
             for (JsonNode mp : d.path("mapeamentos")) {
                 jdbc.sql("insert into profile_dir_mapping (profile_dir_id, machine_id, path) values (:d, :m, :path)")
-                        .param("d", dirId).param("m", machineId(ownerId, mp.path("maquina").asText()))
+                        .param("d", dirId).param("m", machineId(ownerId, nome.apply(mp.path("maquina").asText())))
                         .param("path", mp.path("caminho").asText()).update();
             }
         }
@@ -356,7 +413,7 @@ public class ConfigTransferService {
             jdbc.sql("""
                     insert into sync_schedule (profile_id, dest_machine_id, time_of_day, enabled, max_deletions_percent,
                            max_deletions_abs) values (:p, :d, cast(:t as time), :e, :pc, :ab)""")
-                    .param("p", id).param("d", machineId(ownerId, s.path("destino").asText()))
+                    .param("p", id).param("d", machineId(ownerId, nome.apply(s.path("destino").asText())))
                     .param("t", s.path("horario").asText()).param("e", s.path("ativo").asBoolean(false))
                     .param("pc", s.path("limitePercentual").asInt(20)).param("ab", s.path("limiteAbsoluto").asInt(500))
                     .update();

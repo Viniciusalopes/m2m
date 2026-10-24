@@ -19,6 +19,8 @@ public final class BackupDtos {
             boolean accepted,
             boolean pinned,
             String storageMachineName,
+            /** Falso quando a máquina de armazenamento foi removida: o arquivo segue no disco dela. */
+            boolean storageAvailable,
             String storageDir,
             String fileName,
             String sourceMachineName,

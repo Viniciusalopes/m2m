@@ -97,6 +97,29 @@ public class MachineRepository {
         jdbc.sql("delete from machine where owner_id = :o and id = :id").param("o", ownerId).param("id", id).update();
     }
 
+    /** Estados em que o arquivo de um backup existe no disco. */
+    private static final String COM_ARQUIVO = "('COMPLETED', 'COMPLETED_WITH_WARNINGS', 'SUSPECT', 'CORRUPTED')";
+
+    /**
+     * Religa à máquina os backups do dono cuja máquina de armazenamento, com este nome, foi removida (a remoção zera
+     * {@code storage_machine_id} e mantém {@code storage_machine_name}). Devolve quantos foram religados.
+     */
+    public int relinkArchives(long ownerId, long machineId, String name) {
+        return jdbc.sql("""
+                update backup_archive set storage_machine_id = :m
+                 where owner_id = :o and storage_machine_id is null and storage_machine_name = :n""")
+                .param("m", machineId).param("o", ownerId).param("n", name).update();
+    }
+
+    /** Backups feitos a partir da máquina (pelo nome da origem) e guardados nela, com o arquivo no disco. */
+    public MachineDtos.ArchiveCounts archiveCounts(long ownerId, long machineId, String name) {
+        long origem = jdbc.sql("select count(*) from backup_archive where owner_id = :o and source_machine_name = :n"
+                + " and status in " + COM_ARQUIVO).param("o", ownerId).param("n", name).query(Long.class).single();
+        long guardados = jdbc.sql("select count(*) from backup_archive where owner_id = :o and storage_machine_id = :m"
+                + " and status in " + COM_ARQUIVO).param("o", ownerId).param("m", machineId).query(Long.class).single();
+        return new MachineDtos.ArchiveCounts(origem, guardados);
+    }
+
     public void saveTest(long ownerId, long id, String capabilitiesJson, String testJson) {
         jdbc.sql("""
                 update machine set capabilities = cast(:caps as jsonb), last_test = cast(:test as jsonb),

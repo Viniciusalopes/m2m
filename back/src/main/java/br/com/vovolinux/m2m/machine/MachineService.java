@@ -64,8 +64,9 @@ public class MachineService {
         } catch (DuplicateKeyException e) {
             throw duplicate(m);
         }
+        int religados = repository.relinkArchives(ownerId, id, m.name());
         audit.record("MACHINE_CREATE", m.name(), AuditService.SUCESSO,
-                Map.of("protocolo", m.protocol().name(), "host", String.valueOf(m.host())));
+                Map.of("protocolo", m.protocol().name(), "host", String.valueOf(m.host()), "backupsReligados", religados));
         return view(require(ownerId, id));
     }
 
@@ -85,10 +86,18 @@ public class MachineService {
         if (mudouDestino) {
             identities.forget(id); // outro servidor: a identidade precisa ser confirmada de novo
         }
-        audit.record("MACHINE_UPDATE", m.name(), AuditService.SUCESSO, Map.of("identidadeReiniciada", mudouDestino));
+        int religados = atual.name().equals(m.name()) ? 0 : repository.relinkArchives(ownerId, id, m.name());
+        audit.record("MACHINE_UPDATE", m.name(), AuditService.SUCESSO,
+                Map.of("identidadeReiniciada", mudouDestino, "backupsReligados", religados));
         return view(require(ownerId, id));
     }
 
+    /** Quantos backups foram feitos a partir da máquina e quantos estão guardados nela (aviso da remoção). */
+    public MachineDtos.ArchiveCounts archiveCounts(long ownerId, long id) {
+        return repository.archiveCounts(ownerId, id, require(ownerId, id).name());
+    }
+
+    /** Remove a máquina sem tocar nos backups: os guardados nela ficam com o armazenamento indisponível. */
     public void delete(long ownerId, long id) {
         Machine m = require(ownerId, id);
         List<String> usos = new ArrayList<>();
@@ -99,9 +108,11 @@ public class MachineService {
             audit.record("MACHINE_DELETE", m.name(), AuditService.FALHA, Map.of("motivo", "em-uso"));
             throw new ApiException(HttpStatus.CONFLICT, "maquina.em-uso", Map.of("usos", usos));
         }
+        MachineDtos.ArchiveCounts backups = repository.archiveCounts(ownerId, id, m.name());
         pool.invalidate(id);
         repository.delete(ownerId, id);
-        audit.record("MACHINE_DELETE", m.name(), AuditService.SUCESSO, Map.of());
+        audit.record("MACHINE_DELETE", m.name(), AuditService.SUCESSO,
+                Map.of("backupsComOrigem", backups.fromMachine(), "backupsGuardados", backups.storedOnMachine()));
     }
 
     private ApiException duplicate(Machine m) {

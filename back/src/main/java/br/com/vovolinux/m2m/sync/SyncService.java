@@ -1,6 +1,7 @@
 package br.com.vovolinux.m2m.sync;
 
 import br.com.vovolinux.m2m.audit.AuditService;
+import br.com.vovolinux.m2m.backup.ArchiveFiles;
 import br.com.vovolinux.m2m.backup.ArchiveStatus;
 import br.com.vovolinux.m2m.backup.BackupArchive;
 import br.com.vovolinux.m2m.backup.BackupArchiveRepository;
@@ -253,6 +254,7 @@ public class SyncService {
         if (!ArchiveStatus.usable(a.status())) {
             throw new ApiException(HttpStatus.CONFLICT, "backup.arquivo-indisponivel", Map.of("status", a.status()));
         }
+        ArchiveFiles.requireStorage(a);
         Map<String, Object> params = new HashMap<>();
         params.put("archiveId", archiveId);
         Job job = jobService.enqueue(ownerId, JobType.SYNC_UNDO, "MANUAL", a.profileId(), a.profileNameSnapshot(), params);

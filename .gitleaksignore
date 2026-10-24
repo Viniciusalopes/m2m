@@ -1,7 +1,7 @@
 # Falsos positivos do gitleaks, conferidos um a um.
 # Senha do administrador do stack descartável do e2e no antigo .gitlab-ci.yml (removido): valor de teste, nunca usado
 # numa instalação real. O workflow atual gera essa senha a cada execução.
-edecf1719755127d870436379e03449c99e18fd0:.gitlab-ci.yml:generic-api-key:104
+1c53ec107a431409f3d3a93ae0852e2affd7eed8:.gitlab-ci.yml:generic-api-key:104
 # Mensagem pública do HMAC das rotas internas do instalador ("m2m-instalador"): o segredo é a chave mestra, que nunca
 # está no código.
-d4e5113bd08ef932aecfba8a17c49ea20e458669:back/src/main/java/br/com/vovolinux/m2m/maintenance/InstallerController.java:generic-api-key:44
+88477cbd99fbce792939626aa15dc8ef0a0ffa33:back/src/main/java/br/com/vovolinux/m2m/maintenance/InstallerController.java:generic-api-key:44

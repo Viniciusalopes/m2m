@@ -28,18 +28,31 @@ public class JobRecovery implements ApplicationRunner {
     private final OutboxPublisher outbox;
     private final JsonMapper json;
     private final Path tmpDir;
+    private final boolean naPartida;
 
     public JobRecovery(JobRepository repository, JobExecutor executor, OutboxPublisher outbox, JsonMapper json,
-            @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir) {
+            @Value("${m2m.tmp-dir:/var/lib/m2m-tmp}") String tmpDir,
+            @Value("${m2m.recuperacao.na-partida:true}") boolean naPartida) {
         this.repository = repository;
         this.executor = executor;
         this.outbox = outbox;
         this.json = json;
         this.tmpDir = Path.of(tmpDir);
+        this.naPartida = naPartida;
     }
 
+    /**
+     * Na partida da aplicação. Os testes desligam (m2m.recuperacao.na-partida=false): vários contextos Spring dividem
+     * o mesmo banco e a mesma fila, e um contexto novo interromperia os jobs que outro está executando.
+     */
     @Override
     public void run(ApplicationArguments args) {
+        if (naPartida) {
+            recuperar();
+        }
+    }
+
+    public void recuperar() {
         for (Job job : repository.markRunningInterrupted()) {
             log.warn("Job {} ({}) estava em execução quando a aplicação parou: marcado como interrompido", job.id(),
                     job.type());

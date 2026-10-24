@@ -10,6 +10,7 @@ import java.nio.file.NoSuchFileException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -31,17 +32,29 @@ public class TransferRecovery implements ApplicationRunner {
     private final OutboxPublisher outbox;
     private final MachineRepository machines;
     private final GatewayPool pool;
+    private final boolean naPartida;
 
     public TransferRecovery(TransferRepository repository, OutboxPublisher outbox, MachineRepository machines,
-            GatewayPool pool) {
+            GatewayPool pool, @Value("${m2m.recuperacao.na-partida:true}") boolean naPartida) {
         this.repository = repository;
         this.outbox = outbox;
         this.machines = machines;
         this.pool = pool;
+        this.naPartida = naPartida;
     }
 
+    /**
+     * Na partida da aplicação. Os testes desligam (m2m.recuperacao.na-partida=false): vários contextos Spring dividem
+     * o mesmo banco e a mesma fila, e um contexto novo interromperia as transferências que outro está executando.
+     */
     @Override
     public void run(ApplicationArguments args) {
+        if (naPartida) {
+            recuperar();
+        }
+    }
+
+    public void recuperar() {
         for (TransferItem i : repository.markTransferringInterrupted()) {
             log.warn("Transferência {} estava em andamento quando a aplicação parou: marcada como interrompida",
                     i.id());

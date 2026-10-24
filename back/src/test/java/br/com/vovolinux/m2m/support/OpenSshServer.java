@@ -29,6 +29,11 @@ public final class OpenSshServer {
         try {
             Path config = Files.createTempDirectory("m2m-openssh-config-");
             Files.setPosixFilePermissions(config, PosixFilePermissions.fromString("rwxrwxrwx"));
+            // o OpenSSH 9.8+ penaliza a origem que desconecta antes de autenticar, e o teste de conexão faz isso de
+            // propósito para capturar a chave do servidor: com todos os testes vindo do mesmo endereço, o sshd passaria
+            // a recusar as conexões no meio da classe. A imagem inclui o sshd_config.d se a pasta existir.
+            Path drop = Files.createDirectories(config.resolve("sshd/sshd_config.d"));
+            Files.writeString(drop.resolve("m2m-testes.conf"), "PerSourcePenalties no\n");
             // o container passa /config para PUID:PGID; com o usuário de quem roda os testes, o host continua gravando
             // nele (o runner do GitHub não é o 1000 das máquinas de desenvolvimento)
             GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse("lscr.io/linuxserver/openssh-server:latest"))

@@ -493,7 +493,7 @@ class TransferenciaIT {
                 local, "HP", origemPath + "/r.txt", a, "TA", remote("aguardando.txt"), 8, 1_700_000_000_000L, 0644,
                 null, false, null, null));
 
-        recovery.run(null);
+        recovery.recuperar();
 
         assertThat(repo.findAny(rodando).orElseThrow().status()).isEqualTo("INTERRUPTED");
         TransferItem fim = esperarItem(aguardando);

@@ -226,7 +226,7 @@ class FilaDeJobsIT {
         Files.createDirectories(tmp);
         Files.writeString(tmp.resolve("parcial.bin"), "lixo");
 
-        recovery.run(null);
+        recovery.recuperar();
 
         Job j = repository.findAny(id).orElseThrow();
         assertThat(j.status()).isEqualTo(JobStatus.INTERRUPTED);
@@ -243,8 +243,8 @@ class FilaDeJobsIT {
                 values (:o, 'TEST', 'QUEUED', 'SCHEDULED', '{"name":"perdido","mode":"warn"}'::jsonb) returning id""")
                 .param("o", owner).query(Long.class).single();
 
-        recovery.run(null);
-        recovery.run(null); // reiniciar de novo não pode duplicar
+        recovery.recuperar();
+        recovery.recuperar(); // reiniciar de novo não pode duplicar
 
         await().atMost(Duration.ofSeconds(20)).until(() -> estado(id).equals(JobStatus.COMPLETED_WITH_WARNINGS));
         // dá tempo de uma eventual mensagem duplicada ser consumida e ignorada

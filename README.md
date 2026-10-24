@@ -1,6 +1,6 @@
 # m2m - Machine To Machine
 
-[![CI](https://github.com/viniciusalopes/m2m/actions/workflows/ci.yml/badge.svg)](https://github.com/viniciusalopes/m2m/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/viniciusalopes/m2m)](https://github.com/viniciusalopes/m2m/releases/latest) [![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)](LICENSE)
+[![CI](https://github.com/Viniciusalopes/m2m/actions/workflows/ci.yml/badge.svg)](https://github.com/Viniciusalopes/m2m/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Viniciusalopes/m2m)](https://github.com/Viniciusalopes/m2m/releases/latest) [![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)](LICENSE)
 
 Aplicação web para **backup, restauração, sincronização e transferência de arquivos entre máquinas** (LOCAL, SFTP, FTP e FTPS), com fila de jobs, verificação de igualdade, criptografia opcional dos backups e segundo fator no login.
 
@@ -70,7 +70,7 @@ Prefere que o Claude conduza a instalação? Veja [Instalar com o Claude](#insta
 
 ### Caminho A: executável pronto
 
-1. **Baixe o instalador e o `SHA256SUMS`** da [última release](https://github.com/viniciusalopes/m2m/releases/latest). O instalador é um executável único, sem dependências: ele leva dentro o código da versão e o quiz.
+1. **Baixe o instalador e o `SHA256SUMS`** da [última release](https://github.com/Viniciusalopes/m2m/releases/latest). O instalador é um executável único, sem dependências: ele leva dentro o código da versão e o quiz.
 
 2. **Confira o download e dê permissão de execução:**
 
@@ -130,7 +130,7 @@ Prefere que o Claude conduza a instalação? Veja [Instalar com o Claude](#insta
 3. **Clone o repositório e rode o instalador:**
 
    ```bash
-   git clone https://github.com/viniciusalopes/m2m.git
+   git clone https://github.com/Viniciusalopes/m2m.git
    cd m2m
    ./instalar.sh
    ```
@@ -200,7 +200,7 @@ Se você usa o [Claude Code](https://docs.anthropic.com/en/docs/claude-code/over
 
 ```text
 Instale o m2m nesta máquina. Baixe o roteiro de instalação com
-curl -fsSL https://raw.githubusercontent.com/viniciusalopes/m2m/main/docs/instalacao-com-claude.md
+curl -fsSL https://raw.githubusercontent.com/Viniciusalopes/m2m/main/docs/instalacao-com-claude.md
 leia-o inteiro e siga-o do início ao fim, respeitando todas as regras dele. Fale comigo em português.
 ```
 

@@ -24,7 +24,7 @@ uname -m
 ```
 
 - Continue só se `uname -m` for `x86_64` e se `ID=ubuntu` ou se `ID_LIKE` contiver `ubuntu` (derivados como Linux Mint, Pop!_OS e Zorin OS). Num derivado, o Ubuntu de base é o `UBUNTU_CODENAME`.
-- Se não for compatível, explique que o instalador é para Ubuntu e derivados em amd64, aponte a seção "Instalação limpa" do README (<https://github.com/viniciusalopes/m2m#instalação-limpa-ubuntu-e-derivados>) e **encerre sem alterar nada**.
+- Se não for compatível, explique que o instalador é para Ubuntu e derivados em amd64, aponte a seção "Instalação limpa" do README (<https://github.com/Viniciusalopes/m2m#instalação-limpa-ubuntu-e-derivados>) e **encerre sem alterar nada**.
 
 ## Passo 2: procurar uma instalação existente
 
@@ -53,7 +53,7 @@ Baixe o instalador e o `SHA256SUMS` da última release numa pasta própria (não
 
 ```bash
 mkdir -p ~/m2m-instalador && cd ~/m2m-instalador
-curl -fsSL https://api.github.com/repos/viniciusalopes/m2m/releases/latest \
+curl -fsSL https://api.github.com/repos/Viniciusalopes/m2m/releases/latest \
   | grep -o '"browser_download_url": *"[^"]*"' | cut -d'"' -f4 \
   | grep -E 'linux-amd64$|SHA256SUMS$' \
   | while read -r url; do curl -fsSLO "$url"; done
@@ -136,6 +136,6 @@ Quando o m2m estiver no ar, resuma para a pessoa:
 - que vale **baixar o arquivo da instalação** (`.json`) na tela final e guardá-lo com a chave mestra num cofre de senhas, e que, para reinstalar ou atualizar depois, a desinstalação pelo quiz oferece o **arquivo de reinstalação**, que leva também a configuração do m2m e devolve os backups à lista na reinstalação;
 - que a tela final oferece os **atalhos `m2m-up` e `m2m-down`**;
 - que o botão **Encerrar o instalador** fecha o quiz (ou ele se encerra sozinho depois de um tempo sem uso);
-- onde ler mais: o README do projeto (<https://github.com/viniciusalopes/m2m>), em especial "Primeiro uso com segurança".
+- onde ler mais: o README do projeto (<https://github.com/Viniciusalopes/m2m>), em especial "Primeiro uso com segurança".
 
 No caminho A, a pasta `~/m2m-instalador` pode ser apagada depois: o executável só é preciso de novo para desinstalar, e pode ser baixado outra vez.

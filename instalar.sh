@@ -4,8 +4,8 @@
 # Uso: ./instalar.sh [opções do instalador, como --porta 8766 ou --sem-navegador]
 set -eu
 RAIZ="$(cd "$(dirname "$0")" && pwd)"
-README="https://github.com/viniciusalopes/m2m#instalação-limpa-ubuntu-e-derivados"
-RELEASES="https://github.com/viniciusalopes/m2m/releases/latest"
+README="https://github.com/Viniciusalopes/m2m#instalação-limpa-ubuntu-e-derivados"
+RELEASES="https://github.com/Viniciusalopes/m2m/releases/latest"
 
 falha() {
     echo "m2m: $1" >&2
@@ -19,7 +19,7 @@ case "$(uname -m)" in
     *) falha "o instalador é só para amd64 e esta máquina é $(uname -m)." ;;
 esac
 
-[ -d "$RAIZ/.git" ] || falha "$RAIZ não é um clone do repositório (falta o .git). Clone com: git clone https://github.com/viniciusalopes/m2m.git"
+[ -d "$RAIZ/.git" ] || falha "$RAIZ não é um clone do repositório (falta o .git). Clone com: git clone https://github.com/Viniciusalopes/m2m.git"
 
 if ! command -v docker >/dev/null 2>&1; then
     falha "o Docker não está instalado. Instale o Docker Engine e o Compose v2 antes de rodar este script."

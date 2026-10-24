@@ -92,13 +92,19 @@
   },
   "sobre": {
     "versao": "Versão {{ versao }}",
-    "licenca": "Copyright (c) 2026 Vovolinux. Todos os direitos reservados.",
+    "licenca": "Copyright (c) 2026 Vovolinux. Distribuído sob a licença MIT.",
     "creditos-titulo": "Créditos",
     "filezilla-1": "A tela de transferência do m2m tem como referência funcional o",
     "filezilla-2": "(Tim Kosse e colaboradores, GPL-3.0-or-later). O m2m não contém código do FileZilla.",
     "filezilla-marca": "\"FileZilla\" é marca registrada de seus titulares e não é usada como nome, logotipo ou funcionalidade do m2m.",
     "terceiros-titulo": "Avisos de terceiros",
-    "terceiros-indisponivel": "A lista de componentes de terceiros não está disponível nesta compilação."
+    "terceiros-indisponivel": "A lista de componentes de terceiros não está disponível nesta compilação.",
+    "doacao-titulo": "Apoie o projeto",
+    "doacao-convite": "O m2m é gratuito e de código aberto. Se ele é útil para você, considere apoiar o desenvolvimento com uma doação.",
+    "doacao-em-breve": "As formas de doação serão publicadas em breve.",
+    "doacao-abrir": "Doar",
+    "doacao-copiar": "Copiar",
+    "doacao-copiado": "Copiado!"
   },
   "erro": {
     "generico": "Não foi possível concluir a operação. Tente novamente.",
@@ -199,6 +205,7 @@
       "em-uso": "O backup está em uso por um job e não pode ser excluído agora.",
       "falha-ao-excluir": "Não foi possível excluir {{ arquivo }}: {{ detalhe }}",
       "arquivo-indisponivel": "O arquivo deste backup não está disponível ({{ status }}).",
+      "armazenamento-indisponivel": "A máquina de armazenamento {{ maquina }} foi removida. O arquivo continua no disco dela: cadastre de novo uma máquina com o nome {{ maquina }} para usar este backup.",
       "manifesto-indisponivel": "O manifesto lateral deste backup não está disponível.",
       "caminho-invalido": "Caminho inválido: {{ caminho }}",
       "diretorio-origem-ausente": "O diretório de origem {{ diretorio }} não existe.",
@@ -346,7 +353,8 @@
     },
     "remover": {
       "titulo": "Remover a máquina {{ nome }}?",
-      "mensagem": "A máquina será removida. O histórico continuará exibindo o nome dela."
+      "mensagem": "A máquina será removida. O histórico continuará exibindo o nome dela.",
+      "mensagem-backups": "A máquina será removida, mas nenhum backup é apagado: {{ origem }} backup(s) feito(s) a partir dela continuam disponíveis para restauração, e {{ guardados }} backup(s) guardado(s) nela continuam no disco dela, marcados como armazenamento indisponível até que uma máquina com o nome {{ nome }} seja cadastrada de novo."
     },
     "form": {
       "nova": "Nova máquina",
@@ -590,6 +598,8 @@
     "titulo": "Backups",
     "vazio": "Nenhum backup encontrado.",
     "orfao": "Órfão",
+    "armazenamento-indisponivel": "Armazenamento indisponível",
+    "armazenamento-indisponivel-dica": "A máquina {{ maquina }} foi removida. O arquivo continua no disco dela: cadastre de novo uma máquina com o nome {{ maquina }} para restaurar, baixar ou excluir este backup.",
     "fixado": "Fixado (fora da retenção)",
     "fidelidade-parcial": "Fidelidade parcial",
     "aceitar": "Aceitar",

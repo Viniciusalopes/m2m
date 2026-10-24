@@ -82,14 +82,23 @@ export class Machines implements OnInit {
 
   async remover(m: Machine): Promise<void> {
     this.erro.set(null);
+    // os backups ligados à máquina nunca são apagados: o aviso diz quantos são e que ficam no disco
+    const backups = await this.service.archiveCounts(m.id).catch(() => null);
+    const comBackups = !!backups && backups.fromMachine + backups.storedOnMachine > 0;
     const ok = await firstValueFrom(
       this.dialog
         .open(ConfirmDialog, {
           data: {
             titulo: 'maquinas.remover.titulo',
-            mensagem: 'maquinas.remover.mensagem',
+            mensagem: comBackups
+              ? 'maquinas.remover.mensagem-backups'
+              : 'maquinas.remover.mensagem',
             confirmar: 'comum.excluir',
-            params: { nome: m.name },
+            params: {
+              nome: m.name,
+              origem: backups?.fromMachine ?? 0,
+              guardados: backups?.storedOnMachine ?? 0,
+            },
             perigo: true,
           },
         })

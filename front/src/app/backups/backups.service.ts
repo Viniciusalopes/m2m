@@ -21,6 +21,8 @@ export interface Backup {
   accepted: boolean;
   pinned: boolean;
   storageMachineName: string | null;
+  /** Falso quando a máquina de armazenamento foi removida: o arquivo segue no disco dela. */
+  storageAvailable: boolean;
   storageDir: string;
   fileName: string;
   sourceMachineName: string | null;

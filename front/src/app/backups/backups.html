@@ -107,6 +107,20 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'backups.col.armazenamento' | transloco }}</th>
         <td mat-cell *matCellDef="let b">
           {{ b.storageMachineName }}
+          @if (!b.storageAvailable) {
+            <span
+              class="indisponivel"
+              [title]="
+                'backups.armazenamento-indisponivel-dica'
+                  | transloco: { maquina: b.storageMachineName }
+              "
+            >
+              <m2m-status
+                estado="warn"
+                [texto]="'backups.armazenamento-indisponivel' | transloco"
+              />
+            </span>
+          }
           <div class="arquivo">{{ b.storageDir }}</div>
         </td>
       </ng-container>
@@ -161,7 +175,14 @@
           <button
             mat-icon-button
             (click)="excluir(b)"
+            [disabled]="!b.storageAvailable"
             [attr.aria-label]="'comum.excluir' | transloco"
+            [title]="
+              b.storageAvailable
+                ? ''
+                : ('backups.armazenamento-indisponivel-dica'
+                  | transloco: { maquina: b.storageMachineName })
+            "
           >
             <mat-icon>delete</mat-icon>
           </button>

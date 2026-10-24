@@ -105,7 +105,8 @@ export class Backups implements OnInit {
 
   podeUsarArquivo(b: Backup): boolean {
     return (
-      b.status === 'COMPLETED' || b.status === 'COMPLETED_WITH_WARNINGS' || b.status === 'SUSPECT'
+      b.storageAvailable &&
+      (b.status === 'COMPLETED' || b.status === 'COMPLETED_WITH_WARNINGS' || b.status === 'SUSPECT')
     );
   }
 

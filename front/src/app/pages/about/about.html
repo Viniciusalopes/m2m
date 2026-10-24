@@ -4,6 +4,43 @@
   <p>{{ 'sobre.versao' | transloco: { versao: versao } }}</p>
   <p>{{ 'sobre.licenca' | transloco }}</p>
 
+  <mat-card appearance="outlined" class="doacao">
+    <mat-card-header
+      ><mat-card-title>{{ 'sobre.doacao-titulo' | transloco }}</mat-card-title></mat-card-header
+    >
+    <mat-card-content>
+      <p>{{ 'sobre.doacao-convite' | transloco }}</p>
+      @if (doacoes().length) {
+        <ul class="formas">
+          @for (f of doacoes(); track f.nome) {
+            <li>
+              <strong>{{ f.nome }}</strong>
+              @if (f.descricao) {
+                <span class="descricao">{{ f.descricao }}</span>
+              }
+              @if (f.tipo === 'link') {
+                <a mat-stroked-button [href]="f.valor" target="_blank" rel="noopener noreferrer">
+                  <mat-icon>open_in_new</mat-icon> {{ 'sobre.doacao-abrir' | transloco }}
+                </a>
+              } @else {
+                <code class="valor">{{ f.valor }}</code>
+                <button mat-stroked-button type="button" (click)="copiar(f)">
+                  <mat-icon>content_copy</mat-icon>
+                  {{
+                    (copiada() === f.nome ? 'sobre.doacao-copiado' : 'sobre.doacao-copiar')
+                      | transloco
+                  }}
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="em-breve">{{ 'sobre.doacao-em-breve' | transloco }}</p>
+      }
+    </mat-card-content>
+  </mat-card>
+
   <mat-card appearance="outlined">
     <mat-card-header
       ><mat-card-title>{{ 'sobre.creditos-titulo' | transloco }}</mat-card-title></mat-card-header

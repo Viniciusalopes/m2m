@@ -98,6 +98,12 @@ export interface BrowseResult {
   items: BrowseItem[];
 }
 
+/** Backups ligados a uma máquina: todos permanecem no disco quando ela é removida. */
+export interface ArchiveCounts {
+  fromMachine: number;
+  storedOnMachine: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MachinesService {
   private http = inject(HttpClient);
@@ -112,6 +118,11 @@ export class MachinesService {
 
   update(id: number, req: MachineRequest): Promise<Machine> {
     return firstValueFrom(this.http.put<Machine>(`/api/machines/${id}`, req));
+  }
+
+  /** Backups feitos a partir da máquina e guardados nela, para o aviso da remoção. */
+  archiveCounts(id: number): Promise<ArchiveCounts> {
+    return firstValueFrom(this.http.get<ArchiveCounts>(`/api/machines/${id}/backups`));
   }
 
   remove(id: number): Promise<void> {

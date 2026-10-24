@@ -2,11 +2,11 @@ import { expect, test, Page } from "@playwright/test";
 import { execSync } from "node:child_process";
 import { mkdirSync, rmSync } from "node:fs";
 import { credenciais } from "../playwright.config";
+import { SANDBOX } from "../ambiente";
 
 // Precisa do compose de teste (OpenSSH em container) e grava só no sandbox e nele: E2E_SERVERS=1
 const comServidores = process.env.E2E_SERVERS === "1";
 const sshHost = process.env.E2E_SSH_HOST ?? "m2m-test-ssh";
-const SANDBOX = "/home/usuario/m2m-sandbox";
 
 async function entrar(page: Page) {
   await page.goto("/login");

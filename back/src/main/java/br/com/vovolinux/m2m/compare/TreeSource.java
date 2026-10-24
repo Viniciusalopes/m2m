@@ -20,6 +20,6 @@ public interface TreeSource {
 
     boolean preservesLinks();
 
-    /** Descrição para relatórios (ex.: "NOTEBOOK-REMOTO:/home/x"). */
+    /** Descrição para relatórios (ex.: "NOTEBOOK:/home/x"). */
     String describe();
 }

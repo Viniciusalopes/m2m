@@ -1,11 +1,11 @@
 import { expect, test, Page } from '@playwright/test';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { credenciais } from '../playwright.config';
+import { SANDBOX } from '../ambiente';
 
 // Precisa do compose de teste (servidor SFTP em container): E2E_SERVERS=1
 const comServidores = process.env.E2E_SERVERS === '1';
 const sshHost = process.env.E2E_SSH_HOST ?? 'm2m-test-ssh';
-const SANDBOX = '/home/usuario/m2m-sandbox';
 
 async function entrar(page: Page) {
   await page.goto('/login');
@@ -54,7 +54,7 @@ test.describe('transferência pela interface', () => {
     await page.getByRole('button', { name: 'Confirmar esta identidade' }).click();
     await page.getByRole('button', { name: 'Fechar' }).click();
 
-    // tela de transferência: esquerdo = NOTEBOOK (sandbox), direito = servidor de teste (/config)
+    // tela de transferência: esquerdo = máquina LOCAL (sandbox), direito = servidor de teste (/config)
     await page.getByRole('link', { name: 'Transferência' }).click();
     await expect(page.getByRole('heading', { name: 'Transferência', level: 1 })).toBeVisible();
     const esquerdo = page.locator('m2m-transfer-pane').nth(0);

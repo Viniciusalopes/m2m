@@ -2,6 +2,7 @@ package br.com.vovolinux.m2m;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -100,13 +101,11 @@ class MaquinasIT {
     }
 
     @Test
-    void valoresIniciaisDoHpEnvy() throws Exception {
+    void primeiraExecucaoCriaSoAMaquinaLocal() throws Exception {
         MockHttpSession s = entrarAdmin();
         mvc.perform(get("/api/machines").session(s)).andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.name=='NOTEBOOK')].protocol").value(hasItem("LOCAL")))
-                .andExpect(jsonPath("$[?(@.name=='NOTEBOOK-REMOTO')].host").value(hasItem("192.168.0.10")))
-                .andExpect(jsonPath("$[?(@.name=='NOTEBOOK-REMOTO')].port").value(hasItem(22)))
-                .andExpect(jsonPath("$[?(@.name=='NOTEBOOK-REMOTO')].protocol").value(hasItem("SFTP")));
+                .andExpect(jsonPath("$[?(@.protocol=='LOCAL')].name").value(contains("NOTEBOOK")))
+                .andExpect(jsonPath("$[?(@.name=='NOTEBOOK')].host").value(hasItem("localhost")));
     }
 
     @Test
@@ -164,7 +163,7 @@ class MaquinasIT {
 
     @Test
     void soExisteUmaMaquinaLocal() throws Exception {
-        // o admin já tem o NOTEBOOK (LOCAL) do seed; outro usuário não pode criar uma segunda LOCAL
+        // o admin já tem a NOTEBOOK (LOCAL) do seed; outro usuário não pode criar uma segunda LOCAL
         MockHttpSession s = entrar(usuarios.novo());
         mvc.perform(post("/api/machines").session(s).with(csrf()).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\":\"Outro\",\"protocol\":\"LOCAL\"}"))

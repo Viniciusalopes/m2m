@@ -12,14 +12,17 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Valores iniciais do NOTEBOOK: com o acesso LOCAL ativo e nenhuma máquina cadastrada, cria NOTEBOOK (LOCAL) e
- * NOTEBOOK-REMOTO (SFTP, 192.168.0.10:22). Sem LOCAL (ex.: VPS) nada é criado. Também valida o bind mount do host.
+ * Máquina inicial: com o acesso LOCAL ativo e nenhuma máquina cadastrada, cria só a máquina LOCAL com o nome de
+ * M2M_LOCAL_NAME (padrão {@code LOCAL}). Sem LOCAL (ex.: VPS) nada é criado. Também valida o bind mount do host.
  */
 @Component
 @Order(10)
 public class MachineSeeder implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(MachineSeeder.class);
+
+    /** Nome da máquina LOCAL quando M2M_LOCAL_NAME não é informado. */
+    static final String NOME_PADRAO = "LOCAL";
 
     private final LocalProperties local;
     private final UserRepository users;
@@ -47,13 +50,13 @@ public class MachineSeeder implements ApplicationRunner {
             if (machines.count(u.id()) > 0) {
                 return;
             }
-            if (!machines.localExists()) {
-                machines.insert(new Machine(0, u.id(), "NOTEBOOK", "Host onde o m2m roda", "localhost", Protocol.LOCAL, 0,
-                        null, null, null, null, 4, "{}", null, null));
+            if (machines.localExists()) {
+                return;
             }
-            machines.insert(new Machine(0, u.id(), "NOTEBOOK-REMOTO", "Notebook de trabalho", "192.168.0.10", Protocol.SFTP,
-                    22, null, "usuario", "KEY", null, 4, "{}", null, null));
-            log.info("Máquinas iniciais criadas: NOTEBOOK (LOCAL) e NOTEBOOK-REMOTO (SFTP 192.168.0.10:22)");
+            String name = local.name() == null || local.name().isBlank() ? NOME_PADRAO : local.name().strip();
+            machines.insert(new Machine(0, u.id(), name, "Host onde o m2m roda", "localhost", Protocol.LOCAL, 0, null,
+                    null, null, null, 4, "{}", null, null));
+            log.info("Máquina inicial criada: {} (LOCAL)", name);
         });
     }
 

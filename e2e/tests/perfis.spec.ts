@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { credenciais } from '../playwright.config';
+import { PARTES_SANDBOX, SANDBOX } from '../ambiente';
 
-// O m2m-back enxerga o host em /hostfs/home; os diretórios abaixo são do sandbox do NOTEBOOK (D19).
-const SANDBOX = '/home/usuario/m2m-sandbox';
+// O m2m-back enxerga o host em /hostfs/home; os diretórios abaixo são do sandbox da máquina LOCAL (D19).
 
 test.describe('perfis', () => {
   const id = Date.now();
@@ -41,9 +41,9 @@ test.describe('perfis', () => {
     await page.getByRole('link', { name: 'Novo perfil' }).click();
 
     await page.getByLabel('Nome', { exact: true }).fill(nome);
-    // a origem vem preenchida com a primeira máquina (NOTEBOOK); armazenamento padrão LOCAL /home/backup
+    // a origem vem preenchida com a primeira máquina (a LOCAL); armazenamento padrão LOCAL /home/backup
     await page.getByRole('button', { name: 'Adicionar diretório' }).click();
-    await escolherDiretorio(page, ['usuario', 'm2m-sandbox', `e2e-${id}`, 'trabalho']);
+    await escolherDiretorio(page, [...PARTES_SANDBOX, `e2e-${id}`, 'trabalho']);
     await expect(page.locator('.diretorios .caminho')).toContainText(`${raiz}/trabalho`);
 
     // armazenamento no sandbox (o /home/backup real não é tocado nos testes)
@@ -85,7 +85,7 @@ test.describe('perfis', () => {
       await page.getByRole('link', { name: 'Novo perfil' }).click();
       await page.getByLabel('Nome', { exact: true }).fill(`${nome}-dup`);
       await page.getByRole('button', { name: 'Adicionar diretório' }).click();
-      await escolherDiretorio(page, ['usuario', 'm2m-sandbox', `e2e-${id}`, 'trabalho']);
+      await escolherDiretorio(page, [...PARTES_SANDBOX, `e2e-${id}`, 'trabalho']);
       await page.getByLabel('Diretório de armazenamento').fill(`${raiz}/b-${i}`);
       await page.getByRole('button', { name: 'Salvar' }).click();
       if (i === 0) {

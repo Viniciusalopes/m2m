@@ -1,8 +1,8 @@
 import { expect, test, Page } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { credenciais } from '../playwright.config';
+import { literal, MAQUINA_LOCAL, PARTES_SANDBOX, SANDBOX } from '../ambiente';
 
-const SANDBOX = '/home/usuario/m2m-sandbox';
 
 /** Só o passo ativo do assistente tem botão "Continuar" visível. */
 async function continuar(page: Page) {
@@ -45,7 +45,7 @@ test.describe('restauração pela interface', () => {
     await page.getByLabel('Nome', { exact: true }).fill(nome);
     await page.getByRole('button', { name: 'Adicionar diretório' }).click();
     const d = page.getByRole('dialog');
-    for (const parte of ['usuario', 'm2m-sandbox', `e2e-rest-${id}`, 'origem']) {
+    for (const parte of [...PARTES_SANDBOX, `e2e-rest-${id}`, 'origem']) {
       await d.getByText(parte, { exact: true }).first().click();
     }
     await d.getByRole('button', { name: 'Escolher este diretório' }).click();
@@ -62,7 +62,7 @@ test.describe('restauração pela interface', () => {
     await linhaBackup.getByRole('button', { name: 'Restaurar' }).click();
     await expect(page).toHaveURL(/\/restaurar\/\d+$/);
     await page.getByRole('combobox', { name: 'Máquina de destino' }).click({ force: true }); // o rótulo flutuante intercepta o clique do Playwright
-    await page.getByRole('option', { name: /NOTEBOOK/ }).click();
+    await page.getByRole('option', { name: new RegExp(literal(MAQUINA_LOCAL)) }).click();
     await continuar(page);
     // destino = origem: o caminho original vem pré-preenchido; troca pelo caminho de restauração
     const campo = page.getByLabel('Caminho de destino');
@@ -96,7 +96,7 @@ test.describe('restauração pela interface', () => {
     await conteudo.getByRole('button', { name: /Restaurar selecionados \(1\)/ }).click();
     const sel = page.getByRole('dialog');
     await sel.getByRole('combobox', { name: 'Máquina de destino' }).click({ force: true });
-    await page.getByRole('option', { name: /NOTEBOOK/ }).click();
+    await page.getByRole('option', { name: new RegExp(literal(MAQUINA_LOCAL)) }).click();
     await sel.getByLabel('Diretório de destino').fill(`${raiz}/recuperados`);
     await sel.getByRole('button', { name: 'Verificar conflitos' }).click();
     await expect(sel.getByText('Nenhum item existe no destino')).toBeVisible();

@@ -1,9 +1,8 @@
 import { request } from '@playwright/test';
 import { existsSync, readdirSync, rmSync } from 'node:fs';
+import { SANDBOX } from './ambiente';
 import { credenciais } from './playwright.config';
 
-// Sandbox do NOTEBOOK (D19): só pastas filhas diretas com prefixo "e2e-" são removidas.
-const SANDBOX = process.env.E2E_SANDBOX ?? '/home/usuario/m2m-sandbox';
 
 const ehE2E = (nome: string | null | undefined) => (nome ?? '').includes('E2E');
 

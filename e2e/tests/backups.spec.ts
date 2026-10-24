@@ -1,9 +1,9 @@
 import { expect, test, Page } from '@playwright/test';
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { credenciais } from '../playwright.config';
+import { literal, MAQUINA_LOCAL, PARTES_SANDBOX, SANDBOX } from '../ambiente';
 
-// O m2m-back enxerga o host em /hostfs/home; tudo abaixo vive no sandbox do NOTEBOOK (D19).
-const SANDBOX = '/home/usuario/m2m-sandbox';
+// O m2m-back enxerga o host em /hostfs/home; tudo abaixo vive no sandbox da máquina LOCAL (D19).
 
 test.describe('backup pela interface', () => {
   const id = Date.now();
@@ -39,7 +39,7 @@ test.describe('backup pela interface', () => {
     await page.getByLabel('Nome', { exact: true }).fill(nome);
     await page.getByRole('button', { name: 'Adicionar diretório' }).click();
     const dialogo = page.getByRole('dialog');
-    for (const parte of ['usuario', 'm2m-sandbox', `e2e-bk-${id}`, 'trabalho']) {
+    for (const parte of [...PARTES_SANDBOX, `e2e-bk-${id}`, 'trabalho']) {
       await dialogo.getByText(parte, { exact: true }).first().click();
     }
     await dialogo.getByRole('button', { name: 'Escolher este diretório' }).click();
@@ -62,7 +62,7 @@ test.describe('backup pela interface', () => {
     // arquivo gravado no sandbox, com o complemento no nome, sem .partial
     const arquivos = readdirSync(`${raiz}/backups`);
     const tar = arquivos.find((n) => n.endsWith('.tar.zst'));
-    expect(tar).toMatch(new RegExp(`^${nome}_e2e_NOTEBOOK_\\d{8}-\\d{6}\\.tar\\.zst$`));
+    expect(tar).toMatch(new RegExp(`^${nome}_e2e_${literal(MAQUINA_LOCAL)}_\\d{8}-\\d{6}\\.tar\\.zst$`));
     expect(arquivos.some((n) => n.endsWith('.partial'))).toBe(false);
     expect(arquivos).toContain(`${tar}.manifest`);
 

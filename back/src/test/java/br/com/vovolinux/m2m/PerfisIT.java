@@ -56,7 +56,7 @@ class PerfisIT {
 
     MockHttpSession admin;
     long local;
-    long dell;
+    long remota; // máquina SFTP de exemplo, só para os mapeamentos
     String base; // diretório exclusivo deste teste, no "host"
 
     @BeforeAll
@@ -74,7 +74,13 @@ class PerfisIT {
         admin = (MockHttpSession) mvc.perform(post("/api/auth/login").param("username", "admin")
                 .param("password", "Senha-Admin-Teste-1").with(csrf())).andReturn().getRequest().getSession(false);
         local = jdbc.sql("select id from machine where protocol = 'LOCAL'").query(Long.class).single();
-        dell = jdbc.sql("select id from machine where name = 'NOTEBOOK-REMOTO'").query(Long.class).single();
+        remota = jdbc.sql("select id from machine where name = 'REMOTA'").query(Long.class).optional()
+                .orElseGet(() -> jdbc.sql("""
+                        insert into machine (owner_id, name, description, host, protocol, port, username, auth_type,
+                                             max_connections)
+                        values ((select id from app_user where username = 'admin'), 'REMOTA', 'Máquina remota de exemplo',
+                                'remota.exemplo.test', 'SFTP', 22, 'usuario', 'KEY', 4)
+                        returning id""").query(Long.class).single());
         String id = UUID.randomUUID().toString().substring(0, 8);
         base = "/home/teste/t-" + id;
         Files.createDirectories(HOST.resolve("t-" + id + "/trabalho"));
@@ -187,21 +193,21 @@ class PerfisIT {
 
     @Test
     void mapeamentoPorMaquinaDeDestino() throws Exception {
-        String dirs = "[{\"path\":\"" + base + "/trabalho\",\"mappings\":[{\"machineId\":" + dell
-                + ",\"path\":\"/home/dell/projetos\"}]},{\"path\":\"" + base + "/fotos\",\"mappings\":[{\"machineId\":"
-                + dell + ",\"path\":\"/home/dell/fotos\"}]}]";
+        String dirs = "[{\"path\":\"" + base + "/trabalho\",\"mappings\":[{\"machineId\":" + remota
+                + ",\"path\":\"/home/usuario/projetos\"}]},{\"path\":\"" + base + "/fotos\",\"mappings\":[{\"machineId\":"
+                + remota + ",\"path\":\"/home/usuario/fotos\"}]}]";
         JsonNode p = criar(perfil(nome(), dirs, base + "/b", ""));
         assertThat(p.get("directories").get(0).get("mappings").get(0).get("path").asText())
-                .isEqualTo("/home/dell/projetos");
-        assertThat(p.get("directories").get(1).get("mappings").get(0).get("machineId").asLong()).isEqualTo(dell);
+                .isEqualTo("/home/usuario/projetos");
+        assertThat(p.get("directories").get(1).get("mappings").get(0).get("machineId").asLong()).isEqualTo(remota);
 
         // destinos que se sobrepõem na mesma máquina são recusados
-        String sobrepostos = "[{\"path\":\"" + base + "/trabalho\",\"mappings\":[{\"machineId\":" + dell
-                + ",\"path\":\"/home/dell/x\"}]},{\"path\":\"" + base + "/fotos\",\"mappings\":[{\"machineId\":" + dell
-                + ",\"path\":\"/home/dell/x/fotos\"}]}]";
+        String sobrepostos = "[{\"path\":\"" + base + "/trabalho\",\"mappings\":[{\"machineId\":" + remota
+                + ",\"path\":\"/home/usuario/x\"}]},{\"path\":\"" + base + "/fotos\",\"mappings\":[{\"machineId\":" + remota
+                + ",\"path\":\"/home/usuario/x/fotos\"}]}]";
         rejeita(perfil(nome(), sobrepostos, base + "/b", ""), 400, "perfil.mapeamento-sobreposto");
         // mapeamento relativo é inválido
-        rejeita(perfil(nome(), "[{\"path\":\"" + base + "/trabalho\",\"mappings\":[{\"machineId\":" + dell
+        rejeita(perfil(nome(), "[{\"path\":\"" + base + "/trabalho\",\"mappings\":[{\"machineId\":" + remota
                 + ",\"path\":\"relativo\"}]}]", base + "/b", ""), 400, "perfil.mapeamento-invalido");
     }
 

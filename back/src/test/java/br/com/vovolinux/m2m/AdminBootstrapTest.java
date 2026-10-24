@@ -37,8 +37,8 @@ class AdminBootstrapTest {
     @Test
     void bancoVazioCriaAdminComSenhaEmHash() {
         when(users.count()).thenReturn(0L);
-        com("usuario", "Senha-Forte-123", "v@exemplo.test").run(null);
-        verify(users).create(eq("usuario"), eq("v@exemplo.test"), any(), eq("ADMIN"));
+        com("ana", "Senha-Forte-123", "ana@exemplo.test").run(null);
+        verify(users).create(eq("ana"), eq("ana@exemplo.test"), any(), eq("ADMIN"));
         org.mockito.ArgumentCaptor<String> hash = org.mockito.ArgumentCaptor.forClass(String.class);
         verify(users).create(anyString(), anyString(), hash.capture(), anyString());
         assertThat(hash.getValue()).isNotEqualTo("Senha-Forte-123");

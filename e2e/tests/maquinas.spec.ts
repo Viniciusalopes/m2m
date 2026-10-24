@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { credenciais } from '../playwright.config';
+import { literal, MAQUINA_LOCAL, MAQUINA_REAL } from '../ambiente';
 
 // Precisa do compose de teste (servidores SFTP/FTP em container): E2E_SERVERS=1
 const comServidores = process.env.E2E_SERVERS === '1';
@@ -16,12 +17,19 @@ test.describe('máquinas', () => {
     await page.getByRole('link', { name: 'Máquinas' }).click();
   });
 
-  test('mostra as máquinas iniciais do NOTEBOOK', async ({ page }) => {
-    // Ancorado no início: perfis e jobs de outros testes também citam "NOTEBOOK" em suas células
+  test('mostra a máquina LOCAL', async ({ page }) => {
+    // Ancorado no início: perfis e jobs de outros testes também citam a máquina LOCAL em suas células
     await expect(page).toHaveURL(/\/maquinas$/);
-    await expect(page.getByRole('cell', { name: /^NOTEBOOK/ }).first()).toBeVisible();
-    await expect(page.getByRole('cell', { name: /^NOTEBOOK-REMOTO/ }).first()).toBeVisible();
-    await expect(page.getByRole('cell', { name: '192.168.0.10:22' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: new RegExp(`^${literal(MAQUINA_LOCAL)}`) }).first()).toBeVisible();
+  });
+
+  test('mostra a máquina real cadastrada (E2E_MAQUINA_REAL_NOME)', async ({ page }) => {
+    test.skip(!MAQUINA_REAL, 'E2E_MAQUINA_REAL_NOME não definida');
+    await expect(page).toHaveURL(/\/maquinas$/);
+    await expect(page.getByRole('cell', { name: new RegExp(`^${literal(MAQUINA_REAL!.nome)}`) }).first()).toBeVisible();
+    if (MAQUINA_REAL!.endereco) {
+      await expect(page.getByRole('cell', { name: MAQUINA_REAL!.endereco })).toBeVisible();
+    }
   });
 
   test('FTP mostra o alerta de falta de criptografia no formulário', async ({ page }) => {

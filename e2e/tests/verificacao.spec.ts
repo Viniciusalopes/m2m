@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { mkdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { credenciais } from '../playwright.config';
+import { PARTES_SANDBOX, SANDBOX } from '../ambiente';
 
-// Verificação entre duas pastas do próprio sandbox do NOTEBOOK: a máquina de destino é a NOTEBOOK-REMOTO? Não: usa um
-// segundo perfil LOCAL só se houver outra máquina; aqui o fluxo de tela é validado até a escolha do destino.
-const SANDBOX = '/home/usuario/m2m-sandbox';
+// Verificação entre duas pastas do sandbox da máquina LOCAL; o fluxo de tela é validado até a escolha do destino.
 
 test.describe('verificação', () => {
   const id = Date.now();
@@ -30,7 +29,7 @@ test.describe('verificação', () => {
     await page.getByLabel('Nome', { exact: true }).fill(nome);
     await page.getByRole('button', { name: 'Adicionar diretório' }).click();
     const d = page.getByRole('dialog');
-    for (const parte of ['usuario', 'm2m-sandbox', `e2e-ver-${id}`, 'origem']) {
+    for (const parte of [...PARTES_SANDBOX, `e2e-ver-${id}`, 'origem']) {
       await d.getByText(parte, { exact: true }).first().click();
     }
     await d.getByRole('button', { name: 'Escolher este diretório' }).click();

@@ -480,7 +480,11 @@ Para desenvolver o instalador: módulo Go em `installer/` (código em `internal/
 
 ## Apoie o projeto
 
-O m2m é gratuito e de código aberto. Se ele é útil para você, considere apoiar o desenvolvimento com uma doação. As formas de doação serão publicadas em breve; elas também aparecem na tela **Sobre** do m2m.
+O m2m é gratuito e de código aberto. Se ele é útil para você, considere apoiar o desenvolvimento com uma doação:
+
+- **PayPal** (cartão de crédito ou saldo PayPal, em reais): [doar pelo PayPal](https://www.paypal.com/donate/?business=RELWG6ZBS4D4U&no_recurring=0&item_name=O+m2m+%C3%A9+gratuito+e+de+c%C3%B3digo+aberto.+Sua+doa%C3%A7%C3%A3o+ajuda+a+manter+backups%2C+sincroniza%C3%A7%C3%A3o+e+transfer%C3%AAncias+evoluindo.&currency_code=BRL)
+
+As mesmas formas de doação aparecem na tela **Sobre** do m2m. Obrigado!
 
 ## Créditos e licenças
 

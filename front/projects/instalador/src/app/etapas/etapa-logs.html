@@ -1,0 +1,22 @@
+<p class="intro">{{ 'logs.intro' | transloco }}</p>
+<div [formGroup]="form">
+  <div class="campos">
+    <mat-form-field>
+      <mat-label>{{ 'logs.porta' | transloco }}</mat-label>
+      <input matInput type="number" formControlName="portaGrafana" />
+      <mat-error><m2m-erro-campo [controle]="form.controls.portaGrafana" /></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'logs.retencao' | transloco }}</mat-label>
+      <input matInput type="number" formControlName="retencaoDias" />
+      <mat-error>
+        <m2m-erro-campo [controle]="form.controls.retencaoDias" [maximo]="365" />
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <mat-slide-toggle formControlName="acessoRede">{{ 'logs.rede' | transloco }}</mat-slide-toggle>
+  <p class="dica">
+    {{ (form.controls.acessoRede.value ? 'logs.rede-dica' : 'logs.local-dica') | transloco }}
+  </p>
+  <p class="dica">{{ 'logs.senha' | transloco }}</p>
+</div>

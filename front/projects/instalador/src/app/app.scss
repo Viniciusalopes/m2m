@@ -1,0 +1,41 @@
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+}
+
+.logo {
+  height: 2.5rem;
+}
+
+h1 {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.sub {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.erro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--m2m-fail);
+}
+
+.encerrado {
+  text-align: center;
+  margin-top: 4rem;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: var(--m2m-ok);
+  }
+}

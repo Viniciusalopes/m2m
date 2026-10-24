@@ -1,0 +1,32 @@
+@use './etapas';
+
+dl {
+  margin: 0;
+}
+
+.grupo {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+dt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: var(--mat-sys-title-small);
+
+  button {
+    margin-left: auto;
+  }
+}
+
+dd {
+  margin: 0.15rem 0 0 1rem;
+}
+
+.pulada {
+  padding: 0 0.5rem;
+  border-radius: 1rem;
+  background: var(--m2m-info-container);
+  font: var(--mat-sys-label-small);
+}

@@ -81,6 +81,82 @@
           "builder": "@angular/build:unit-test"
         }
       }
+    },
+    "instalador": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/instalador",
+      "sourceRoot": "projects/instalador/src",
+      "prefix": "m2m",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "projects/instalador/src/main.ts",
+            "tsConfig": "projects/instalador/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "outputPath": "dist/instalador",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/instalador/public"
+              },
+              {
+                "glob": "m2m-*.svg",
+                "input": "src/assets/brand",
+                "output": "assets/brand"
+              }
+            ],
+            "styles": [
+              "node_modules/@fontsource-variable/inter/index.css",
+              "node_modules/@fontsource/material-icons/index.css",
+              "projects/instalador/src/styles.scss"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1.2MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "instalador:build:production"
+            },
+            "development": {
+              "buildTarget": "instalador:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
     }
   }
 }

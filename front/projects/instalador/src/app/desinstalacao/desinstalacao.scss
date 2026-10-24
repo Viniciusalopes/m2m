@@ -1,0 +1,92 @@
+.info,
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+
+  p {
+    margin: 0.15rem 0;
+  }
+}
+
+.info {
+  background: var(--m2m-info-container);
+}
+
+.aviso {
+  background: var(--m2m-warn-container);
+}
+
+.dica,
+.descricao {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.descricao {
+  margin: 0 0 0.25rem 2.5rem;
+}
+
+.itens,
+.destinos {
+  list-style: none;
+  padding: 0;
+
+  li {
+    padding: 0.35rem 0;
+  }
+}
+
+.destinos li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.estado {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0 2.5rem;
+
+  &.concluido mat-icon,
+  &.concluido {
+    color: var(--m2m-ok);
+  }
+
+  &.falhou mat-icon,
+  &.falhou {
+    color: var(--m2m-fail);
+  }
+}
+
+.linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 1rem;
+}
+
+.perigo {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+}
+
+.ok {
+  color: var(--m2m-ok);
+}
+
+.erro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--m2m-fail);
+}
+
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}

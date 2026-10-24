@@ -1,0 +1,48 @@
+<p class="intro">{{ 'rede.intro' | transloco }}</p>
+<div [formGroup]="form">
+  <div class="campos">
+    <mat-form-field class="largo">
+      <mat-label>{{ 'rede.endereco' | transloco }}</mat-label>
+      <input matInput formControlName="endereco" [matAutocomplete]="enderecos" />
+      <mat-autocomplete #enderecos="matAutocomplete">
+        @for (e of quiz.estado()?.enderecos ?? []; track e) {
+          <mat-option [value]="e">{{ e }}</mat-option>
+        }
+      </mat-autocomplete>
+      <mat-hint>{{ 'rede.endereco-dica' | transloco }}</mat-hint>
+      <mat-error><m2m-erro-campo [controle]="form.controls.endereco" /></mat-error>
+    </mat-form-field>
+  </div>
+
+  <h3>{{ 'rede.certificado' | transloco }}</h3>
+  <mat-radio-group formControlName="certificado" class="opcoes">
+    <mat-radio-button value="ca-local">{{ 'rede.ca-local' | transloco }}</mat-radio-button>
+    <mat-radio-button value="proprio">{{ 'rede.proprio' | transloco }}</mat-radio-button>
+    <mat-radio-button value="autoassinado">{{ 'rede.autoassinado' | transloco }}</mat-radio-button>
+  </mat-radio-group>
+  <p class="erro"><m2m-erro-campo [controle]="form.controls.certificado" /></p>
+  <p class="dica">{{ 'rede.dica.' + form.controls.certificado.value | transloco }}</p>
+
+  @if (form.controls.certificado.value === 'proprio') {
+    <div class="campos">
+      <mat-form-field>
+        <mat-label>{{ 'rede.arquivo-certificado' | transloco }}</mat-label>
+        <input
+          matInput
+          formControlName="certificadoArquivo"
+          placeholder="/etc/letsencrypt/live/…/fullchain.pem"
+        />
+        <mat-error><m2m-erro-campo [controle]="form.controls.certificadoArquivo" /></mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>{{ 'rede.arquivo-chave' | transloco }}</mat-label>
+        <input
+          matInput
+          formControlName="chaveArquivo"
+          placeholder="/etc/letsencrypt/live/…/privkey.pem"
+        />
+        <mat-error><m2m-erro-campo [controle]="form.controls.chaveArquivo" /></mat-error>
+      </mat-form-field>
+    </div>
+  }
+</div>

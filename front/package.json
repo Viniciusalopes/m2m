@@ -1,6 +1,7 @@
 {
   "name": "front",
   "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -10,7 +11,7 @@
     "escala": "node scripts/gerar-escala-material.mjs",
     "license:check": "license-checker-rseidelsohn --production --excludePrivatePackages --onlyAllow \"Apache-2.0;MIT;ISC;BSD-2-Clause;BSD-3-Clause;0BSD;Python-2.0;CC0-1.0;BlueOak-1.0.0;Unlicense;OFL-1.1\"",
     "license:notices": "license-checker-rseidelsohn --production --excludePrivatePackages --markdown --out tmp/THIRD-PARTY-FRONT.md",
-    "lint": "prettier --check \"src/**/*.{ts,html,scss,json}\" --ignore-path .prettierignore"
+    "lint": "prettier --check \"src/**/*.{ts,html,scss,json}\" \"projects/**/*.{ts,html,scss,json}\" --ignore-path .prettierignore"
   },
   "private": true,
   "packageManager": "npm@11.19.1",

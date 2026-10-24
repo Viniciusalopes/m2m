@@ -1,0 +1,115 @@
+@let r = quiz.respostas();
+@let s = quiz.segredos();
+@let puladas = quiz.puladas();
+<p class="intro">{{ 'revisao.intro' | transloco }}</p>
+
+@if (puladas.has('seguranca')) {
+  <section class="aviso">
+    <mat-icon>key</mat-icon>
+    <p>{{ 'revisao.seguranca-pulada' | transloco }}</p>
+  </section>
+}
+
+<dl>
+  <div class="grupo">
+    <dt>
+      {{ 'etapa.containers' | transloco }}
+      @if (puladas.has('containers')) {
+        <span class="pulada">{{ 'revisao.padroes' | transloco }}</span>
+      }
+      <button mat-button type="button" (click)="corrigir.emit('containers')">
+        {{ 'revisao.corrigir' | transloco }}
+      </button>
+    </dt>
+    <dd>{{ 'containers.diretorio' | transloco }}: {{ r.containers.diretorio }}</dd>
+    <dd>
+      {{
+        'revisao.portas'
+          | transloco: { http: r.containers.portaHttp, https: r.containers.portaHttps }
+      }}
+    </dd>
+    <dd>{{ 'containers.fuso' | transloco }}: {{ r.containers.fuso }}</dd>
+  </div>
+
+  <div class="grupo">
+    <dt>
+      {{ 'etapa.seguranca' | transloco }}
+      @if (puladas.has('seguranca')) {
+        <span class="pulada">{{ 'revisao.padroes' | transloco }}</span>
+      }
+      <button mat-button type="button" (click)="corrigir.emit('seguranca')">
+        {{ 'revisao.corrigir' | transloco }}
+      </button>
+    </dt>
+    <dd>{{ 'seguranca.chave' | transloco }}: {{ mascarar(s.chaveMestra) }}</dd>
+    <dd>{{ 'revisao.senhas-internas' | transloco }}: {{ mascarar(s.senhaBanco) }}</dd>
+  </div>
+
+  <div class="grupo">
+    <dt>
+      {{ 'etapa.usuarios' | transloco }}
+      <button mat-button type="button" (click)="corrigir.emit('usuarios')">
+        {{ 'revisao.corrigir' | transloco }}
+      </button>
+    </dt>
+    <dd>{{ 'usuarios.usuario' | transloco }}: {{ r.usuarios.usuario }}</dd>
+    <dd>{{ 'usuarios.email' | transloco }}: {{ r.usuarios.email || '—' }}</dd>
+    <dd>{{ 'usuarios.senha' | transloco }}: {{ mascarar(s.senhaAdmin) }}</dd>
+  </div>
+
+  <div class="grupo">
+    <dt>
+      {{ 'etapa.rede' | transloco }}
+      @if (puladas.has('rede')) {
+        <span class="pulada">{{ 'revisao.padroes' | transloco }}</span>
+      }
+      <button mat-button type="button" (click)="corrigir.emit('rede')">
+        {{ 'revisao.corrigir' | transloco }}
+      </button>
+    </dt>
+    <dd>{{ 'rede.endereco' | transloco }}: {{ r.rede.endereco }}</dd>
+    <dd>{{ 'rede.certificado' | transloco }}: {{ 'rede.' + r.rede.certificado | transloco }}</dd>
+    @if (r.rede.certificado === 'proprio') {
+      <dd>{{ r.rede.certificadoArquivo }} · {{ r.rede.chaveArquivo }}</dd>
+    }
+  </div>
+
+  <div class="grupo">
+    <dt>
+      {{ 'etapa.maquinas' | transloco }}
+      @if (puladas.has('maquinas')) {
+        <span class="pulada">{{ 'revisao.padroes' | transloco }}</span>
+      }
+      <button mat-button type="button" (click)="corrigir.emit('maquinas')">
+        {{ 'revisao.corrigir' | transloco }}
+      </button>
+    </dt>
+    @if (r.maquinas.localAtivo) {
+      <dd>
+        {{ 'revisao.local' | transloco: { nome: r.maquinas.nome, dir: r.maquinas.diretorioHost } }}
+      </dd>
+      <dd>{{ 'maquinas.raizes' | transloco }}: {{ r.maquinas.raizes.join(', ') }}</dd>
+    } @else {
+      <dd>{{ 'revisao.sem-local' | transloco }}</dd>
+    }
+  </div>
+
+  <div class="grupo">
+    <dt>
+      {{ 'etapa.logs' | transloco }}
+      @if (puladas.has('logs')) {
+        <span class="pulada">{{ 'revisao.padroes' | transloco }}</span>
+      }
+      <button mat-button type="button" (click)="corrigir.emit('logs')">
+        {{ 'revisao.corrigir' | transloco }}
+      </button>
+    </dt>
+    <dd>
+      {{
+        (r.logs.acessoRede ? 'revisao.grafana-rede' : 'revisao.grafana-local')
+          | transloco: { porta: r.logs.portaGrafana, dias: r.logs.retencaoDias }
+      }}
+    </dd>
+    <dd>{{ 'revisao.senha-grafana' | transloco }}: {{ mascarar(s.senhaGrafana) }}</dd>
+  </div>
+</dl>

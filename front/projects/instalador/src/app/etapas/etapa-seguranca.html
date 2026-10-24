@@ -1,0 +1,71 @@
+<p class="intro">{{ 'seguranca.intro' | transloco }}</p>
+<div [formGroup]="form">
+  <mat-slide-toggle formControlName="chaveInformada" (change)="alternar($event.checked)">
+    {{ 'seguranca.informar' | transloco }}
+  </mat-slide-toggle>
+
+  @if (form.controls.chaveInformada.value) {
+    <div class="campos">
+      <mat-form-field class="largo">
+        <mat-label>{{ 'seguranca.chave' | transloco }}</mat-label>
+        <input
+          matInput
+          [type]="mostrar() ? 'text' : 'password'"
+          autocomplete="off"
+          formControlName="chaveMestra"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          [attr.aria-label]="'seguranca.mostrar' | transloco"
+          (click)="mostrar.set(!mostrar())"
+        >
+          <mat-icon>{{ mostrar() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-hint>{{ 'seguranca.chave-dica' | transloco }}</mat-hint>
+        <mat-error><m2m-erro-campo [controle]="form.controls.chaveMestra" /></mat-error>
+      </mat-form-field>
+    </div>
+  } @else {
+    <p>{{ 'seguranca.gerada' | transloco }}</p>
+    <div class="chave">
+      <code>{{ mostrar() ? form.controls.chaveMestra.value : '••••••••••••••••••••••••' }}</code>
+      <button
+        mat-icon-button
+        type="button"
+        [attr.aria-label]="'seguranca.mostrar' | transloco"
+        (click)="mostrar.set(!mostrar())"
+      >
+        <mat-icon>{{ mostrar() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <button mat-stroked-button type="button" (click)="copiar()">
+        <mat-icon>{{ copiada() ? 'check' : 'content_copy' }}</mat-icon>
+        {{ (copiada() ? 'comando.copiado' : 'comando.copiar') | transloco }}
+      </button>
+      <button mat-stroked-button type="button" (click)="baixar()">
+        <mat-icon>download</mat-icon> {{ 'seguranca.baixar' | transloco }}
+      </button>
+    </div>
+  }
+
+  <p class="dica">
+    {{
+      (quiz.importado() && !quiz.importacao()?.semSegredos
+        ? 'seguranca.senhas-importadas'
+        : 'seguranca.senhas-geradas'
+      ) | transloco
+    }}
+  </p>
+
+  <section class="aviso">
+    <mat-icon>key</mat-icon>
+    <div>
+      <p>{{ 'seguranca.aviso' | transloco }}</p>
+      <mat-checkbox formControlName="guardei">{{ 'seguranca.guardei' | transloco }}</mat-checkbox>
+      @if (form.controls.guardei.touched && !form.controls.guardei.value) {
+        <p class="erro">{{ 'seguranca.guardei-obrigatorio' | transloco }}</p>
+      }
+    </div>
+  </section>
+</div>

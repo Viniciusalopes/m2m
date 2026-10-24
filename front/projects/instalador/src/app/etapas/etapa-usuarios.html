@@ -1,0 +1,47 @@
+<p class="intro">{{ 'usuarios.intro' | transloco }}</p>
+<div class="campos" [formGroup]="form">
+  <mat-form-field>
+    <mat-label>{{ 'usuarios.usuario' | transloco }}</mat-label>
+    <input matInput autocomplete="off" formControlName="usuario" />
+    <mat-error><m2m-erro-campo [controle]="form.controls.usuario" /></mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'usuarios.email' | transloco }}</mat-label>
+    <input matInput type="email" formControlName="email" />
+    <mat-hint>{{ 'usuarios.email-dica' | transloco }}</mat-hint>
+    <mat-error><m2m-erro-campo [controle]="form.controls.email" /></mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'usuarios.senha' | transloco }}</mat-label>
+    <input
+      matInput
+      [type]="mostrar() ? 'text' : 'password'"
+      autocomplete="new-password"
+      formControlName="senhaAdmin"
+    />
+    <button
+      mat-icon-button
+      matSuffix
+      type="button"
+      [attr.aria-label]="'seguranca.mostrar' | transloco"
+      (click)="mostrar.set(!mostrar())"
+    >
+      <mat-icon>{{ mostrar() ? 'visibility_off' : 'visibility' }}</mat-icon>
+    </button>
+    <mat-hint>{{ 'usuarios.senha-dica' | transloco }}</mat-hint>
+    <mat-error><m2m-erro-campo [controle]="form.controls.senhaAdmin" /></mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'usuarios.confirmacao' | transloco }}</mat-label>
+    <input
+      matInput
+      [type]="mostrar() ? 'text' : 'password'"
+      autocomplete="new-password"
+      formControlName="confirmacao"
+    />
+    <mat-error><m2m-erro-campo [controle]="form.controls.confirmacao" /></mat-error>
+  </mat-form-field>
+</div>
+@if (form.hasError('diferentes') && form.controls.confirmacao.touched) {
+  <p class="erro">{{ 'usuarios.diferentes' | transloco }}</p>
+}

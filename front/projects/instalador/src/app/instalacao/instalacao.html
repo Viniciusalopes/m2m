@@ -1,0 +1,101 @@
+@if (quiz.importacao(); as imp) {
+  <section class="importado">
+    <mat-icon>upload_file</mat-icon>
+    <p>
+      {{ 'quiz.importado' | transloco: { versao: imp.m2m, data: imp.criadoEm } }}
+      @if (imp.semSegredos) {
+        {{ 'quiz.importado-sem-segredos' | transloco }}
+      }
+      @if (imp.configuracao; as c) {
+        {{ 'quiz.importado-configuracao' | transloco: { maquinas: c.maquinas, perfis: c.perfis } }}
+      }
+    </p>
+  </section>
+}
+
+<mat-stepper orientation="vertical" [linear]="true" #stepper>
+  @for (etapa of etapas; track etapa) {
+    <mat-step [completed]="quiz.confirmadas().has(etapa)" [editable]="true">
+      <ng-template matStepLabel>
+        {{ 'etapa.' + etapa | transloco }}
+        @if (quiz.problemas()[etapa]) {
+          <mat-icon class="problema" [attr.aria-label]="'quiz.problema' | transloco"
+            >warning</mat-icon
+          >
+        }
+      </ng-template>
+
+      @if (quiz.problemas()[etapa] && !quiz.confirmadas().has(etapa)) {
+        <p class="problemas">{{ 'quiz.problemas-importados' | transloco }}</p>
+      }
+
+      @switch (etapa) {
+        @case ('prerequisitos') {
+          <m2m-etapa-prerequisitos (verificada)="verificados($event)" />
+        }
+        @case ('containers') {
+          <m2m-etapa-containers />
+        }
+        @case ('seguranca') {
+          <m2m-etapa-seguranca />
+        }
+        @case ('usuarios') {
+          <m2m-etapa-usuarios />
+        }
+        @case ('rede') {
+          <m2m-etapa-rede />
+        }
+        @case ('maquinas') {
+          <m2m-etapa-maquinas />
+        }
+        @case ('logs') {
+          <m2m-etapa-logs />
+        }
+        @case ('revisao') {
+          <m2m-etapa-revisao (corrigir)="irPara($event)" />
+        }
+      }
+
+      @if (validando()) {
+        <mat-progress-bar mode="indeterminate" />
+      }
+      @if (erro()) {
+        <p class="erro"><mat-icon>error</mat-icon> {{ erro() | transloco }}</p>
+      }
+      @if (falha()) {
+        <p class="erro"><mat-icon>error</mat-icon> {{ falha() }}</p>
+      }
+
+      <div class="acoes">
+        @if (etapa === 'prerequisitos') {
+          <button mat-button type="button" (click)="voltar.emit()">
+            {{ 'quiz.inicio' | transloco }}
+          </button>
+        } @else {
+          <button mat-button type="button" matStepperPrevious>
+            {{ 'quiz.voltar' | transloco }}
+          </button>
+        }
+        @if (quiz.podePular(etapa)) {
+          <button mat-stroked-button type="button" [disabled]="validando()" (click)="pular(etapa)">
+            {{ 'quiz.pular' | transloco }}
+          </button>
+        }
+        @if (etapa === 'revisao') {
+          <button mat-flat-button type="button" [disabled]="validando()" (click)="iniciar()">
+            <mat-icon>rocket_launch</mat-icon> {{ 'quiz.iniciar' | transloco }}
+          </button>
+        } @else {
+          <button
+            mat-flat-button
+            type="button"
+            [disabled]="validando() || (etapa === 'prerequisitos' && prerequisitosBloqueiam())"
+            (click)="avancar(etapa)"
+          >
+            {{ (quiz.importado() ? 'quiz.confirmar' : 'quiz.avancar') | transloco }}
+          </button>
+        }
+      </div>
+    </mat-step>
+  }
+</mat-stepper>

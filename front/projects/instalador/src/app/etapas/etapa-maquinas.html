@@ -1,0 +1,31 @@
+<p class="intro">{{ 'maquinas.intro' | transloco }}</p>
+<div [formGroup]="form">
+  <mat-slide-toggle formControlName="localAtivo">{{
+    'maquinas.local' | transloco
+  }}</mat-slide-toggle>
+  <p class="dica">
+    {{
+      (form.controls.localAtivo.value ? 'maquinas.local-dica' : 'maquinas.sem-local-dica')
+        | transloco
+    }}
+  </p>
+  <div class="campos">
+    <mat-form-field>
+      <mat-label>{{ 'maquinas.nome' | transloco }}</mat-label>
+      <input matInput formControlName="nome" />
+      <mat-error><m2m-erro-campo [controle]="form.controls.nome" /></mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'maquinas.diretorio-host' | transloco }}</mat-label>
+      <input matInput formControlName="diretorioHost" />
+      <mat-hint>{{ 'maquinas.diretorio-host-dica' | transloco }}</mat-hint>
+      <mat-error><m2m-erro-campo [controle]="form.controls.diretorioHost" /></mat-error>
+    </mat-form-field>
+    <mat-form-field class="largo">
+      <mat-label>{{ 'maquinas.raizes' | transloco }}</mat-label>
+      <input matInput formControlName="raizes" />
+      <mat-hint>{{ 'maquinas.raizes-dica' | transloco }}</mat-hint>
+      <mat-error><m2m-erro-campo [controle]="form.controls.raizes" /></mat-error>
+    </mat-form-field>
+  </div>
+</div>

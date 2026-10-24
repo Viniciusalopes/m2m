@@ -1,0 +1,117 @@
+@let s = situacao();
+@if (!s) {
+  <mat-spinner diameter="40" />
+} @else if (!s.resultado) {
+  <h2>{{ 'progresso.titulo' | transloco }}</h2>
+  <ol class="passos">
+    @for (p of s.passos; track p.id) {
+      <li [class]="p.estado">
+        <mat-icon [class.girando]="p.estado === 'executando'">{{ icones[p.estado] }}</mat-icon>
+        <span>{{ p.titulo }}</span>
+        <span class="estado">{{ 'progresso.estado.' + p.estado | transloco }}</span>
+      </li>
+    }
+  </ol>
+  @if (ativo(); as a) {
+    @if (a.erro) {
+      <p class="erro"><mat-icon>error</mat-icon> {{ a.erro }}</p>
+    }
+    <h3>{{ 'progresso.log' | transloco: { passo: a.titulo } }}</h3>
+    <pre class="log">{{ (a.log ?? []).slice(-80).join('\n') }}</pre>
+  }
+  @if (falhou() && !s.rodando) {
+    <p>{{ 'progresso.falhou' | transloco }}</p>
+    <button mat-flat-button type="button" (click)="tentarDeNovo()">
+      <mat-icon>replay</mat-icon> {{ 'progresso.tentar-de-novo' | transloco }}
+    </button>
+  }
+  @if (falha()) {
+    <p class="erro"><mat-icon>error</mat-icon> {{ falha() }}</p>
+  }
+} @else {
+  @let r = s.resultado;
+  <section class="pronto">
+    <mat-icon>celebration</mat-icon>
+    <div>
+      <h2>{{ 'conclusao.titulo' | transloco }}</h2>
+      <p>
+        {{ 'conclusao.endereco' | transloco }}
+        <a [href]="r.url" target="_blank" rel="noopener">{{ r.url }}</a>
+      </p>
+      <p>{{ 'conclusao.usuario' | transloco: { usuario: r.usuario } }}</p>
+      <p>{{ 'conclusao.grafana' | transloco: { url: r.urlGrafana } }}</p>
+      <p>{{ 'conclusao.diretorio' | transloco: { dir: r.diretorio } }}</p>
+    </div>
+  </section>
+
+  @for (a of r.avisos; track a) {
+    <p class="aviso"><mat-icon>warning</mat-icon> {{ a }}</p>
+  }
+
+  @if (r.comandos.length) {
+    <h3>{{ 'conclusao.pendentes' | transloco }}</h3>
+    @for (c of r.comandos; track c.id) {
+      <m2m-cartao-comando [comando]="c" />
+    }
+  }
+
+  <h3>{{ 'conclusao.atalhos' | transloco }}</h3>
+  <p class="dica">{{ 'conclusao.atalhos-dica' | transloco }}</p>
+  @if (atalhos(); as arquivos) {
+    <p>
+      <mat-icon>check</mat-icon>
+      {{ 'conclusao.atalhos-criados' | transloco: { arquivos: arquivos.join(', ') } }}
+    </p>
+  } @else {
+    <button mat-stroked-button type="button" (click)="criarAtalhos()">
+      <mat-icon>terminal</mat-icon> {{ 'conclusao.criar-atalhos' | transloco }}
+    </button>
+  }
+
+  <h3>{{ 'conclusao.exportar' | transloco }}</h3>
+  <p class="dica">
+    {{ 'conclusao.exportar-dica' | transloco: { min: quiz.estado()?.minExportar ?? 12 } }}
+  </p>
+  <div class="exportar">
+    <mat-form-field>
+      <mat-label>{{ 'conclusao.senha' | transloco }}</mat-label>
+      <input
+        matInput
+        type="password"
+        autocomplete="new-password"
+        [ngModel]="senha()"
+        (ngModelChange)="senha.set($event)"
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>{{ 'conclusao.confirmar-senha' | transloco }}</mat-label>
+      <input
+        matInput
+        type="password"
+        autocomplete="new-password"
+        [ngModel]="confirmacao()"
+        (ngModelChange)="confirmacao.set($event)"
+      />
+    </mat-form-field>
+    <button
+      mat-flat-button
+      type="button"
+      [disabled]="!senhaValida() || exportando()"
+      (click)="exportar()"
+    >
+      <mat-icon>download</mat-icon> {{ 'conclusao.baixar' | transloco }}
+    </button>
+  </div>
+  @if (exportado()) {
+    <p><mat-icon>check</mat-icon> {{ 'conclusao.exportado' | transloco }}</p>
+  }
+  @if (falha()) {
+    <p class="erro"><mat-icon>error</mat-icon> {{ falha() }}</p>
+  }
+
+  <p class="fim">
+    <button mat-button type="button" (click)="encerrar.emit()">
+      <mat-icon>logout</mat-icon> {{ 'conclusao.encerrar' | transloco }}
+    </button>
+  </p>
+}

@@ -1,0 +1,146 @@
+@let e = quiz.estado();
+@if (e) {
+  @if (e.bloqueia) {
+    <section class="aviso">
+      <mat-icon>info</mat-icon>
+      <div>
+        <p>
+          <strong>{{ 'inicio.encontrada' | transloco }}</strong>
+          {{ 'inicio.somente-limpa' | transloco }}
+        </p>
+        <ul>
+          @if (e.existente.diretorio) {
+            <li>{{ 'inicio.diretorio' | transloco: { dir: e.existente.diretorio } }}</li>
+          }
+          @if (e.existente.containers?.length) {
+            <li>{{ 'inicio.containers' | transloco: { n: e.existente.containers?.length } }}</li>
+          }
+          @if (e.existente.volumes?.length) {
+            <li>{{ 'inicio.volumes' | transloco: { n: e.existente.volumes?.length } }}</li>
+          }
+        </ul>
+      </div>
+    </section>
+  } @else if (e.encontrada) {
+    <section class="aviso">
+      <mat-icon>info</mat-icon>
+      <p>{{ 'inicio.so-diretorio' | transloco: { dir: e.existente.diretorio } }}</p>
+    </section>
+  }
+
+  <div class="escolhas">
+    <mat-card appearance="outlined" [class.escolhida]="escolhaInstalar()">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>download</mat-icon>
+        <mat-card-title>{{ 'inicio.instalar' | transloco }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ 'inicio.instalar-texto' | transloco }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button
+          mat-flat-button
+          type="button"
+          [disabled]="e.bloqueia"
+          (click)="escolhaInstalar.set(true)"
+        >
+          {{ 'inicio.instalar' | transloco }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>delete_sweep</mat-icon>
+        <mat-card-title>{{ 'inicio.desinstalar' | transloco }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ 'inicio.desinstalar-texto' | transloco }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-stroked-button type="button" (click)="desinstalar.emit()">
+          {{ 'inicio.desinstalar' | transloco }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  @if (escolhaInstalar()) {
+    <section class="importar">
+      <h2>{{ 'inicio.pergunta-arquivo' | transloco }}</h2>
+      <mat-radio-group
+        [ngModel]="temArquivo()"
+        (ngModelChange)="temArquivo.set($event)"
+        [attr.aria-label]="'inicio.pergunta-arquivo' | transloco"
+      >
+        <mat-radio-button value="nao">{{ 'inicio.sem-arquivo' | transloco }}</mat-radio-button>
+        <mat-radio-button value="sim">{{ 'inicio.com-arquivo' | transloco }}</mat-radio-button>
+      </mat-radio-group>
+
+      @if (temArquivo() === 'nao') {
+        <p>
+          <button mat-flat-button type="button" (click)="comecar()">
+            {{ 'inicio.comecar' | transloco }}
+          </button>
+        </p>
+      } @else {
+        <p class="dica">{{ 'inicio.importar-dica' | transloco }}</p>
+        <p>
+          <input
+            #arquivo
+            type="file"
+            accept=".json,application/json"
+            hidden
+            (change)="escolherArquivo($event)"
+          />
+          <button mat-stroked-button type="button" (click)="arquivo.click()">
+            <mat-icon>upload_file</mat-icon> {{ 'inicio.escolher-arquivo' | transloco }}
+          </button>
+          @if (nomeArquivo()) {
+            <span class="nome">{{ nomeArquivo() }}</span>
+          }
+        </p>
+        <mat-form-field class="senha">
+          <mat-label>{{ 'inicio.senha-arquivo' | transloco }}</mat-label>
+          <input
+            matInput
+            type="password"
+            autocomplete="off"
+            [ngModel]="senha()"
+            (ngModelChange)="senha.set($event)"
+          />
+        </mat-form-field>
+        @if (erro()) {
+          <p class="erro">
+            <mat-icon>error</mat-icon>
+            {{ 'inicio.arquivo-invalido' | transloco: { motivo: erro() } }}
+          </p>
+        }
+        @if (semSegredos()) {
+          <section class="aviso">
+            <mat-icon>key_off</mat-icon>
+            <div>
+              <p>{{ 'inicio.senha-errada' | transloco }}</p>
+              <button mat-stroked-button type="button" (click)="semSegredos.set(null)">
+                {{ 'inicio.tentar-outra-senha' | transloco }}
+              </button>
+              <button mat-button type="button" (click)="seguirSemSegredos()">
+                {{ 'inicio.seguir-sem-segredos' | transloco }}
+              </button>
+            </div>
+          </section>
+        }
+        <p>
+          <button
+            mat-flat-button
+            type="button"
+            [disabled]="!conteudo() || !senha() || importando()"
+            (click)="importar()"
+          >
+            {{ 'inicio.importar' | transloco }}
+          </button>
+        </p>
+      }
+    </section>
+  }
+}

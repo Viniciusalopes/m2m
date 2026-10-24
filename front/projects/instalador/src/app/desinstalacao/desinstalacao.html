@@ -1,0 +1,186 @@
+@let l = localizada();
+@if (!l) {
+  @if (falha()) {
+    <p class="erro"><mat-icon>error</mat-icon> {{ falha() }}</p>
+  } @else {
+    <mat-spinner diameter="40" />
+  }
+} @else if (!l.encontrada) {
+  <section class="info">
+    <mat-icon>search_off</mat-icon>
+    <p>{{ 'desinstalacao.nada' | transloco }}</p>
+  </section>
+  <p class="acoes">
+    <button mat-button type="button" (click)="voltar.emit()">
+      {{ 'quiz.inicio' | transloco }}
+    </button>
+    <button mat-flat-button type="button" (click)="encerrar.emit()">
+      {{ 'conclusao.encerrar' | transloco }}
+    </button>
+  </p>
+} @else {
+  <h2>{{ 'desinstalacao.titulo' | transloco }}</h2>
+  <section class="info">
+    <mat-icon>inventory_2</mat-icon>
+    <div>
+      @if (l.diretorio) {
+        <p>{{ 'desinstalacao.diretorio' | transloco: { dir: l.diretorio } }}</p>
+      }
+      <p>{{ 'desinstalacao.versao' | transloco: { versao: l.versao, data: l.criadoEm || '—' } }}</p>
+      <p>
+        {{
+          'desinstalacao.recursos'
+            | transloco: { containers: l.containers?.length ?? 0, volumes: l.volumes?.length ?? 0 }
+        }}
+      </p>
+    </div>
+  </section>
+
+  <h3>{{ 'desinstalacao.destinos' | transloco }}</h3>
+  <p class="dica">{{ 'desinstalacao.destinos-dica' | transloco }}</p>
+  @if (l.destinos.erro) {
+    <p class="aviso"><mat-icon>warning</mat-icon> {{ l.destinos.erro }}</p>
+  } @else if (!l.destinos.itens.length) {
+    <p>{{ 'desinstalacao.sem-destinos' | transloco }}</p>
+  } @else {
+    <ul class="destinos">
+      @for (d of l.destinos.itens; track d.perfil) {
+        <li>
+          <mat-icon>lock</mat-icon>
+          <strong>{{ d.perfil }}</strong
+          >: {{ d.maquina }} ({{ d.protocolo
+          }}{{ d.host && d.protocolo !== 'LOCAL' ? ' ' + d.host : '' }}) — {{ d.diretorio }}
+          @if (d.noHost) {
+            <span class="dica">{{
+              'desinstalacao.no-host' | transloco: { caminho: d.noHost }
+            }}</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+
+  <h3>{{ 'desinstalacao.itens' | transloco }}</h3>
+  <ul class="itens">
+    @for (it of l.itens; track it.id) {
+      <li>
+        <mat-checkbox
+          [checked]="marcados().has(it.id)"
+          [disabled]="it.sempre || removendo() || !!resultado()"
+          (change)="marcar(it.id, $event.checked)"
+        >
+          <strong>{{ it.titulo }}</strong>
+        </mat-checkbox>
+        <p class="descricao">{{ it.descricao }}</p>
+        @if (it.aviso && marcados().has(it.id)) {
+          <p class="aviso"><mat-icon>warning</mat-icon> {{ it.aviso }}</p>
+        }
+        @if (it.avisoFica && !marcados().has(it.id)) {
+          <p class="aviso"><mat-icon>info</mat-icon> {{ it.avisoFica }}</p>
+        }
+        @if (estados()[it.id]; as st) {
+          <p class="estado" [class]="st.estado">
+            <mat-icon>{{ icones[st.estado] }}</mat-icon>
+            {{ 'progresso.estado.' + st.estado | transloco }}
+            @if (st.erro) {
+              — {{ st.erro }}
+            }
+          </p>
+        }
+      </li>
+    }
+  </ul>
+  <p class="dica">{{ 'desinstalacao.docker-fica' | transloco }}</p>
+
+  @if (!resultado()) {
+    @if (l.temEnv) {
+      <h3>{{ 'desinstalacao.exportar' | transloco }}</h3>
+      <p class="dica">
+        {{ 'desinstalacao.exportar-dica' | transloco: { min: quiz.estado()?.minExportar ?? 12 } }}
+      </p>
+      @if (!l.backNoAr) {
+        <p class="aviso">
+          <mat-icon>warning</mat-icon> {{ 'desinstalacao.exportar-sem-configuracao' | transloco }}
+        </p>
+      }
+      <div class="linha">
+        <mat-form-field>
+          <mat-label>{{ 'conclusao.senha' | transloco }}</mat-label>
+          <input
+            matInput
+            type="password"
+            autocomplete="new-password"
+            [ngModel]="senha()"
+            (ngModelChange)="senha.set($event)"
+          />
+        </mat-form-field>
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="senha().length < (quiz.estado()?.minExportar ?? 12)"
+          (click)="exportar()"
+        >
+          <mat-icon>download</mat-icon> {{ 'conclusao.baixar' | transloco }}
+        </button>
+        @if (exportado()) {
+          <mat-icon class="ok">check</mat-icon>
+        }
+      </div>
+    }
+
+    <h3>{{ 'desinstalacao.confirmar' | transloco }}</h3>
+    <p>{{ 'desinstalacao.confirmar-dica' | transloco: { palavra: palavra() } }}</p>
+    <div class="linha">
+      <mat-form-field>
+        <mat-label>{{ 'desinstalacao.palavra' | transloco: { palavra: palavra() } }}</mat-label>
+        <input
+          matInput
+          autocomplete="off"
+          [ngModel]="digitado()"
+          (ngModelChange)="digitado.set($event)"
+        />
+      </mat-form-field>
+      <button
+        mat-flat-button
+        type="button"
+        class="perigo"
+        [disabled]="!podeRemover()"
+        (click)="remover()"
+      >
+        <mat-icon>delete_forever</mat-icon> {{ 'desinstalacao.remover' | transloco }}
+      </button>
+      @if (removendo()) {
+        <mat-spinner diameter="24" />
+      }
+    </div>
+    <p class="acoes">
+      <button mat-button type="button" [disabled]="removendo()" (click)="voltar.emit()">
+        {{ 'quiz.inicio' | transloco }}
+      </button>
+    </p>
+  } @else {
+    @let r = resultado()!;
+    <section class="info">
+      <mat-icon>task_alt</mat-icon>
+      <p>{{ 'desinstalacao.concluida' | transloco }}</p>
+    </section>
+    @if (r.comandos.length) {
+      <h3>{{ 'conclusao.pendentes' | transloco }}</h3>
+      @for (c of r.comandos; track c.id) {
+        <m2m-cartao-comando [comando]="c" />
+      }
+    }
+    <h3>{{ 'desinstalacao.opcionais' | transloco }}</h3>
+    @for (c of r.opcionais; track c.id) {
+      <m2m-cartao-comando [comando]="c" />
+    }
+    <p class="acoes">
+      <button mat-flat-button type="button" (click)="encerrar.emit()">
+        {{ 'conclusao.encerrar' | transloco }}
+      </button>
+    </p>
+  }
+  @if (falha()) {
+    <p class="erro"><mat-icon>error</mat-icon> {{ falha() }}</p>
+  }
+}

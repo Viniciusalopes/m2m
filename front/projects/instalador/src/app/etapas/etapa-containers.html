@@ -1,0 +1,27 @@
+<p class="intro">{{ 'containers.intro' | transloco }}</p>
+<div class="campos" [formGroup]="form">
+  <mat-form-field class="largo">
+    <mat-label>{{ 'containers.diretorio' | transloco }}</mat-label>
+    <input matInput formControlName="diretorio" [readonly]="clone() !== ''" />
+    <mat-hint>{{
+      (clone() ? 'containers.diretorio-clone' : 'containers.diretorio-dica') | transloco
+    }}</mat-hint>
+    <mat-error><m2m-erro-campo [controle]="form.controls.diretorio" /></mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'containers.porta-http' | transloco }}</mat-label>
+    <input matInput type="number" formControlName="portaHttp" />
+    <mat-error><m2m-erro-campo [controle]="form.controls.portaHttp" /></mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'containers.porta-https' | transloco }}</mat-label>
+    <input matInput type="number" formControlName="portaHttps" />
+    <mat-error><m2m-erro-campo [controle]="form.controls.portaHttps" /></mat-error>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>{{ 'containers.fuso' | transloco }}</mat-label>
+    <input matInput formControlName="fuso" />
+    <mat-hint>{{ 'containers.fuso-dica' | transloco }}</mat-hint>
+    <mat-error><m2m-erro-campo [controle]="form.controls.fuso" /></mat-error>
+  </mat-form-field>
+</div>

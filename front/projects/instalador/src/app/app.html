@@ -1,0 +1,40 @@
+<header class="topo">
+  <img src="assets/brand/m2m-logo.svg" alt="" class="logo" />
+  <div>
+    <h1>{{ 'app.titulo' | transloco }}</h1>
+    @if (quiz.estado(); as e) {
+      <p class="sub">
+        {{ 'app.versao' | transloco: { versao: e.versao, so: e.so.nome, arq: e.arquitetura } }}
+      </p>
+    }
+  </div>
+</header>
+
+<main class="m2m-instalador-pagina">
+  @switch (modo()) {
+    @case ('carregando') {
+      <mat-spinner diameter="40" />
+    }
+    @case ('erro') {
+      <p class="erro"><mat-icon>error</mat-icon> {{ erro() }}</p>
+    }
+    @case ('inicio') {
+      <m2m-inicio (instalar)="modo.set('instalar')" (desinstalar)="modo.set('desinstalar')" />
+    }
+    @case ('instalar') {
+      <m2m-instalacao (iniciado)="modo.set('progresso')" (voltar)="modo.set('inicio')" />
+    }
+    @case ('progresso') {
+      <m2m-progresso (encerrar)="encerrar()" />
+    }
+    @case ('desinstalar') {
+      <m2m-desinstalacao (voltar)="modo.set('inicio')" (encerrar)="encerrar()" />
+    }
+    @case ('encerrado') {
+      <section class="encerrado">
+        <mat-icon>check_circle</mat-icon>
+        <p>{{ 'app.encerrado' | transloco }}</p>
+      </section>
+    }
+  }
+</main>

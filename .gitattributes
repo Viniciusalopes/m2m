@@ -1,0 +1,2 @@
+# O código embutido no instalador (git archive) não leva o próprio instalador
+installer/ export-ignore

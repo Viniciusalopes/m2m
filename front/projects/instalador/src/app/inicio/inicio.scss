@@ -1,0 +1,61 @@
+.escolhas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.escolhida {
+  border-color: var(--mat-sys-primary);
+}
+
+.aviso {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--m2m-info-container);
+  color: var(--mat-sys-on-surface);
+
+  p {
+    margin: 0 0 0.5rem;
+  }
+
+  button {
+    margin-right: 0.5rem;
+  }
+}
+
+.importar {
+  margin-top: 1.5rem;
+
+  h2 {
+    font: var(--mat-sys-title-medium);
+  }
+
+  mat-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+.senha {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.nome {
+  margin-left: 0.75rem;
+}
+
+.dica {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.erro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--m2m-fail);
+}

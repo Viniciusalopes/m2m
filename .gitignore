@@ -13,3 +13,10 @@ e2e/playwright-report/
 *.partial
 .idea/
 .vscode/
+# Instalador: conteúdo embutido e executáveis gerados por scripts/gerar-instalador.sh
+installer/embed/conteudo/*
+!installer/embed/conteudo/.gitkeep
+!installer/embed/conteudo/ui/
+installer/embed/conteudo/ui/*
+!installer/embed/conteudo/ui/.gitkeep
+dist/

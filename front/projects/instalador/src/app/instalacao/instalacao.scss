@@ -1,0 +1,36 @@
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.erro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--m2m-fail);
+}
+
+.importado,
+.problemas {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--m2m-info-container);
+
+  p {
+    margin: 0;
+  }
+}
+
+.problemas {
+  background: var(--m2m-warn-container);
+}
+
+.problema {
+  color: var(--m2m-warn);
+  vertical-align: middle;
+}

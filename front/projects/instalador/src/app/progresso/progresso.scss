@@ -1,0 +1,106 @@
+.passos {
+  list-style: none;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+  }
+
+  .estado {
+    margin-left: auto;
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .concluido mat-icon {
+    color: var(--m2m-ok);
+  }
+
+  .falhou mat-icon {
+    color: var(--m2m-fail);
+  }
+
+  .executando mat-icon {
+    color: var(--m2m-info);
+  }
+}
+
+.girando {
+  animation: girar 1.5s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.log {
+  max-height: 22rem;
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--mat-sys-surface-container-highest);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.erro,
+.aviso {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.erro {
+  color: var(--m2m-fail);
+}
+
+.aviso {
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--m2m-warn-container);
+}
+
+.pronto {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--m2m-ok-container);
+
+  > mat-icon {
+    font-size: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--m2m-ok);
+  }
+
+  h2 {
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    margin: 0.25rem 0;
+  }
+}
+
+.dica {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.exportar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 1rem;
+}
+
+.fim {
+  margin-top: 2rem;
+  text-align: right;
+}

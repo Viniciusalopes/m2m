@@ -1,0 +1,215 @@
+{
+  "app": {
+    "titulo": "Instalador do m2m",
+    "versao": "Versão {{versao}} · {{so}} · {{arq}}",
+    "encerrado": "O instalador foi encerrado. Pode fechar esta aba."
+  },
+  "etapa": {
+    "prerequisitos": "Pré-requisitos",
+    "containers": "Containers",
+    "seguranca": "Segurança",
+    "usuarios": "Usuários",
+    "rede": "Rede",
+    "maquinas": "Máquinas",
+    "logs": "Logs",
+    "revisao": "Revisão"
+  },
+  "erro": {
+    "obrigatorio": "Campo obrigatório.",
+    "minimo": "Use no mínimo {{n}} caracteres.",
+    "faixa": "Informe um valor de {{min}} a {{max}}.",
+    "email": "E-mail inválido.",
+    "formato": "Formato inválido."
+  },
+  "comando": {
+    "o-que-faz": "O que faz:",
+    "para-que-serve": "Para que serve:",
+    "copiar": "Copiar",
+    "copiado": "Copiado"
+  },
+  "inicio": {
+    "instalar": "Instalar o m2m",
+    "instalar-texto": "Instalação limpa nesta máquina: o quiz confere os pré-requisitos, pede só o essencial e sobe o m2m.",
+    "desinstalar": "Desinstalar o m2m",
+    "desinstalar-texto": "Remove o m2m desta máquina. Você escolhe o que apagar; os destinos de backup nunca são removidos.",
+    "encontrada": "O m2m já está instalado nesta máquina.",
+    "somente-limpa": "O instalador só faz instalação limpa: para instalar de novo, desinstale antes.",
+    "diretorio": "Diretório: {{dir}}",
+    "containers": "{{n}} container(es) do projeto m2m",
+    "volumes": "{{n}} volume(s) de dados do projeto m2m",
+    "so-diretorio": "O diretório {{dir}} já tem um .env do m2m. Para instalar, escolha outro diretório na etapa Containers.",
+    "pergunta-arquivo": "Você tem um arquivo de instalação ou de reinstalação para importar?",
+    "sem-arquivo": "Não, começar do zero",
+    "com-arquivo": "Sim, importar o arquivo .json de uma instalação anterior",
+    "comecar": "Começar",
+    "importar-dica": "O arquivo preenche todas as etapas. Você passa por cada uma para confirmar ou alterar os valores. Se for um arquivo de reinstalação, a configuração do m2m é restaurada ao fim.",
+    "escolher-arquivo": "Escolher o arquivo",
+    "senha-arquivo": "Senha dos segredos do arquivo",
+    "importar": "Importar",
+    "arquivo-invalido": "Arquivo não importado: {{motivo}}",
+    "senha-errada": "A senha não confere: os segredos (chave mestra e senhas) não foram carregados. Tente outra senha ou siga só com as respostas; nesse caso as senhas internas são geradas de novo e a chave mestra precisa ser informada na etapa Segurança para ler os backups da instalação anterior.",
+    "tentar-outra-senha": "Tentar outra senha",
+    "seguir-sem-segredos": "Seguir sem os segredos"
+  },
+  "quiz": {
+    "inicio": "Voltar ao início",
+    "voltar": "Voltar",
+    "pular": "Pular (usar os padrões)",
+    "avancar": "Avançar",
+    "confirmar": "Confirmar e avançar",
+    "iniciar": "Iniciar m2m",
+    "corrija": "Corrija os campos destacados para avançar.",
+    "padroes-invalidos": "Os padrões desta etapa não servem nesta máquina: corrija os campos destacados.",
+    "importado": "Valores importados do arquivo da versão {{versao}}, criado em {{data}}. Confirme ou altere cada etapa.",
+    "importado-sem-segredos": "Os segredos não foram carregados.",
+    "importado-configuracao": "O arquivo traz a configuração do m2m ({{maquinas}} máquina(s) e {{perfis}} perfil(is)), que será restaurada ao fim da instalação, com a reindexação dos backups que ficaram no disco.",
+    "problema": "Valor importado que não serve nesta máquina",
+    "problemas-importados": "Alguns valores importados não servem nesta máquina: confira os campos destacados."
+  },
+  "prerequisitos": {
+    "intro": "O instalador verificou esta máquina. Os itens pendentes impedem a instalação; os opcionais, não. Para cada pendência há um comando para colar no terminal.",
+    "estado": {
+      "atendido": "Atendido",
+      "pendente": "Pendente",
+      "opcional": "Opcional"
+    },
+    "bloqueia": "Resolva os itens pendentes e clique em Verificar de novo para avançar.",
+    "verificar": "Verificar de novo"
+  },
+  "containers": {
+    "intro": "Onde o m2m fica instalado e em quais portas ele atende.",
+    "diretorio": "Diretório de instalação",
+    "diretorio-dica": "Recebe o código do m2m e o .env. Precisa estar vazio ou não existir.",
+    "diretorio-clone": "Modo clone: o m2m é instalado no próprio clone do repositório, que recebe o .env.",
+    "porta-http": "Porta HTTP",
+    "porta-https": "Porta HTTPS",
+    "fuso": "Fuso horário",
+    "fuso-dica": "Usado nos horários dos backups e dos logs, como America/Sao_Paulo."
+  },
+  "seguranca": {
+    "intro": "A chave mestra cifra as senhas das máquinas, as chaves dos backups criptografados e o segundo fator.",
+    "informar": "Usar uma chave mestra que já tenho (para ler backups cifrados de outra instalação)",
+    "chave": "Chave mestra",
+    "chave-dica": "No mínimo 16 caracteres.",
+    "mostrar": "Mostrar ou ocultar",
+    "gerada": "O instalador gerou uma chave mestra nova:",
+    "baixar": "Baixar",
+    "senhas-geradas": "As senhas internas do banco, da fila e do Grafana foram geradas automaticamente.",
+    "senhas-importadas": "As senhas internas do banco, da fila e do Grafana vieram do arquivo importado.",
+    "aviso": "Guarde a chave mestra num cofre de senhas. Sem ela, as credenciais salvas e os backups criptografados ficam irrecuperáveis.",
+    "guardei": "Guardei a chave mestra",
+    "guardei-obrigatorio": "Confirme que guardou a chave mestra para avançar."
+  },
+  "usuarios": {
+    "intro": "O administrador criado na primeira execução. Os demais usuários são cadastrados depois, no m2m.",
+    "usuario": "Usuário",
+    "email": "E-mail",
+    "email-dica": "Opcional; usado nas notificações.",
+    "senha": "Senha",
+    "senha-dica": "No mínimo 12 caracteres.",
+    "confirmacao": "Confirme a senha",
+    "diferentes": "As senhas não conferem."
+  },
+  "rede": {
+    "intro": "O endereço pelo qual o m2m será aberto e o certificado HTTPS.",
+    "endereco": "Endereço público",
+    "endereco-dica": "Escolha um endereço desta máquina ou digite um nome DNS, sem https://.",
+    "certificado": "Certificado",
+    "ca-local": "CA local do m2m (recomendado)",
+    "proprio": "Certificado próprio",
+    "autoassinado": "Autoassinado",
+    "dica": {
+      "ca-local": "O m2m cria a própria autoridade certificadora. O Chrome deste usuário passa a confiar nela, e no fim aparece o comando para o sistema confiar também. Os outros dispositivos importam a CA uma vez.",
+      "proprio": "Use um certificado válido para o endereço, como o do Let's Encrypt, informando os arquivos PEM.",
+      "autoassinado": "O m2m gera um certificado sozinho ao subir; o navegador mostra um aviso a cada novo dispositivo."
+    },
+    "arquivo-certificado": "Arquivo do certificado (PEM)",
+    "arquivo-chave": "Arquivo da chave privada (PEM)"
+  },
+  "maquinas": {
+    "intro": "A máquina LOCAL é esta máquina vista pelo m2m. As máquinas remotas são cadastradas depois, na tela Máquinas.",
+    "local": "Acesso LOCAL ligado",
+    "local-dica": "O m2m enxerga os arquivos do diretório do host e pode fazer backup deles.",
+    "sem-local-dica": "Nada desta máquina é montado no m2m (indicado para VPS). Os backups vão para máquinas remotas.",
+    "nome": "Nome da máquina LOCAL",
+    "diretorio-host": "Diretório do host montado",
+    "diretorio-host-dica": "Dentro do m2m, ele aparece como /home.",
+    "raizes": "Raízes permitidas",
+    "raizes-dica": "Separadas por vírgula, como o m2m as vê: /home ou subdiretórios dele."
+  },
+  "logs": {
+    "intro": "O Grafana mostra os logs de todas as aplicações do m2m.",
+    "porta": "Porta do Grafana",
+    "retencao": "Retenção dos logs (dias)",
+    "rede": "Abrir o Grafana para a rede",
+    "local-dica": "O Grafana só abre nesta máquina (127.0.0.1).",
+    "rede-dica": "O Grafana abre de outros computadores da rede, pelo botão da Auditoria.",
+    "senha": "A senha do usuário admin do Grafana é gerada automaticamente e fica no .env."
+  },
+  "revisao": {
+    "intro": "Confira as escolhas. Ao clicar em Iniciar m2m, o instalador grava o .env, prepara o certificado, constrói as imagens e sobe os containers.",
+    "corrigir": "Corrigir",
+    "padroes": "padrões",
+    "portas": "Portas HTTP {{http}} e HTTPS {{https}}",
+    "senhas-internas": "Senhas internas",
+    "local": "Máquina LOCAL {{nome}}, com {{dir}} montado",
+    "sem-local": "Sem acesso LOCAL",
+    "grafana-local": "Grafana na porta {{porta}}, só nesta máquina, logs por {{dias}} dia(s)",
+    "grafana-rede": "Grafana na porta {{porta}}, aberto para a rede, logs por {{dias}} dia(s)",
+    "senha-grafana": "Senha do Grafana",
+    "seguranca-pulada": "A chave mestra foi gerada e vai para o .env. Baixe o arquivo da instalação ao fim para guardá-la."
+  },
+  "progresso": {
+    "titulo": "Iniciando o m2m",
+    "estado": {
+      "aguardando": "Aguardando",
+      "executando": "Em andamento",
+      "concluido": "Concluído",
+      "falhou": "Falhou"
+    },
+    "log": "Log: {{passo}}",
+    "falhou": "Corrija a causa (por exemplo, a conexão com a internet) e tente de novo: a instalação retoma a partir do passo que falhou, com as mesmas respostas.",
+    "tentar-de-novo": "Tentar de novo"
+  },
+  "conclusao": {
+    "titulo": "O m2m está no ar",
+    "endereco": "Endereço:",
+    "usuario": "Entre com o usuário {{usuario}} e a senha definida no quiz.",
+    "grafana": "Logs no Grafana: {{url}}",
+    "diretorio": "Instalado em {{dir}}.",
+    "pendentes": "Comandos pendentes",
+    "atalhos": "Atalhos de shell",
+    "atalhos-dica": "Cria m2m-up (sobe o m2m) e m2m-down (derruba, mantendo os dados) no ~/.bashrc e no ~/.zshrc. Valem nas próximas sessões do terminal.",
+    "criar-atalhos": "Criar os atalhos",
+    "atalhos-criados": "Atalhos criados em {{arquivos}}.",
+    "exportar": "Arquivo da instalação",
+    "exportar-dica": "Baixe um .json com as respostas para reinstalar com as mesmas escolhas. A chave mestra e as senhas vão cifradas com a senha abaixo (mínimo {{min}} caracteres). O instalador não grava o arquivo: ele só existe se você baixar.",
+    "senha": "Senha do arquivo",
+    "confirmar-senha": "Confirme a senha",
+    "baixar": "Baixar o .json",
+    "exportado": "Arquivo baixado. Guarde-o junto com a senha.",
+    "encerrar": "Encerrar o instalador"
+  },
+  "desinstalacao": {
+    "titulo": "Desinstalar o m2m",
+    "nada": "Não foi encontrada nenhuma instalação do m2m nesta máquina. Nada foi alterado.",
+    "diretorio": "Instalação em {{dir}}",
+    "versao": "Versão {{versao}}, instalada em {{data}}",
+    "recursos": "{{containers}} container(es) e {{volumes}} volume(s) do projeto m2m",
+    "destinos": "Destinos de backup",
+    "destinos-dica": "Os backups ficam nestes destinos e nunca são removidos pelo instalador.",
+    "sem-destinos": "Nenhum perfil de backup cadastrado.",
+    "no-host": "(nesta máquina: {{caminho}})",
+    "itens": "O que remover",
+    "docker-fica": "O Docker e os pacotes do sistema ficam instalados. Ao fim aparece, como opcional, o comando para removê-los.",
+    "exportar": "Arquivo de reinstalação",
+    "exportar-dica": "Baixe o .json desta instalação para reinstalar depois como está: as respostas do quiz, a mesma chave mestra e, com o m2m no ar, a configuração do m2m (máquinas, credenciais, perfis com as chaves de criptografia, agendamentos e e-mail). Tudo vai cifrado com a senha abaixo (mínimo de {{min}} caracteres). Ao reinstalar importando o arquivo, a configuração é restaurada e os backups que ficaram no disco voltam à lista.",
+    "exportar-sem-configuracao": "O m2m está fora do ar: o arquivo levará só as respostas e os segredos da instalação, sem a configuração do m2m. Para incluí-la, suba o m2m (m2m-up) e abra este quiz de novo.",
+    "confirmar": "Confirmação",
+    "confirmar-dica": "Revise os itens marcados. A remoção não pode ser desfeita: digite {{palavra}} para confirmar.",
+    "palavra": "Digite {{palavra}}",
+    "remover": "Remover",
+    "concluida": "Desinstalação concluída. Confira acima o resultado de cada item.",
+    "opcionais": "Comandos opcionais"
+  }
+}

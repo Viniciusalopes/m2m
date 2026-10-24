@@ -29,8 +29,10 @@ public final class OpenSshServer {
         try {
             Path config = Files.createTempDirectory("m2m-openssh-config-");
             Files.setPosixFilePermissions(config, PosixFilePermissions.fromString("rwxrwxrwx"));
+            // o container passa /config para PUID:PGID; com o usuário de quem roda os testes, o host continua gravando
+            // nele (o runner do GitHub não é o 1000 das máquinas de desenvolvimento)
             GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse("lscr.io/linuxserver/openssh-server:latest"))
-                    .withEnv("PUID", "1000").withEnv("PGID", "1000").withEnv("TZ", "America/Sao_Paulo")
+                    .withEnv("PUID", HostUser.uid(config)).withEnv("PGID", HostUser.gid(config)).withEnv("TZ", "America/Sao_Paulo")
                     .withEnv("USER_NAME", USER).withEnv("USER_PASSWORD", PASSWORD).withEnv("PASSWORD_ACCESS", "true")
                     .withExposedPorts(2222)
                     .withFileSystemBind(config.toString(), "/config")

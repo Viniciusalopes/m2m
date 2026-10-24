@@ -49,7 +49,8 @@ public final class SftpServer {
             Files.setPosixFilePermissions(keys.resolve("m2m.pub"), PostixReadable.perms());
 
             GenericContainer<?> c = new GenericContainer<>(DockerImageName.parse("atmoz/sftp:latest"))
-                    .withCommand(USER + ":" + PASSWORD + ":1000:1000:dados")
+                    // mesmo UID/GID de quem roda os testes: o host consegue gravar no que o servidor criar
+                    .withCommand(USER + ":" + PASSWORD + ":" + HostUser.uid(dados) + ":" + HostUser.gid(dados) + ":dados")
                     .withExposedPorts(22)
                     .withFileSystemBind(dados.toString(), "/home/" + USER + "/dados")
                     .withFileSystemBind(keys.toString(), "/home/" + USER + "/.ssh/keys", org.testcontainers.containers.BindMode.READ_ONLY)

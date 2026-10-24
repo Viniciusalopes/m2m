@@ -47,7 +47,7 @@ jobs:
       # Testcontainers usa o Docker do próprio runner (PostgreSQL, RabbitMQ, OpenSSH, pure-ftpd)
       - name: Testes do back
         run: cd back && ./mvnw -B verify
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: relatorios-back
@@ -105,7 +105,7 @@ jobs:
         run: |
           (cd front && npm ci)
           ./scripts/gerar-third-party-notices.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: third-party-notices
           path: THIRD-PARTY-NOTICES.md

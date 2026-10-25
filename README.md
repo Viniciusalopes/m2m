@@ -118,6 +118,14 @@ Prefere que o Claude conduza a instalação? Veja [Instalar com o Claude](#insta
    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
    ```
 
+   Se a máquina já tem o Docker do próprio Ubuntu (o pacote `docker.io`; `docker --version` mostra `-0ubuntu`), não troque o Engine: instale só os complementos do Ubuntu, como o quiz também propõe:
+
+   ```bash
+   sudo apt-get install -y docker-compose-v2 docker-buildx
+   ```
+
+   Se você trocou o `docker.io` pelo Docker oficial e o serviço não sobe (`no sockets found via socket activation` em `journalctl -u docker`), reinicie o socket junto com o serviço: `sudo systemctl reset-failed docker.socket docker.service && sudo systemctl restart docker.socket docker.service`.
+
 2. **Permita que o seu usuário use o Docker** e abra uma sessão nova (ou saia e entre de novo):
 
    ```bash

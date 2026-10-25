@@ -1,8 +1,9 @@
 // Mesmo tema, escala e estilos globais do m2m
 @use '../../../src/styles';
 
+// largo para caber 4 a 5 campos por linha numa tela comum (Usuário, E-mail, Senha e Confirmação juntos)
 .m2m-instalador-pagina {
-  max-width: 60rem;
+  max-width: min(92vw, 90rem);
   margin: 0 auto;
   padding: 1.5rem 1rem 4rem;
 }

@@ -14,6 +14,7 @@ import (
 
 	"m2m/installer/internal/comandos"
 	"m2m/installer/internal/executor"
+	"m2m/installer/internal/instalacao"
 	"m2m/installer/internal/respostas"
 	"m2m/installer/internal/sistema"
 )
@@ -166,5 +167,46 @@ func TestModoClone(t *testing.T) {
 	json.Unmarshal(w.Body.Bytes(), &e)
 	if e["bloqueia"] != true {
 		t.Errorf("clone com .env deveria bloquear: %v", e["bloqueia"])
+	}
+}
+
+func TestCAParaOComputadorDoNavegador(t *testing.T) {
+	s, host := novo(t)
+	if w := req(s, "GET", "/api/ca", host, comCookie); w.Code != http.StatusNotFound {
+		t.Fatalf("sem CA criada: %d", w.Code)
+	}
+	dir := instalacao.DirTLS(s.cfg.Home)
+	os.MkdirAll(dir, 0o700)
+	os.WriteFile(filepath.Join(dir, "ca.crt"), []byte("-----BEGIN CERTIFICATE-----\nca\n"), 0o644)
+	os.WriteFile(filepath.Join(dir, "ca.key"), []byte("segredo"), 0o600)
+	if w := req(s, "GET", "/api/ca", host, nil); w.Code != http.StatusForbidden {
+		t.Fatalf("sem o token: %d", w.Code)
+	}
+	w := req(s, "GET", "/api/ca", host, comCookie)
+	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), "BEGIN CERTIFICATE") || strings.Contains(w.Body.String(), "segredo") ||
+		!strings.Contains(w.Header().Get("Content-Disposition"), "m2m-local-ca.crt") {
+		t.Fatalf("CA: %d %q %v", w.Code, w.Body.String(), w.Header())
+	}
+	// o estado diz ao quiz se o navegador está em outro computador
+	s.cfg.Remoto = true
+	var e map[string]any
+	json.Unmarshal(req(s, "GET", "/api/estado", host, comCookie).Body.Bytes(), &e)
+	if e["remoto"] != true {
+		t.Errorf("remoto: %v", e["remoto"])
+	}
+}
+
+func TestTokenDoAmbiente(t *testing.T) {
+	if v, err := TokenDoAmbiente(""); v != "" || err != nil {
+		t.Errorf("vazio deveria gerar: %q %v", v, err)
+	}
+	bom := strings.Repeat("ab12", 16)
+	if v, err := TokenDoAmbiente(bom); v != bom || err != nil {
+		t.Errorf("token válido: %q %v", v, err)
+	}
+	for _, ruim := range []string{"curto", strings.Repeat("z", 64), strings.Repeat("ab", 8)} {
+		if _, err := TokenDoAmbiente(ruim); err == nil {
+			t.Errorf("deveria recusar %q", ruim)
+		}
 	}
 }

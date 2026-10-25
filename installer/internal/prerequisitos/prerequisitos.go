@@ -1,5 +1,5 @@
-// Package prerequisitos verifica, sem privilégio, o que a máquina precisa para construir e rodar o m2m, e monta os
-// comandos para o que faltar.
+// Package prerequisitos verifica, sem privilégio, se a máquina está pronta para construir e rodar o m2m. Quem prepara
+// a máquina é o instalar.sh; o quiz só mostra o que falta e orienta a rodá-lo.
 package prerequisitos
 
 import (
@@ -40,12 +40,11 @@ const (
 var HostsInternet = []string{"download.docker.com", "registry-1.docker.io", "repo.maven.apache.org", "registry.npmjs.org"}
 
 type Item struct {
-	ID        string             `json:"id"`
-	Titulo    string             `json:"titulo"`
-	Estado    string             `json:"estado"`
-	Detalhe   string             `json:"detalhe"`
-	Essencial bool               `json:"essencial"`
-	Comandos  []comandos.Comando `json:"comandos"`
+	ID        string `json:"id"`
+	Titulo    string `json:"titulo"`
+	Estado    string `json:"estado"`
+	Detalhe   string `json:"detalhe"`
+	Essencial bool   `json:"essencial"`
 }
 
 type Verificacao struct {
@@ -129,7 +128,6 @@ func (s Sonda) itemDocker(ctx context.Context) (Item, bool) {
 	it := Item{ID: "docker", Titulo: "Docker Engine", Essencial: true}
 	if !s.Exec.Procurar("docker") {
 		it.Estado, it.Detalhe = Pendente, "O Docker não está instalado."
-		it.Comandos = []comandos.Comando{s.Ambiente.InstalarDocker()}
 		return it, false
 	}
 	out, err := s.Exec.Rodar(ctx, executor.Comando{Programa: "docker", Args: []string{"version", "--format", "{{.Server.Version}}"}})
@@ -142,15 +140,12 @@ func (s Sonda) itemDocker(ctx context.Context) (Item, bool) {
 	switch {
 	case strings.Contains(msg, "permission denied"):
 		if s.noGrupoDocker() {
-			it.Detalhe = "O usuário " + s.Ambiente.Usuario + " já está no grupo docker, mas esta sessão foi aberta antes da inclusão."
-			it.Comandos = []comandos.Comando{s.Ambiente.Relancar()}
+			it.Detalhe = "O usuário " + s.Ambiente.Usuario + " já está no grupo docker, mas esta sessão foi aberta antes da inclusão (o instalar.sh abre o instalador com o grupo valendo)."
 		} else {
 			it.Detalhe = "O Docker está instalado, mas o usuário " + s.Ambiente.Usuario + " não tem permissão de usá-lo."
-			it.Comandos = []comandos.Comando{s.Ambiente.GrupoDocker(), s.Ambiente.Relancar()}
 		}
 	default:
 		it.Detalhe = "O Docker está instalado, mas o serviço não responde."
-		it.Comandos = []comandos.Comando{s.Ambiente.IniciarDocker()}
 	}
 	return it, false
 }
@@ -193,20 +188,8 @@ func (s Sonda) itemCompose(ctx context.Context, acessivel bool) Item {
 		it.Detalhe = "O plugin Buildx, usado pelo Compose para construir as imagens, não está instalado."
 	default:
 		it.Estado, it.Detalhe = Atendido, "Compose "+versao+" e Buildx instalados."
-		return it
-	}
-	if s.dockerDoUbuntu(ctx) {
-		it.Comandos = []comandos.Comando{s.Ambiente.ComplementosUbuntu()}
-	} else {
-		it.Comandos = []comandos.Comando{s.Ambiente.InstalarDocker()}
 	}
 	return it
-}
-
-// dockerDoUbuntu diz se o Docker instalado é o pacote docker.io da distribuição.
-func (s Sonda) dockerDoUbuntu(ctx context.Context) bool {
-	out, err := s.Exec.Rodar(ctx, executor.Comando{Programa: "dpkg-query", Args: []string{"-W", "-f=${Status}", "docker.io"}})
-	return err == nil && strings.Contains(string(out), "ok installed")
 }
 
 func (s Sonda) itemFerramenta(programa, nome string, essencial bool, uso string) Item {
@@ -217,7 +200,6 @@ func (s Sonda) itemFerramenta(programa, nome string, essencial bool, uso string)
 		it.Detalhe = "Instalado: " + uso + "."
 	} else {
 		it.Detalhe = "Não instalado: " + uso + "."
-		it.Comandos = []comandos.Comando{s.Ambiente.PacotesBase()}
 	}
 	return it
 }
@@ -290,7 +272,7 @@ func (s Sonda) itemMemoria() Item {
 	case err != nil:
 		it.Estado, it.Detalhe = Pendente, "Não foi possível ler /proc/meminfo: "+err.Error()
 	case total+folgaMemoria < MinMemoria:
-		it.Estado, it.Detalhe = Pendente, "A máquina tem "+gib(total)+"; o build e o m2m precisam de "+gib(MinMemoria)+"."
+		it.Estado, it.Detalhe = Pendente, "A máquina tem "+gib(total)+"; o build e o m2m precisam de "+gib(MinMemoria)+". Aumente a memória da máquina."
 	case total < MinMemoria:
 		it.Estado, it.Detalhe = Atendido, gib(total)+" visíveis ao sistema, o que corresponde a uma máquina de "+gib(MinMemoria)+", o mínimo para o build e o m2m."
 	default:
@@ -322,6 +304,9 @@ func (s Sonda) itemDisco(ctx context.Context, diretorio string, dockerAcessivel 
 		partes = append(partes, fmt.Sprintf("%s livres em %s", gib(livre), sistema.ExistenteMaisProximo(p)))
 	}
 	it.Detalhe = strings.Join(partes, "; ") + " (necessário " + gib(MinDisco) + ")."
+	if it.Estado == Pendente {
+		it.Detalhe += " Libere espaço ou aumente o disco."
+	}
 	return it
 }
 

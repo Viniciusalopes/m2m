@@ -28,6 +28,29 @@
     </section>
   }
 
+  @if (!preparo()) {
+    <p class="dica">{{ 'inicio.verificando' | transloco }}</p>
+  } @else if (preparo()!.bloqueia) {
+    <section class="aviso">
+      <mat-icon>build</mat-icon>
+      <div>
+        <p>
+          <strong>{{ 'inicio.nao-preparada' | transloco }}</strong>
+        </p>
+        <ul>
+          @for (it of preparo()!.itens; track it.id) {
+            @if (it.estado !== 'atendido') {
+              <li>
+                <strong>{{ it.titulo }}:</strong> {{ it.detalhe }}
+              </li>
+            }
+          }
+        </ul>
+        <p>{{ (scriptResolve() ? 'inicio.rode-script' : 'inicio.sem-minimos') | transloco }}</p>
+      </div>
+    </section>
+  }
+
   <div class="escolhas">
     <mat-card appearance="outlined" [class.escolhida]="escolhaInstalar()">
       <mat-card-header>
@@ -41,7 +64,7 @@
         <button
           mat-flat-button
           type="button"
-          [disabled]="e.bloqueia"
+          [disabled]="e.bloqueia || !preparo() || preparo()!.bloqueia"
           (click)="escolhaInstalar.set(true)"
         >
           {{ 'inicio.instalar' | transloco }}

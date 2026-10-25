@@ -19,6 +19,9 @@ const MIN_PX = 2; // acima disso converte
 // Listas (menu lateral): a regra-base do MDC (ex.: margin-right 32px) é superada por uma regra do Material com token
 // (--mat-list-…-end-space, 16px) de mais especificidade; com o prefixo `html` a base voltaria a vencer. Os tokens já escalam.
 const IGNORAR = /\.(mdc-list|mat-mdc-list|mat-mdc-nav-list)/;
+// Botões: o mesmo caso na regra-base `.mdc-button { padding: 0 8px }`, que o Material supera com o padding de cada tipo
+// (token --mat-button-*-horizontal-padding); com `html` ela venceria e grudaria ícone e texto nas bordas (decisão 15).
+const IGNORAR_DECL = new Set(['.mdc-button\0padding']);
 
 const PX = /(?<![\w.#-])(-?\d*\.?\d+)px\b/g;
 const rem = (px) => `${(Number(px) / 16).toFixed(4).replace(/\.?0+$/, '')}rem`;
@@ -89,7 +92,7 @@ for (const f of fontes) {
       if (prop.startsWith('--') || prop === 'stroke-width' || prop === 'box-shadow') continue;
       // o que sobra depois de tirar var(--x, fallback) já é tratado pelos tokens
       const resto = val.replace(/var\(--[^(),]+,\s*[^()]*\)/g, '');
-      if (temPx(resto)) fixas.set(`${sel}\0${prop}`, val);
+      if (temPx(resto) && !IGNORAR_DECL.has(`${sel}\0${prop}`)) fixas.set(`${sel}\0${prop}`, val);
     }
   }
 }

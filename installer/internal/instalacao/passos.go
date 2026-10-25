@@ -1,6 +1,7 @@
 package instalacao
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/json"
@@ -52,13 +53,12 @@ type Passo struct {
 
 // Resultado é o que a tela de conclusão mostra.
 type Resultado struct {
-	URL         string             `json:"url"`
-	Usuario     string             `json:"usuario"`
-	Diretorio   string             `json:"diretorio"`
-	URLGrafana  string             `json:"urlGrafana"`
-	Comandos    []comandos.Comando `json:"comandos"`
-	Avisos      []string           `json:"avisos"`
-	Certificado string             `json:"certificado"`
+	URL         string   `json:"url"`
+	Usuario     string   `json:"usuario"`
+	Diretorio   string   `json:"diretorio"`
+	URLGrafana  string   `json:"urlGrafana"`
+	Avisos      []string `json:"avisos"`
+	Certificado string   `json:"certificado"`
 }
 
 // Situacao é o retrato da instalação para o quiz (também ao reconectar).
@@ -84,7 +84,9 @@ type Config struct {
 	Segredos     respostas.Segredos
 	Emitir       func(Evento)
 	// Responde confere o /healthz do m2m; nil usa HTTPS e HTTP em 127.0.0.1.
-	Responde  func(ctx context.Context) error
+	Responde func(ctx context.Context) error
+	// CASistema é o arquivo da CA no sistema (comandos.CASistema; outro nos testes).
+	CASistema string
 	Prazo     time.Duration // espera pelos containers; padrão 15 min
 	Intervalo time.Duration // entre consultas; padrão 5 s
 	Agora     func() time.Time
@@ -574,20 +576,34 @@ func (i *Instalacao) concluir() (*Resultado, error) {
 	os.Remove(filepath.Join(i.dir(), Marcador))
 	res := &Resultado{
 		URL: respostas.URLPublica(r), Usuario: r.Usuarios.Usuario, Diretorio: i.dir(),
-		Certificado: r.Rede.Certificado, Comandos: []comandos.Comando{},
+		Certificado: r.Rede.Certificado,
 	}
 	host := "127.0.0.1"
 	if r.Logs.AcessoRede {
 		host = r.Rede.Endereco
 	}
 	res.URLGrafana = "https://" + host + ":" + strconv.Itoa(r.Logs.PortaGrafana)
-	if r.Rede.Certificado == respostas.CertificadoCALocal {
-		res.Comandos = append(res.Comandos, i.cfg.Ambiente.ConfiarCA(filepath.Join(DirTLS(i.cfg.Home), "ca.crt")))
-	}
 	i.mu.Lock()
 	res.Avisos = append([]string{}, i.avisos...)
 	i.mu.Unlock()
+	if r.Rede.Certificado == respostas.CertificadoCALocal && !mesmoConteudo(filepath.Join(DirTLS(i.cfg.Home), "ca.crt"), i.casistema()) {
+		res.Avisos = append(res.Avisos, i.cfg.Ambiente.AvisoConfiarCA())
+	}
 	return res, nil
+}
+
+func (i *Instalacao) casistema() string {
+	if i.cfg.CASistema != "" {
+		return i.cfg.CASistema
+	}
+	return comandos.CASistema
+}
+
+// mesmoConteudo diz se os dois arquivos existem e são iguais (a CA do m2m já confiada no sistema).
+func mesmoConteudo(a, b string) bool {
+	x, errA := os.ReadFile(a)
+	y, errB := os.ReadFile(b)
+	return errA == nil && errB == nil && bytes.Equal(x, y)
 }
 
 // CriarAtalhos grava os atalhos m2m-up e m2m-down e anota os arquivos no registro.

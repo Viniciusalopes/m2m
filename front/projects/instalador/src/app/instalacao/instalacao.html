@@ -30,9 +30,6 @@
       }
 
       @switch (etapa) {
-        @case ('prerequisitos') {
-          <m2m-etapa-prerequisitos (verificada)="verificados($event)" />
-        }
         @case ('containers') {
           <m2m-etapa-containers />
         }
@@ -67,7 +64,7 @@
       }
 
       <div class="acoes">
-        @if (etapa === 'prerequisitos') {
+        @if ($first) {
           <button mat-button type="button" (click)="voltar.emit()">
             {{ 'quiz.inicio' | transloco }}
           </button>
@@ -86,12 +83,7 @@
             <mat-icon>rocket_launch</mat-icon> {{ 'quiz.iniciar' | transloco }}
           </button>
         } @else {
-          <button
-            mat-flat-button
-            type="button"
-            [disabled]="validando() || (etapa === 'prerequisitos' && prerequisitosBloqueiam())"
-            (click)="avancar(etapa)"
-          >
+          <button mat-flat-button type="button" [disabled]="validando()" (click)="avancar(etapa)">
             {{ (quiz.importado() ? 'quiz.confirmar' : 'quiz.avancar') | transloco }}
           </button>
         }

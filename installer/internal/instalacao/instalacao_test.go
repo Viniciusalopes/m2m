@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -107,9 +108,10 @@ func execucao(t *testing.T, ex *executor.Falso, mudar func(*respostas.Respostas)
 	so := sistema.SO{ID: "ubuntu", Versao: "24.04", Codinome: "noble", Nome: "Ubuntu 24.04", Familia: "ubuntu", CodinomeUbuntu: "noble"}
 	i := Nova(Config{
 		Home: home, Versao: "v1.0.0", Exec: ex, Respostas: r, Segredos: s,
-		Codigo:   func() ([]byte, error) { return codigoFalso(t), nil },
-		Ambiente: comandos.Ambiente{SO: so, Usuario: "ana"},
-		Responde: func(context.Context) error { return nil }, Intervalo: time.Millisecond,
+		Codigo:    func() ([]byte, error) { return codigoFalso(t), nil },
+		Ambiente:  comandos.Ambiente{SO: so, Usuario: "ana", PeloScript: true},
+		CASistema: filepath.Join(home, "ca-sistema.crt"),
+		Responde:  func(context.Context) error { return nil }, Intervalo: time.Millisecond,
 	})
 	return i, home
 }
@@ -174,11 +176,12 @@ func TestInstalacaoCompleta(t *testing.T) {
 		t.Error("marcador deveria sair ao fim")
 	}
 	res := s.Resultado
-	if res == nil || res.URL != "https://192.168.0.10" || len(res.Comandos) != 1 || res.Comandos[0].ID != "confiar-ca" {
+	if res == nil || res.URL != "https://192.168.0.10" {
 		t.Fatalf("resultado: %+v", res)
 	}
-	if len(res.Avisos) != 1 || !strings.Contains(res.Avisos[0], "certutil") {
-		t.Errorf("deveria avisar da falta do certutil: %v", res.Avisos)
+	// sem comando com sudo: a falta do certutil e a CA que o instalar.sh confia ao encerrar viram avisos
+	if len(res.Avisos) != 2 || !strings.Contains(res.Avisos[0], "certutil") || !strings.Contains(res.Avisos[1], "quando você encerrar o instalador") {
+		t.Errorf("avisos: %v", res.Avisos)
 	}
 	if err := i.Iniciar(context.Background()); err != ErrEmAndamento {
 		t.Errorf("instalação concluída não pode recomeçar: %v", err)
@@ -215,8 +218,8 @@ func TestFalhaNoBuildERetomada(t *testing.T) {
 	if !strings.HasSuffix(ex.Chamadas[chamadasAntes], " build") {
 		t.Errorf("a retomada deveria começar pelo build: %v", ex.Chamadas[chamadasAntes:])
 	}
-	if s.Resultado.Certificado != respostas.CertificadoAutoassinado || len(s.Resultado.Comandos) != 0 {
-		t.Errorf("autoassinado não tem comando de CA: %+v", s.Resultado)
+	if s.Resultado.Certificado != respostas.CertificadoAutoassinado || slices.ContainsFunc(s.Resultado.Avisos, func(a string) bool { return strings.Contains(a, "CA local") }) {
+		t.Errorf("autoassinado não tem aviso de CA: %+v", s.Resultado)
 	}
 }
 

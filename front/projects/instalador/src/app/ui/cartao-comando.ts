@@ -12,9 +12,7 @@ import { Comando } from '../modelo';
     @let c = comando();
     <section class="cartao">
       <h4>
-        <mat-icon aria-hidden="true">{{
-          c.privilegio ? 'admin_panel_settings' : 'terminal'
-        }}</mat-icon>
+        <mat-icon aria-hidden="true">terminal</mat-icon>
         {{ c.titulo }}
       </h4>
       <p>

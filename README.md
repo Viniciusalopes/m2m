@@ -18,8 +18,10 @@ O m2m roda no seu próprio computador ou servidor, em containers Docker, e é ab
 ## Sumário
 
 1. [Instalação limpa (Ubuntu e derivados)](#instalação-limpa-ubuntu-e-derivados)
-   - [Caminho A: executável pronto](#caminho-a-executável-pronto)
-   - [Caminho B: a partir do clone](#caminho-b-a-partir-do-clone)
+   - [Numa máquina acessada por SSH (um comando no seu computador)](#numa-máquina-acessada-por-ssh-um-comando-no-seu-computador)
+   - [Na própria máquina, pela release](#na-própria-máquina-pela-release)
+   - [Pelo clone](#pelo-clone)
+   - [O que o script faz na máquina](#o-que-o-script-faz-na-máquina)
    - [O que o quiz pergunta](#o-que-o-quiz-pergunta)
    - [Depois da instalação](#depois-da-instalação)
    - [Atualizar](#atualizar)
@@ -48,113 +50,123 @@ O m2m roda no seu próprio computador ou servidor, em containers Docker, e é ab
 
 ## Instalação limpa (Ubuntu e derivados)
 
-A primeira instalação é feita por um **quiz no navegador**: você responde algumas perguntas e o instalador gera a configuração, prepara o certificado HTTPS, constrói e sobe o m2m. **Não é preciso editar nenhum arquivo.**
+A instalação tem duas partes, e nenhuma pede para editar arquivos:
+
+1. **O `instalar.sh` prepara a máquina**, uma vez, no terminal. Ele mostra o que vai fazer, pede uma confirmação e a senha do `sudo` só para o que precisar: instala o Docker e as ferramentas que faltam e inclui o seu usuário no grupo `docker`.
+2. **O quiz no navegador configura o m2m.** Você responde algumas perguntas e o instalador gera a configuração, prepara o certificado HTTPS, constrói e sobe o m2m.
 
 **Requisitos da máquina:**
 
 - **Ubuntu 22.04, 24.04 ou 26.04**, ou um derivado deles (Linux Mint, Pop!_OS, Zorin OS etc.), em **amd64** (x86_64).
-- **4 GiB de memória** e **16 GiB livres em disco**: o build das imagens usa cerca de 1,6 GiB de RAM no pico e a instalação ocupa uns 5 GiB.
+- Um usuário comum com permissão de `sudo`. O script se recusa a rodar como `root`.
+- **4 GiB de memória** e **16 GiB livres em disco**: o build das imagens usa cerca de 1,6 GiB de RAM no pico e a instalação ocupa uns 5 GiB. Abaixo disso o script não instala e não mexe no disco. No Ubuntu Server, o volume da raiz costuma ocupar só metade do disco: `sudo vgs` mostra o espaço sem uso, e `sudo lvextend -r -l +100%FREE /dev/ubuntu-vg/ubuntu-lv` passa esse espaço para a raiz, se for o que você quer.
 - **Internet** durante a instalação (pacotes, imagens-base, Maven e npm).
 - Portas **80** e **443** livres (dá para trocar no quiz).
 
-Há dois caminhos até o quiz. Os dois chegam ao mesmo resultado.
-
-| | Caminho A: executável pronto | Caminho B: a partir do clone |
-|---|---|---|
-| Precisa de Docker antes? | Não: o quiz mostra os comandos para instalar | Sim |
-| Precisa de `git`? | Não | Sim |
-| Onde o m2m fica | No diretório escolhido no quiz (padrão `~/m2m`) | No próprio clone |
-| Para quem | Quem só quer usar o m2m | Quem quer acompanhar o código ou contribuir |
-
 Prefere que o Claude conduza a instalação? Veja [Instalar com o Claude](#instalar-com-o-claude).
 
-### Caminho A: executável pronto
+### Numa máquina acessada por SSH (um comando no seu computador)
 
-1. **Baixe o instalador e o `SHA256SUMS`** da [última release](https://github.com/Viniciusalopes/m2m/releases/latest). O instalador é um executável único, sem dependências: ele leva dentro o código da versão e o quiz.
+Para instalar num servidor, numa VM ou em qualquer máquina sem tela que você acessa por SSH, rode **no seu computador** (Linux ou macOS), onde está o navegador:
 
-2. **Confira o download e dê permissão de execução:**
+```bash
+curl -fsSLO https://github.com/Viniciusalopes/m2m/releases/latest/download/instalar-remoto.sh
+sh instalar-remoto.sh usuario@servidor
+```
+
+Opções do `ssh` vão depois do destino, por exemplo `sh instalar-remoto.sh usuario@servidor -p 2222 -i ~/.ssh/chave`. Numa única conexão SSH (a senha do SSH, se houver, é pedida uma vez), o script:
+
+1. baixa e confere, no servidor, o `instalar.sh` da mesma versão e o roda: o que ele faz está em [O que o script faz na máquina](#o-que-o-script-faz-na-máquina), e a senha do `sudo` do servidor é pedida ali mesmo, no seu terminal;
+2. abre o quiz **sozinho** no seu navegador, pelo túnel da conexão;
+3. quando você clica em **Encerrar o instalador**, importa a CA local do m2m nos navegadores do seu computador, sem cliques: Chrome/Chromium e Firefox no Linux (sem `sudo`; se faltar o `certutil`, instala o `libnss3-tools` pedindo a sua senha), Acesso às Chaves no macOS (o sistema pede a sua senha). Por fim, abre o m2m, já sem aviso de certificado.
+
+Para **desinstalar**, rode o mesmo comando e escolha **Desinstalar o m2m** no quiz: ao encerrar, a CA sai também dos navegadores do seu computador.
+
+No Windows, ou para outros computadores e celulares, a tela final do quiz tem o botão **Baixar a CA do m2m**, com o passo a passo para importá-la.
+
+### Na própria máquina, pela release
+
+1. **Baixe o `instalar.sh` e o `SHA256SUMS`** da [última release](https://github.com/Viniciusalopes/m2m/releases/latest), numa pasta só para eles:
+
+   ```bash
+   mkdir -p ~/m2m-instalador && cd ~/m2m-instalador
+   curl -fsSLO https://github.com/Viniciusalopes/m2m/releases/latest/download/instalar.sh
+   curl -fsSLO https://github.com/Viniciusalopes/m2m/releases/latest/download/SHA256SUMS
+   ```
+
+2. **Confira o download:**
 
    ```bash
    sha256sum -c SHA256SUMS --ignore-missing
-   chmod +x m2m-instalador-*-linux-amd64
    ```
 
-   O `sha256sum` precisa responder `OK`: assim você sabe que o arquivo não foi corrompido nem trocado.
+   O `instalar.sh` precisa aparecer com `OK`: assim você sabe que o arquivo não foi corrompido nem trocado.
 
-3. **Execute como o seu usuário, sem `sudo`:**
+3. **Rode o script como o seu usuário, sem `sudo` na frente:**
 
    ```bash
-   ./m2m-instalador-*-linux-amd64
+   sh instalar.sh
    ```
 
-   Com interface gráfica, o navegador abre no quiz. Numa sessão SSH (servidor sem tela), o terminal mostra o comando do túnel: rode-o **no seu computador** e abra no seu navegador o endereço mostrado.
+   O script baixa o executável do instalador da mesma versão, confere o checksum dele e, depois de preparar a máquina, abre o quiz. Com interface gráfica, o navegador abre sozinho.
+
+   **Máquina sem tela, sem o `instalar-remoto.sh`:** o mais simples é usar o [comando único](#numa-máquina-acessada-por-ssh-um-comando-no-seu-computador). Se preferir rodar o `instalar.sh` direto, o quiz abre no navegador do **seu computador** por um túnel que vem na própria sessão SSH: entre na máquina já com o túnel e rode o script nessa sessão:
 
    ```bash
    ssh -L 8765:127.0.0.1:8765 usuario@servidor
+   cd ~/m2m-instalador && sh instalar.sh
    ```
 
-   O quiz só escuta em `127.0.0.1`, e o endereço tem um token de uso único: não o compartilhe. Opções: `--porta` troca a porta do quiz e `--sem-navegador` não abre o navegador.
-
-4. **Responda o quiz** (veja [O que o quiz pergunta](#o-que-o-quiz-pergunta)). O instalador nunca roda `sudo` nem pede a senha do sistema: o que exige administrador (instalar o Docker, incluir o seu usuário no grupo `docker`, confiar no certificado do m2m) aparece como um **comando para colar no terminal**, com o que ele faz e para que serve. Depois de rodar o comando, clique em **Verificar de novo**.
-
-   Ao entrar no grupo `docker`, o quiz pede para abrir o instalador de novo numa sessão com o grupo valendo. O comando aparece pronto, no formato `sg docker -c ./m2m-instalador-...`.
-
-5. **Clique em Iniciar m2m** na Revisão e acompanhe o progresso. Na primeira vez, o build leva alguns minutos. Se um passo falhar (por exemplo, por falta de internet), **Tentar de novo** retoma a partir dele.
-
-### Caminho B: a partir do clone
-
-1. **Instale o Docker Engine e o Compose v2** pelo repositório oficial do Docker. O comando abaixo vale para o Ubuntu e os derivados (usa o codinome do Ubuntu de base):
+   Ou faça tudo de uma vez, do seu computador:
 
    ```bash
-   sudo apt-get update
-   sudo apt-get install -y ca-certificates curl git
-   sudo install -m 0755 -d /etc/apt/keyrings
-   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-   sudo chmod a+r /etc/apt/keyrings/docker.asc
-   . /etc/os-release
-   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${UBUNTU_CODENAME:-$VERSION_CODENAME} stable" \
-     | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-   sudo apt-get update
-   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   ssh -t -L 8765:127.0.0.1:8765 usuario@servidor 'cd ~/m2m-instalador && sh instalar.sh'
    ```
 
-   Se a máquina já tem o Docker do próprio Ubuntu (o pacote `docker.io`; `docker --version` mostra `-0ubuntu`), não troque o Engine: instale só os complementos do Ubuntu, como o quiz também propõe:
+   O script percebe a sessão SSH e, antes de mudar qualquer coisa, pergunta se você entrou com o `-L`; se não, mostra o comando para entrar de novo e para. Depois, mostra o endereço `http://127.0.0.1:8765/?t=...` para abrir no seu navegador. O quiz usa sempre a porta 8765 nessa sessão: se ela estiver ocupada (por exemplo, por outro instalador esquecido aberto), o script avisa e para.
 
-   ```bash
-   sudo apt-get install -y docker-compose-v2 docker-buildx
-   ```
+   O quiz só escuta em `127.0.0.1`, e o endereço tem um token de uso único: não o compartilhe. Opções repassadas ao instalador: `--porta` troca a porta do quiz e `--sem-navegador` não abre o navegador.
 
-   Se você trocou o `docker.io` pelo Docker oficial e o serviço não sobe (`no sockets found via socket activation` em `journalctl -u docker`), reinicie o socket junto com o serviço: `sudo systemctl reset-failed docker.socket docker.service && sudo systemctl restart docker.socket docker.service`.
+4. **Responda o quiz** (veja [O que o quiz pergunta](#o-que-o-quiz-pergunta)) e clique em **Iniciar m2m** na Revisão. Na primeira vez, o build leva alguns minutos. Se um passo falhar (por exemplo, por falta de internet), **Tentar de novo** retoma a partir dele.
 
-2. **Permita que o seu usuário use o Docker** e abra uma sessão nova (ou saia e entre de novo):
+5. **Clique em Encerrar o instalador** (ou dê Ctrl+C no terminal do script). O script conclui o que exige administrador: com a CA local do m2m, pergunta se instala a CA na confiança do sistema, para o `curl` e os navegadores fora do Chrome confiarem no m2m. Por fim, mostra o endereço.
 
-   ```bash
-   sudo usermod -aG docker "$USER"
-   newgrp docker
-   ```
+### Pelo clone
 
-   Pertencer ao grupo `docker` equivale a ter poder de administrador na máquina; é o que o m2m exige para subir os containers sem `sudo`.
+Para quem quer acompanhar o código ou contribuir. O m2m fica no próprio clone, que recebe o `.env`.
 
-3. **Clone o repositório e rode o instalador:**
+```bash
+git clone https://github.com/Viniciusalopes/m2m.git
+cd m2m
+./instalar.sh
+```
 
-   ```bash
-   git clone https://github.com/Viniciusalopes/m2m.git
-   cd m2m
-   ./instalar.sh
-   ```
+O fluxo é o mesmo da release. A diferença é que o script compila o instalador a partir do clone, em containers (não precisa de Go nem de Node na máquina), e abre o quiz **em modo clone**. Na primeira vez ele baixa as imagens `node` e `golang`, o que leva alguns minutos. Se a máquina não tiver o `git`, instale-o antes com `sudo apt-get install -y git`.
 
-   O `instalar.sh` confere o Docker, compila o instalador em containers (não precisa de Go nem de Node na máquina) e abre o quiz **em modo clone**: o m2m é instalado no próprio clone, que recebe o `.env`. Na primeira vez ele baixa as imagens `node` e `golang`, o que leva alguns minutos. Ele aceita as mesmas opções do executável, como `./instalar.sh --sem-navegador`.
+### O que o script faz na máquina
 
-4. **Responda o quiz** e clique em **Iniciar m2m**, como no caminho A.
+Antes de mudar qualquer coisa, o `instalar.sh` lista o que vai fazer e pede confirmação. Ele faz só o necessário e mostra cada comando com `sudo` antes de rodá-lo:
+
+- **Confere o sistema:** Ubuntu ou derivado, amd64, usuário comum com `sudo`, 4 GiB de memória e 16 GiB livres em disco. Se faltar memória ou disco, diz o que a máquina tem e o que falta e para, sem alterar nada: o script não mexe em discos nem volumes. Com o m2m já instalado, não cobra esses mínimos, para a desinstalação continuar possível.
+- **Instala só o que falta:** `ca-certificates`, `curl`, `git`, `openssl` e `libnss3-tools` (o `certutil`, para o Chrome confiar no m2m). Nunca roda `apt-get upgrade`.
+- **Docker:**
+  - sem Docker, instala o Docker Engine, o Compose v2 e o Buildx pelo repositório oficial do Docker, com o codinome do Ubuntu de base;
+  - com o Docker do próprio Ubuntu (`docker.io`), não troca o Engine e instala só o `docker-compose-v2` e o `docker-buildx` do Ubuntu;
+  - em qualquer caso, liga o serviço.
+- **Grupo `docker`:** inclui o seu usuário e abre o quiz com o grupo já valendo, sem pedir para sair e entrar de novo. Pertencer a esse grupo equivale a ter poder de administrador na máquina; é o que o m2m exige para subir os containers sem `sudo`.
+- **No fim:** confia na CA local do m2m no sistema; depois de uma desinstalação, tira a CA e pergunta se remove o Docker (o padrão é não).
+
+Rodado de novo, o script pula o que já está feito e vai direto ao quiz. Se você abriu o executável do instalador sem o script, rode `sh instalar.sh --concluir` depois para fazer só a parte do fim.
 
 ### O que o quiz pergunta
 
-As etapas pedem só o essencial para a primeira execução; e-mail, segundo fator, máquinas remotas e perfis ficam para a interface do m2m. As etapas com padrões seguros podem ser puladas (**Pular** usa os padrões); Pré-requisitos e Usuários, não.
+O quiz só configura o m2m: nenhuma tela pede para rodar comandos no terminal. Se a máquina não estiver preparada (por exemplo, sem Docker), a tela Início mostra o que falta e pede para rodar o `instalar.sh`.
+
+As etapas pedem só o essencial para a primeira execução; e-mail, segundo fator, máquinas remotas e perfis ficam para a interface do m2m. As etapas com padrões seguros podem ser puladas (**Pular** usa os padrões); Usuários, não.
 
 | Etapa | O que pergunta | Padrão |
 |---|---|---|
 | **Início** | Instalar ou desinstalar; se há um arquivo `.json` de outra instalação para importar | Instalar, sem arquivo |
-| **Pré-requisitos** | Nada: confere sistema, Docker, Compose, Buildx, `openssl`, `certutil`, internet, portas, memória e disco, e mostra o comando para cada pendência | — |
 | **Containers** | Diretório de instalação, portas HTTP e HTTPS, fuso horário | `~/m2m` (no modo clone, o clone), 80, 443, fuso do sistema |
 | **Segurança** | Chave mestra (gerada, ou a sua para ler backups cifrados de outra instalação); confirmação de que você a guardou | Gerada |
 | **Usuários** | Usuário, e-mail e senha do administrador (mínimo de 12 caracteres) | `admin` |
@@ -170,7 +182,8 @@ Senhas internas (banco, fila e Grafana) são geradas pelo instalador.
 A tela final mostra:
 
 - o **endereço** do m2m e o usuário administrador;
-- o **comando para o sistema confiar no certificado** do m2m (o Chrome já confia, se o `certutil` estiver instalado);
+- um aviso de que a confiança na CA local do sistema é concluída pelo script ao encerrar o instalador (o Chrome da própria máquina já confia, se o `certutil` estiver instalado);
+- o botão **Baixar a CA do m2m** (`m2m-local-ca.crt`, só o certificado público), com o passo a passo para importá-la no Chrome/Chromium, no Firefox, no Windows e no macOS. Use-o em todo computador ou celular que for abrir o m2m. Se você instalou por SSH, o quiz destaca esse passo: o navegador do seu computador não é a máquina do m2m e só deixa de mostrar o aviso de certificado depois de importar a CA;
 - a opção de criar os **atalhos `m2m-up` e `m2m-down`** no `~/.bashrc` e no `~/.zshrc`;
 - o download do **arquivo da instalação** (`.json`): as respostas vão legíveis e a chave mestra e as senhas vão cifradas (Argon2id + AES-256-GCM) com uma senha de no mínimo 12 caracteres. Com ele, uma reinstalação abre o quiz já preenchido, inclusive com a mesma chave mestra.
 
@@ -181,14 +194,14 @@ O registro da instalação fica em `~/.config/m2m/instalacao.json`, sem segredos
 ### Atualizar
 
 - **Instalação pelo clone (recomendado para quem quer atualizar com frequência):** `git pull` dentro do clone e `m2m-up`. As imagens são reconstruídas e os dados (volumes) ficam.
-- **Instalação pelo executável:** o instalador só faz instalação limpa, então a atualização é uma reinstalação com o **arquivo de reinstalação**:
-  1. com o m2m no ar, rode o executável da nova versão, escolha **Desinstalar o m2m**, baixe o arquivo de reinstalação e desinstale com todos os itens marcados. Os destinos de backup nunca são apagados;
-  2. rode-o de novo, escolha **Instalar** e importe o arquivo: as respostas e a **mesma chave mestra** voltam preenchidas;
+- **Instalação pela release:** o instalador só faz instalação limpa, então a atualização é uma reinstalação com o **arquivo de reinstalação**:
+  1. baixe o `instalar.sh` da nova versão (como na instalação) e, com o m2m no ar, rode-o, escolha **Desinstalar o m2m**, baixe o arquivo de reinstalação e desinstale com todos os itens marcados. Os destinos de backup nunca são apagados. Ao encerrar, responda **não** à pergunta sobre remover o Docker;
+  2. rode o script de novo, escolha **Instalar** e importe o arquivo: as respostas e a **mesma chave mestra** voltam preenchidas;
   3. ao fim da instalação, o instalador restaura a configuração do m2m (máquinas, credenciais, perfis com as chaves de criptografia, agendamentos e e-mail) e reindexa os diretórios de backup: tudo volta como estava, com os backups na lista.
 
 ### Desinstalar
 
-Rode o instalador (o executável ou `./instalar.sh`) e escolha **Desinstalar o m2m**. O quiz:
+Rode o `instalar.sh` (o da release ou o `./instalar.sh` do clone) e escolha **Desinstalar o m2m**. O quiz:
 
 - localiza a instalação pelo registro, pelo diretório padrão (`~/m2m`) ou pelos containers do projeto Compose `m2m`;
 - lista os **destinos de backup** dos perfis, consultados no banco só para leitura. Eles **nunca são removidos**;
@@ -196,11 +209,11 @@ Rode o instalador (o executável ou `./instalar.sh`) e escolha **Desinstalar o m
 - oferece o download do **arquivo de reinstalação** antes de remover: as respostas do quiz, a chave mestra e as senhas e, com o m2m no ar, a configuração do m2m do administrador (máquinas e credenciais, identidades de servidor, chave SSH, perfis com as chaves de criptografia, agendamentos e e-mail), tudo cifrado com a senha que você escolher. Importado numa nova instalação, ele restaura a configuração e reindexa os backups que ficaram no disco. Com o m2m fora do ar, o arquivo leva só a parte da instalação, e o quiz avisa;
 - exige digitar `DESINSTALAR` para confirmar e mostra o resultado de cada item. A falha de um item não impede os demais.
 
-Só são removidos recursos do projeto Compose `m2m`; outros projetos Docker não são tocados. O Docker e os pacotes do sistema ficam. O comando para tirar a CA da confiança do sistema e os comandos opcionais (imagens públicas, cache de build e o próprio Docker) aparecem no fim.
+Só são removidos recursos do projeto Compose `m2m`; outros projetos Docker não são tocados. Os comandos opcionais sem privilégio (apagar as imagens públicas e o cache de build) aparecem no fim. Ao encerrar o instalador, o script tira a CA do m2m da confiança do sistema e pergunta se você quer remover o Docker; o padrão é manter.
 
 ## Instalar com o Claude
 
-Se você usa o [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) (o Claude no terminal), ele pode conduzir a instalação por você: confere a máquina, obtém o instalador, abre o quiz e acompanha até o m2m ficar no ar. **Basta copiar o prompt abaixo e colá-lo numa janela do Claude Code aberta na máquina onde o m2m vai rodar.**
+Se você usa o [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview) (o Claude no terminal), ele pode acompanhar a instalação com você: confere a máquina, baixa e confere o `instalar.sh`, explica o que ele vai fazer e acompanha até o m2m ficar no ar. **Basta copiar o prompt abaixo e colá-lo numa janela do Claude Code aberta na máquina onde o m2m vai rodar.**
 
 **Requisitos:** o Claude Code instalado e logado nessa máquina, Ubuntu ou derivado em amd64, e internet.
 
@@ -215,11 +228,10 @@ leia-o inteiro e siga-o do início ao fim, respeitando todas as regras dele. Fal
 **O que o Claude faz**, seguindo o roteiro [`docs/instalacao-com-claude.md`](docs/instalacao-com-claude.md):
 
 1. Confere se a máquina é Ubuntu ou derivado em amd64 e se já existe um m2m instalado. Se não for compatível, ou se já houver instalação, ele avisa e não altera nada.
-2. Obtém o instalador: o executável da última release, com o checksum conferido, ou, se você abriu o Claude dentro de um clone do repositório com o Docker funcionando, o `./instalar.sh`.
-3. Inicia o instalador e mostra o endereço do quiz (ou o comando do túnel SSH, numa sessão sem tela).
-4. **Você responde o quiz no navegador.** As escolhas são suas; o Claude não preenche nada por você.
-5. Quando o quiz mostrar um comando com `sudo`, o Claude pede que **você** o rode **em outro terminal**: ele nunca executa `sudo` nem pede a sua senha. Se o quiz pedir para reabrir o instalador com o grupo `docker`, ele faz isso por você.
-6. Acompanha a instalação até o m2m responder e resume o endereço e os próximos passos.
+2. Baixa o `instalar.sh` e o `SHA256SUMS` da última release e confere o checksum. Se você abriu o Claude dentro de um clone do repositório, usa o `./instalar.sh` do clone.
+3. Pede que **você** rode o script **num terminal seu**: o script pede a senha do `sudo`, e o Claude nunca executa `sudo` nem pede a sua senha.
+4. Se a máquina é acessada por SSH, lembra que a sua sessão precisa ser aberta com o túnel (`ssh -L 8765:127.0.0.1:8765 ...`) e ajuda com o endereço do quiz que o script mostrar. **Você responde o quiz no navegador**; as escolhas são suas.
+5. Acompanha a instalação até o m2m responder, lembra de encerrar o instalador para o script concluir e resume o endereço e os próximos passos.
 
 O Claude não lê nem mostra o `.env`, não edita arquivos de configuração e não envia nada da instalação para fora da máquina. Como sempre no Claude Code, cada comando que ele quiser rodar passa pela sua aprovação.
 

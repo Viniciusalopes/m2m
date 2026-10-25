@@ -5,7 +5,6 @@
     "encerrado": "O instalador foi encerrado. Pode fechar esta aba."
   },
   "etapa": {
-    "prerequisitos": "Pré-requisitos",
     "containers": "Containers",
     "seguranca": "Segurança",
     "usuarios": "Usuários",
@@ -29,7 +28,7 @@
   },
   "inicio": {
     "instalar": "Instalar o m2m",
-    "instalar-texto": "Instalação limpa nesta máquina: o quiz confere os pré-requisitos, pede só o essencial e sobe o m2m.",
+    "instalar-texto": "Instalação limpa nesta máquina: o quiz pede só o essencial para configurar o m2m e o sobe.",
     "desinstalar": "Desinstalar o m2m",
     "desinstalar-texto": "Remove o m2m desta máquina. Você escolhe o que apagar; os destinos de backup nunca são removidos.",
     "encontrada": "O m2m já está instalado nesta máquina.",
@@ -38,6 +37,10 @@
     "containers": "{{n}} container(es) do projeto m2m",
     "volumes": "{{n}} volume(s) de dados do projeto m2m",
     "so-diretorio": "O diretório {{dir}} já tem um .env do m2m. Para instalar, escolha outro diretório na etapa Containers.",
+    "verificando": "Verificando se a máquina está pronta…",
+    "nao-preparada": "Esta máquina ainda não está pronta para o m2m:",
+    "rode-script": "Rode o instalar.sh no terminal: ele prepara a máquina, pedindo a senha do sudo só para o que precisar, e abre este quiz de novo. O passo a passo está no README do m2m.",
+    "sem-minimos": "O m2m precisa de uma máquina de 4 GiB de memória e de 16 GiB livres em disco, e nem o instalador nem o instalar.sh alteram memória ou disco. Resolva o que falta e abra o instalador de novo.",
     "pergunta-arquivo": "Você tem um arquivo de instalação ou de reinstalação para importar?",
     "sem-arquivo": "Não, começar do zero",
     "com-arquivo": "Sim, importar o arquivo .json de uma instalação anterior",
@@ -65,16 +68,6 @@
     "importado-configuracao": "O arquivo traz a configuração do m2m ({{maquinas}} máquina(s) e {{perfis}} perfil(is)), que será restaurada ao fim da instalação, com a reindexação dos backups que ficaram no disco.",
     "problema": "Valor importado que não serve nesta máquina",
     "problemas-importados": "Alguns valores importados não servem nesta máquina: confira os campos destacados."
-  },
-  "prerequisitos": {
-    "intro": "O instalador verificou esta máquina. Os itens pendentes impedem a instalação; os opcionais, não. Para cada pendência há um comando para colar no terminal.",
-    "estado": {
-      "atendido": "Atendido",
-      "pendente": "Pendente",
-      "opcional": "Opcional"
-    },
-    "bloqueia": "Resolva os itens pendentes e clique em Verificar de novo para avançar.",
-    "verificar": "Verificar de novo"
   },
   "containers": {
     "intro": "Onde o m2m fica instalado e em quais portas ele atende.",
@@ -177,7 +170,19 @@
     "usuario": "Entre com o usuário {{usuario}} e a senha definida no quiz.",
     "grafana": "Logs no Grafana: {{url}}",
     "diretorio": "Instalado em {{dir}}.",
-    "pendentes": "Comandos pendentes",
+    "ca-titulo": "Confiar no m2m em outros computadores",
+    "ca-titulo-remoto": "Confie no m2m neste computador",
+    "ca-titulo-automatica": "A CA do m2m vai para os navegadores deste computador",
+    "ca-remoto": "Você está usando o quiz de outro computador, pelo túnel SSH. A CA local do m2m foi confiada só na máquina do m2m: o navegador deste computador ainda mostra um aviso de certificado. Baixe a CA e importe-a aqui uma vez.",
+    "ca-outros": "Para abrir o m2m sem aviso de certificado em outro computador ou celular, baixe a CA local e importe-a nele.",
+    "ca-automatica": "Ao encerrar o instalador, o instalar-remoto.sh importa a CA local do m2m no Chrome/Chromium e no Firefox deste computador (no macOS, no Acesso às Chaves) e abre o m2m, sem aviso de certificado. Não é preciso fazer nada aqui.",
+    "ca-manual": "Fazer à mão (outros computadores, celulares ou se a importação falhar)",
+    "ca-baixar": "Baixar a CA do m2m (m2m-local-ca.crt)",
+    "ca-chrome": "Chrome ou Chromium: Configurações → Privacidade e segurança → Segurança → Gerenciar certificados → Autoridades (no Linux, \"Gerenciar certificados importados do Linux\") → Importar, e marque \"Confiar neste certificado para identificar sites\".",
+    "ca-firefox": "Firefox: Configurações → Privacidade e segurança → Certificados → Ver certificados → Autoridades → Importar, e marque \"Confiar nesta CA para identificar sites\".",
+    "ca-windows": "Windows (Edge e Chrome): abra o arquivo → Instalar certificado → Usuário atual → \"Colocar todos os certificados no repositório a seguir\" → Autoridades de Certificação Raiz Confiáveis.",
+    "ca-macos": "macOS (Safari e Chrome): abra o arquivo no Acesso às Chaves, no chaveiro \"início de sessão\", abra o certificado \"m2m local CA\" e, em Confiar, escolha \"Sempre confiar\".",
+    "ca-depois": "Depois de importar, feche e abra o navegador. O arquivo é só o certificado público da CA; a chave dela nunca sai da máquina do m2m.",
     "atalhos": "Atalhos de shell",
     "atalhos-dica": "Cria m2m-up (sobe o m2m) e m2m-down (derruba, mantendo os dados) no ~/.bashrc e no ~/.zshrc. Valem nas próximas sessões do terminal.",
     "criar-atalhos": "Criar os atalhos",

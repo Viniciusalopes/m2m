@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { InstaladorApi, mensagemErro } from '../api';
 import { EstadoPasso, Evento, Situacao } from '../modelo';
 import { Quiz } from '../quiz';
-import { CartaoComando } from '../ui/cartao-comando';
 
 const MAX_LOG = 400;
 
@@ -50,6 +50,7 @@ export function aplicarEvento(s: Situacao, e: Evento): Situacao {
 @Component({
   selector: 'm2m-progresso',
   imports: [
+    NgTemplateOutlet,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -57,7 +58,6 @@ export function aplicarEvento(s: Situacao, e: Evento): Situacao {
     MatInputModule,
     MatProgressSpinnerModule,
     TranslocoPipe,
-    CartaoComando,
   ],
   templateUrl: './progresso.html',
   styleUrl: './progresso.scss',

@@ -59,7 +59,6 @@ export interface Comando {
   oQueFaz: string;
   paraQueServe: string;
   texto: string;
-  privilegio: boolean;
 }
 
 export type EstadoItem = 'atendido' | 'pendente' | 'opcional';
@@ -70,7 +69,6 @@ export interface ItemPrerequisito {
   estado: EstadoItem;
   detalhe: string;
   essencial: boolean;
-  comandos: Comando[];
 }
 
 export interface Verificacao {
@@ -112,7 +110,6 @@ export interface Resultado {
   usuario: string;
   diretorio: string;
   urlGrafana: string;
-  comandos: Comando[];
   avisos: string[];
   certificado: TipoCertificado;
 }
@@ -149,6 +146,10 @@ export interface Estado {
   confirmacao: string;
   /** Modo clone: caminho do clone, que é o diretório de instalação fixo; vazio no executável. */
   clone: string;
+  /** O quiz é aberto de outro computador (sessão SSH sem tela, pelo túnel). */
+  remoto: boolean;
+  /** O instalar-remoto.sh importa a CA nos navegadores do computador da pessoa ao encerrar o instalador. */
+  caAutomatica: boolean;
   instalacao: Situacao | null;
 }
 
@@ -221,6 +222,6 @@ export interface ResultadoItem {
 
 export interface ResultadoDesinstalacao {
   itens: ResultadoItem[];
-  comandos: Comando[];
+  avisos: string[];
   opcionais: Comando[];
 }

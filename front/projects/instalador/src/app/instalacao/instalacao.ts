@@ -9,12 +9,11 @@ import { InstaladorApi, mensagemErro } from '../api';
 import { EtapaContainers } from '../etapas/etapa-containers';
 import { EtapaLogs } from '../etapas/etapa-logs';
 import { EtapaMaquinas } from '../etapas/etapa-maquinas';
-import { EtapaPrerequisitos } from '../etapas/etapa-prerequisitos';
 import { EtapaRede } from '../etapas/etapa-rede';
 import { EtapaRevisao } from '../etapas/etapa-revisao';
 import { EtapaSeguranca } from '../etapas/etapa-seguranca';
 import { EtapaUsuarios } from '../etapas/etapa-usuarios';
-import { Erros, Verificacao } from '../modelo';
+import { Erros } from '../modelo';
 import { Etapa, ETAPAS, Quiz, VALIDADAS } from '../quiz';
 
 /** Quiz de instalação: etapas em ordem; avançar valida no instalador, voltar nunca perde respostas. */
@@ -26,7 +25,6 @@ import { Etapa, ETAPAS, Quiz, VALIDADAS } from '../quiz';
     MatProgressBarModule,
     MatStepperModule,
     TranslocoPipe,
-    EtapaPrerequisitos,
     EtapaContainers,
     EtapaSeguranca,
     EtapaUsuarios,
@@ -46,26 +44,17 @@ export class Instalacao {
   readonly stepper = viewChild.required(MatStepper);
 
   readonly etapas = ETAPAS;
-  readonly prerequisitosBloqueiam = signal(true);
   readonly validando = signal(false);
   /** Chave da mensagem de erro do quiz. */
   readonly erro = signal('');
   /** Mensagem de falha vinda do instalador. */
   readonly falha = signal('');
 
-  verificados(v: Verificacao): void {
-    this.prerequisitosBloqueiam.set(v.bloqueia);
-  }
-
   /** Confere a etapa no formulário e no instalador antes de seguir. */
   async avancar(etapa: Etapa): Promise<void> {
     this.erro.set('');
     this.falha.set('');
-    if (etapa === 'prerequisitos') {
-      if (this.prerequisitosBloqueiam()) {
-        return;
-      }
-    } else if (VALIDADAS.has(etapa)) {
+    if (VALIDADAS.has(etapa)) {
       const g = this.quiz.grupo(etapa)!;
       g.markAllAsTouched();
       if (g.invalid) {

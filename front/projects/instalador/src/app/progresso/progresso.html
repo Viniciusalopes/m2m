@@ -48,11 +48,46 @@
     <p class="aviso"><mat-icon>warning</mat-icon> {{ a }}</p>
   }
 
-  @if (r.comandos.length) {
-    <h3>{{ 'conclusao.pendentes' | transloco }}</h3>
-    @for (c of r.comandos; track c.id) {
-      <m2m-cartao-comando [comando]="c" />
-    }
+  @if (r.certificado === 'ca-local') {
+    @let remoto = quiz.estado()?.remoto ?? false;
+    @let automatica = quiz.estado()?.caAutomatica ?? false;
+    <!-- a CA confiada nesta máquina não vale para o navegador de outro computador (quiz pelo túnel SSH);
+         com o instalar-remoto.sh, a importação lá é automática e o passo a passo fica só como alternativa -->
+    <section class="ca" [class.destaque]="remoto && !automatica">
+      <h3>
+        <mat-icon>verified_user</mat-icon>
+        {{
+          (automatica
+            ? 'conclusao.ca-titulo-automatica'
+            : remoto
+              ? 'conclusao.ca-titulo-remoto'
+              : 'conclusao.ca-titulo'
+          ) | transloco
+        }}
+      </h3>
+      @if (automatica) {
+        <p>{{ 'conclusao.ca-automatica' | transloco }}</p>
+        <details>
+          <summary>{{ 'conclusao.ca-manual' | transloco }}</summary>
+          <ng-container *ngTemplateOutlet="passosCA" />
+        </details>
+      } @else {
+        <p>{{ (remoto ? 'conclusao.ca-remoto' : 'conclusao.ca-outros') | transloco }}</p>
+        <ng-container *ngTemplateOutlet="passosCA" />
+      }
+    </section>
+    <ng-template #passosCA>
+      <a mat-flat-button href="/api/ca" download="m2m-local-ca.crt">
+        <mat-icon>download</mat-icon> {{ 'conclusao.ca-baixar' | transloco }}
+      </a>
+      <ul>
+        <li>{{ 'conclusao.ca-chrome' | transloco }}</li>
+        <li>{{ 'conclusao.ca-firefox' | transloco }}</li>
+        <li>{{ 'conclusao.ca-windows' | transloco }}</li>
+        <li>{{ 'conclusao.ca-macos' | transloco }}</li>
+      </ul>
+      <p class="dica">{{ 'conclusao.ca-depois' | transloco }}</p>
+    </ng-template>
   }
 
   <h3>{{ 'conclusao.atalhos' | transloco }}</h3>

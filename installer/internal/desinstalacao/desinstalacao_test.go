@@ -139,7 +139,7 @@ func TestDesinstalacaoTotal(t *testing.T) {
 			t.Errorf("faltou %q em %v", esperado, c.ex.Chamadas)
 		}
 	}
-	if len(res.Opcionais) != 3 || !strings.Contains(res.Opcionais[0].Texto, "grafana/loki:3.6.0") || strings.Contains(res.Opcionais[0].Texto, "m2m-back") {
+	if len(res.Opcionais) != 2 || !strings.Contains(res.Opcionais[0].Texto, "grafana/loki:3.6.0") || strings.Contains(res.Opcionais[0].Texto, "m2m-back") {
 		t.Errorf("opcionais: %+v", res.Opcionais)
 	}
 }
@@ -166,15 +166,21 @@ func TestManterVolumes(t *testing.T) {
 	}
 }
 
-func TestComandoDaCADoSistema(t *testing.T) {
+func TestAvisoDaCADoSistema(t *testing.T) {
 	c := montar(t)
 	cfg := c.cfg()
 	cfg.CASistema = filepath.Join(c.home, "ca-sistema.crt")
 	os.WriteFile(cfg.CASistema, []byte("ca"), 0o644)
 	l := Localizar(context.Background(), c.ex, c.home, c.dir)
 	res := Executar(context.Background(), cfg, l, todos(l))
-	if len(res.Comandos) != 1 || res.Comandos[0].ID != "remover-ca" || !strings.HasPrefix(res.Comandos[0].Texto, "sudo") {
-		t.Fatalf("esperava o comando para remover a CA do sistema: %+v", res.Comandos)
+	// o quiz não mostra comando com sudo: avisa que o instalar.sh tira a CA ao encerrar
+	if len(res.Avisos) != 1 || !strings.Contains(res.Avisos[0], "continua na confiança do sistema") {
+		t.Fatalf("esperava o aviso da CA do sistema: %+v", res.Avisos)
+	}
+	for _, c := range res.Opcionais {
+		if strings.Contains(c.Texto, "sudo") {
+			t.Errorf("opcional com sudo: %+v", c)
+		}
 	}
 }
 

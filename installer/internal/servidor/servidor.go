@@ -36,22 +36,27 @@ const (
 
 // Config é o que o servidor recebe do main (e dos testes).
 type Config struct {
-	Versao     string
-	Home       string
-	Usuario    string
-	SO         sistema.SO
-	Ambiente   comandos.Ambiente
-	Exec       executor.Executor
-	Sonda      prerequisitos.Sonda
-	Verificar  respostas.Verificador
-	Maquina    respostas.Maquina
-	Enderecos  []string
-	UI         fs.FS
-	Codigo     func() ([]byte, error)
-	Clone      string // modo clone: caminho absoluto do clone, que é o diretório de instalação fixo
-	Token      string // vazio: gerado
-	Agora      func() time.Time
-	Instalacao func(instalacao.Config) instalacao.Config // ajuste da config da instalação (testes)
+	Versao    string
+	Home      string
+	Usuario   string
+	SO        sistema.SO
+	Ambiente  comandos.Ambiente
+	Exec      executor.Executor
+	Sonda     prerequisitos.Sonda
+	Verificar respostas.Verificador
+	Maquina   respostas.Maquina
+	Enderecos []string
+	UI        fs.FS
+	Codigo    func() ([]byte, error)
+	Clone     string // modo clone: caminho absoluto do clone, que é o diretório de instalação fixo
+	// Remoto diz que o quiz é aberto de outro computador (sessão SSH sem tela, pelo túnel): a CA local confiada nesta
+	// máquina não vale para o navegador de quem usa o quiz.
+	Remoto bool
+	Token  string // vazio: gerado
+	// CAAutomatica diz que o instalar-remoto.sh importa a CA nos navegadores do computador da pessoa ao fim.
+	CAAutomatica bool
+	Agora        func() time.Time
+	Instalacao   func(instalacao.Config) instalacao.Config // ajuste da config da instalação (testes)
 }
 
 // Servidor guarda o estado da execução em memória: nada de segredo vai para o disco além do .env.
@@ -78,6 +83,18 @@ type Servidor struct {
 type configuracaoImportada struct {
 	cfg   *arquivo.Configuracao
 	senha string
+}
+
+// TokenDoAmbiente aceita um token definido por quem abre o instalador (M2M_TOKEN): vazio gera um; senão exige ao menos
+// 128 bits em hexadecimal, para não enfraquecer a única proteção do quiz além do loopback.
+func TokenDoAmbiente(v string) (string, error) {
+	if v == "" {
+		return "", nil
+	}
+	if len(v) < 32 || strings.Trim(strings.ToLower(v), "0123456789abcdef") != "" {
+		return "", errors.New("M2M_TOKEN inválido: use ao menos 32 caracteres hexadecimais")
+	}
+	return v, nil
 }
 
 // GerarToken devolve 256 bits aleatórios em hexadecimal.

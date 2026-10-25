@@ -32,6 +32,7 @@ func (s *Servidor) rotas() {
 	m.HandleFunc("POST /api/instalar/retomar", s.retomar)
 	m.HandleFunc("GET /api/instalacao", s.situacao)
 	m.HandleFunc("POST /api/atalhos", s.atalhos)
+	m.HandleFunc("GET /api/ca", s.ca)
 	m.HandleFunc("GET /api/desinstalacao", s.desinstalacao)
 	m.HandleFunc("POST /api/desinstalacao/exportar", s.exportarInstalada)
 	m.HandleFunc("POST /api/desinstalar", s.desinstalar)
@@ -89,25 +90,40 @@ func (s *Servidor) bloqueia(e instalacao.Existente) bool {
 func (s *Servidor) estado(w http.ResponseWriter, r *http.Request) {
 	existente := instalacao.Detectar(r.Context(), s.cfg.Exec, s.cfg.Home, s.dirPadrao())
 	responder(w, http.StatusOK, map[string]any{
-		"versao":      s.cfg.Versao,
-		"so":          s.cfg.SO,
-		"testado":     s.cfg.SO.Testado(),
-		"arquitetura": sistema.Maquina(),
-		"usuario":     s.cfg.Usuario,
-		"home":        s.cfg.Home,
-		"hostname":    s.cfg.Maquina.Hostname,
-		"enderecos":   s.cfg.Enderecos,
-		"padroes":     s.padroes(),
-		"segredos":    respostas.GerarSegredos(),
-		"existente":   existente,
-		"encontrada":  existente.Encontrada(),
-		"bloqueia":    s.bloqueia(existente),
-		"clone":       s.cfg.Clone,
-		"minSenha":    respostas.MinSenhaAdmin,
-		"minExportar": arquivo.MinSenha,
-		"confirmacao": PalavraConfirmacao,
-		"instalacao":  s.situacaoAtual(),
+		"versao":       s.cfg.Versao,
+		"so":           s.cfg.SO,
+		"testado":      s.cfg.SO.Testado(),
+		"arquitetura":  sistema.Maquina(),
+		"usuario":      s.cfg.Usuario,
+		"home":         s.cfg.Home,
+		"hostname":     s.cfg.Maquina.Hostname,
+		"enderecos":    s.cfg.Enderecos,
+		"padroes":      s.padroes(),
+		"segredos":     respostas.GerarSegredos(),
+		"existente":    existente,
+		"encontrada":   existente.Encontrada(),
+		"bloqueia":     s.bloqueia(existente),
+		"clone":        s.cfg.Clone,
+		"minSenha":     respostas.MinSenhaAdmin,
+		"minExportar":  arquivo.MinSenha,
+		"confirmacao":  PalavraConfirmacao,
+		"instalacao":   s.situacaoAtual(),
+		"remoto":       s.cfg.Remoto,
+		"caAutomatica": s.cfg.CAAutomatica,
 	})
+}
+
+// ca entrega o certificado público da CA local (nunca a chave), para o computador em que o quiz está aberto confiar
+// no m2m: quando o quiz passa por um túnel SSH, esse computador não é a máquina do m2m.
+func (s *Servidor) ca(w http.ResponseWriter, _ *http.Request) {
+	b, err := os.ReadFile(filepath.Join(instalacao.DirTLS(s.cfg.Home), "ca.crt"))
+	if err != nil {
+		erroJSON(w, http.StatusNotFound, "a CA local do m2m ainda não foi criada")
+		return
+	}
+	w.Header().Set("Content-Type", "application/x-x509-ca-cert")
+	w.Header().Set("Content-Disposition", `attachment; filename="m2m-local-ca.crt"`)
+	_, _ = w.Write(b)
 }
 
 func (s *Servidor) prerequisitos(w http.ResponseWriter, r *http.Request) {

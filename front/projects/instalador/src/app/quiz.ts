@@ -18,7 +18,6 @@ import {
 
 /** Etapas do quiz de instalação, na ordem da spec (Início fica fora do stepper). */
 export const ETAPAS = [
-  'prerequisitos',
   'containers',
   'seguranca',
   'usuarios',
@@ -29,7 +28,7 @@ export const ETAPAS = [
 ] as const;
 export type Etapa = (typeof ETAPAS)[number];
 
-/** Etapas com padrões seguros; Pré-requisitos e Usuários nunca podem ser puladas. */
+/** Etapas com padrões seguros; Usuários nunca pode ser pulada. */
 export const PULAVEIS: ReadonlySet<Etapa> = new Set([
   'containers',
   'seguranca',

@@ -164,11 +164,8 @@
       <mat-icon>task_alt</mat-icon>
       <p>{{ 'desinstalacao.concluida' | transloco }}</p>
     </section>
-    @if (r.comandos.length) {
-      <h3>{{ 'conclusao.pendentes' | transloco }}</h3>
-      @for (c of r.comandos; track c.id) {
-        <m2m-cartao-comando [comando]="c" />
-      }
+    @for (a of r.avisos; track a) {
+      <p class="aviso"><mat-icon>warning</mat-icon> {{ a }}</p>
     }
     <h3>{{ 'desinstalacao.opcionais' | transloco }}</h3>
     @for (c of r.opcionais; track c.id) {

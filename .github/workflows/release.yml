@@ -27,6 +27,16 @@ jobs:
           cache-dependency-path: installer/go.sum
       - name: Gerar o instalador
         run: scripts/gerar-instalador.sh --sem-docker
+      - name: Incluir o instalar.sh e o instalar-remoto.sh com a versão
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # o script baixado da release usa esta versão para buscar e conferir o executável da mesma tag
+          for s in instalar.sh instalar-remoto.sh; do
+            sed 's/^VERSAO=""$/VERSAO="'"$TAG"'"/' "$s" > "dist/instalador/$s"
+            grep -qx "VERSAO=\"$TAG\"" "dist/instalador/$s"
+          done
+          cd dist/instalador && sha256sum instalar.sh instalar-remoto.sh m2m-instalador-* > SHA256SUMS && cat SHA256SUMS
       - name: Publicar a release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -34,12 +44,18 @@ jobs:
         run: |
           gh release create "$TAG" dist/instalador/* --title "m2m $TAG" --notes "Instalador do m2m $TAG para Ubuntu e derivados (amd64).
 
-          Confira o download e execute como o seu usuário, sem sudo:
+          Numa máquina acessada por SSH, do seu computador (Linux ou macOS), um comando faz tudo, inclusive abrir o quiz e importar a CA nos seus navegadores:
+
+          \`\`\`bash
+          curl -fsSLO https://github.com/${{ github.repository }}/releases/download/$TAG/instalar-remoto.sh
+          sh instalar-remoto.sh usuario@maquina
+          \`\`\`
+
+          Na própria máquina, baixe o instalar.sh e o SHA256SUMS numa pasta, confira e rode como o seu usuário. O script prepara a máquina (pede a senha do sudo no terminal só para o que precisar), baixa e confere o executável desta versão e abre o quiz:
 
           \`\`\`bash
           sha256sum -c SHA256SUMS --ignore-missing
-          chmod +x m2m-instalador-$TAG-linux-amd64
-          ./m2m-instalador-$TAG-linux-amd64
+          sh instalar.sh
           \`\`\`
 
           Passo a passo no README: https://github.com/${{ github.repository }}#instalação-limpa-ubuntu-e-derivados"

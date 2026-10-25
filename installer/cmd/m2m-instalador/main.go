@@ -76,30 +76,43 @@ func rodar(portaPedida int, semNavegador bool, clone string) error {
 	if err != nil {
 		return err
 	}
-	exe, _ := os.Executable()
 	ex := executor.Sistema{}
-	amb := comandos.Ambiente{SO: so, Usuario: u.Username, Executavel: exe}
+	// o instalar.sh avisa que abriu o instalador: ele conclui o que exige privilégio quando o instalador termina
+	amb := comandos.Ambiente{SO: so, Usuario: u.Username, PeloScript: os.Getenv("M2M_PELO_SCRIPT") == "1"}
 	enderecos := sistema.Enderecos()
 	maquina := respostas.Maquina{Home: home, Hostname: sistema.Hostname(), Fuso: sistema.FusoHorario("/"), Endereco: enderecos[0]}
 
+	grafico := os.Getenv("DISPLAY") != "" || os.Getenv("WAYLAND_DISPLAY") != ""
 	l, porta, err := servidor.Escutar(portaPedida)
 	if err != nil {
 		return err
 	}
+	// o instalar-remoto.sh define o token (para abrir o quiz no navegador do computador da pessoa) e importa a CA lá;
+	// por ambiente, não por argumento, que outros usuários veriam no ps. Sai do ambiente antes dos comandos filhos.
+	token, err := servidor.TokenDoAmbiente(os.Getenv("M2M_TOKEN"))
+	if err != nil {
+		return err
+	}
+	caAutomatica := os.Getenv("M2M_CA_AUTOMATICA") == "1"
+	os.Unsetenv("M2M_TOKEN")
 	srv := servidor.Novo(servidor.Config{
 		Versao: embedded.Versao(), Home: home, Usuario: u.Username, SO: so, Ambiente: amb, Exec: ex,
 		Sonda: prerequisitos.Real(amb), Verificar: servidor.VerificadorReal{Raiz: "/", HomeDir: home, Clone: clone},
 		Maquina: maquina, Enderecos: enderecos, UI: embedded.UI(), Codigo: embedded.Codigo, Clone: clone,
+		Remoto: os.Getenv("SSH_CONNECTION") != "" && !grafico, CAAutomatica: caAutomatica, Token: token,
 	}, porta)
 
 	fmt.Printf("Instalador do m2m %s (%s, %s)\n\n", embedded.Versao(), so.Nome, runtime.GOARCH)
+	if porta != portaPedida {
+		fmt.Printf("Atenção: a porta %d está ocupada, talvez por outro instalador do m2m ainda aberto; este usa a porta %d.\n"+
+			"Encerre o outro instalador e use a porta %d também no túnel SSH, se houver.\n\n", portaPedida, porta, porta)
+	}
 	if clone != "" {
 		fmt.Printf("Modo clone: o m2m será instalado em %s, usando o código deste clone.\n\n", clone)
 	}
 	if !so.Testado() {
 		fmt.Printf("Aviso: %s não está entre as versões testadas (%s).\n\n", so.Nome, sistema.VersoesSuportadas())
 	}
-	grafico := os.Getenv("DISPLAY") != "" || os.Getenv("WAYLAND_DISPLAY") != ""
 	if grafico && !semNavegador && ex.Procurar("xdg-open") {
 		fmt.Println("Abrindo o quiz no navegador. Se ele não abrir, use este endereço:")
 		fmt.Println("  " + srv.URL())
@@ -111,9 +124,15 @@ func rodar(portaPedida int, semNavegador bool, clone string) error {
 		fmt.Println("Abra o quiz no navegador:")
 		fmt.Println("  " + srv.URL())
 	} else {
-		fmt.Println("Esta sessão não tem interface gráfica. No seu computador, abra um túnel SSH para esta máquina:")
-		fmt.Printf("  ssh -L %d:127.0.0.1:%d %s@%s\n", porta, porta, u.Username, hostSSH())
-		fmt.Println("e, com o túnel aberto, abra no navegador do seu computador:")
+		if !amb.PeloScript {
+			// aberto pelo instalar.sh, a sessão já foi conferida: o túnel vem nela
+			fmt.Println("Esta sessão não tem interface gráfica: o quiz abre no navegador do seu computador por um túnel")
+			fmt.Println("que vem na própria sessão SSH. Se você não entrou nesta máquina assim, saia e entre de novo com:")
+			fmt.Printf("  ssh -L %d:127.0.0.1:%d %s@%s\n", porta, porta, u.Username, hostSSH())
+			fmt.Println("e rode o instalador nessa sessão. Com o túnel, abra:")
+		} else {
+			fmt.Println("Abra no navegador do seu computador (o endereço passa pelo túnel desta sessão SSH):")
+		}
 		fmt.Println("  " + srv.URL())
 	}
 	fmt.Println("\nO endereço contém um token de uso único: não o compartilhe. Ctrl+C encerra o instalador.")

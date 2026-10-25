@@ -55,7 +55,7 @@ func sonda(t *testing.T, raiz string, ex *executor.Falso, livre uint64) Sonda {
 	}
 	return Sonda{
 		Raiz: raiz, Exec: ex, UID: 1000,
-		Ambiente:   comandos.Ambiente{SO: so, Usuario: "ana", Executavel: "/home/ana/m2m-instalador"},
+		Ambiente:   comandos.Ambiente{SO: so, Usuario: "ana"},
 		Internet:   func(context.Context, string) error { return nil },
 		DiscoLivre: func(string) (uint64, error) { return livre, nil },
 	}
@@ -96,8 +96,8 @@ func TestDockerAusente(t *testing.T) {
 	ex.Programas = map[string]bool{"openssl": true}
 	v := sonda(t, raizFalsa(t, "8000000", ""), ex, 50<<30).Verificar(context.Background(), "/home/ana/m2m", nil)
 	d := item(v, "docker")
-	if !v.Bloqueia || d.Estado != Pendente || len(d.Comandos) != 1 || d.Comandos[0].ID != "instalar-docker" {
-		t.Fatalf("esperava Docker pendente com o comando de instalação: %+v", d)
+	if !v.Bloqueia || d.Estado != Pendente || !strings.Contains(d.Detalhe, "não está instalado") {
+		t.Fatalf("esperava Docker pendente: %+v", d)
 	}
 	if c := item(v, "certutil"); c.Estado != Opcional {
 		t.Errorf("certutil ausente deveria ser opcional: %+v", c)
@@ -109,13 +109,13 @@ func TestSemPermissaoNoDocker(t *testing.T) {
 	ex.Respostas["docker version"] = executor.Resposta{Erro: "permission denied while trying to connect to the Docker daemon socket"}
 	v := sonda(t, raizFalsa(t, "8000000", "docker:x:999:"), ex, 50<<30).Verificar(context.Background(), "/x", nil)
 	d := item(v, "docker")
-	if len(d.Comandos) != 2 || d.Comandos[0].ID != "grupo-docker" || d.Comandos[1].ID != "relancar" {
-		t.Fatalf("esperava incluir no grupo e relançar: %+v", d.Comandos)
+	if d.Estado != Pendente || !strings.Contains(d.Detalhe, "não tem permissão") {
+		t.Fatalf("esperava o usuário fora do grupo: %+v", d)
 	}
 	// já no grupo, só falta a sessão nova
 	v = sonda(t, raizFalsa(t, "8000000", "docker:x:999:root,ana"), ex, 50<<30).Verificar(context.Background(), "/x", nil)
-	if d := item(v, "docker"); len(d.Comandos) != 1 || d.Comandos[0].ID != "relancar" {
-		t.Fatalf("esperava só relançar: %+v", d.Comandos)
+	if d := item(v, "docker"); d.Estado != Pendente || !strings.Contains(d.Detalhe, "sessão foi aberta antes da inclusão") {
+		t.Fatalf("esperava a sessão antiga: %+v", d)
 	}
 }
 
@@ -123,8 +123,8 @@ func TestDockerParado(t *testing.T) {
 	ex := dockerOk()
 	ex.Respostas["docker version"] = executor.Resposta{Erro: "Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?"}
 	v := sonda(t, raizFalsa(t, "8000000", ""), ex, 50<<30).Verificar(context.Background(), "/x", nil)
-	if d := item(v, "docker"); d.Comandos[0].ID != "iniciar-docker" {
-		t.Fatalf("esperava iniciar o Docker: %+v", d)
+	if d := item(v, "docker"); d.Estado != Pendente || !strings.Contains(d.Detalhe, "serviço não responde") {
+		t.Fatalf("esperava o serviço parado: %+v", d)
 	}
 }
 
@@ -133,11 +133,12 @@ func TestPortasMemoriaEDisco(t *testing.T) {
 	if p := item(v, "portas"); p.Estado != Opcional || !strings.Contains(p.Detalhe, "80, 443") || strings.Contains(p.Detalhe, "8080") {
 		t.Errorf("portas: %+v", p)
 	}
-	if m := item(v, "memoria"); m.Estado != Pendente {
+	if m := item(v, "memoria"); m.Estado != Pendente || !strings.Contains(m.Detalhe, "Aumente a memória") {
 		t.Errorf("memória de 1,9 GiB deveria bloquear: %+v", m)
 	}
 	d := item(v, "disco")
-	if d.Estado != Pendente || !strings.Contains(d.Detalhe, "5.0 GiB livres") || !strings.Contains(d.Detalhe, "16.0 GiB") {
+	if d.Estado != Pendente || !strings.Contains(d.Detalhe, "5.0 GiB livres") || !strings.Contains(d.Detalhe, "16.0 GiB") ||
+		!strings.Contains(d.Detalhe, "Libere espaço ou aumente o disco") || strings.Contains(d.Detalhe, "instalar.sh") {
 		t.Errorf("disco: %+v", d)
 	}
 	if !v.Bloqueia {
@@ -157,25 +158,11 @@ func TestMemoriaDeMaquinaDe4GiB(t *testing.T) {
 }
 
 func TestBuildxAusente(t *testing.T) {
-	semBuildx := func() *executor.Falso {
-		ex := dockerOk()
-		ex.Respostas["docker buildx version"] = executor.Resposta{Erro: "docker: 'buildx' is not a docker command."}
-		return ex
-	}
-	// Docker do pacote docker.io do Ubuntu: complementa com os pacotes do Ubuntu, sem trocar o Engine
-	ex := semBuildx()
-	ex.Respostas["dpkg-query -W -f=${Status} docker.io"] = executor.Resposta{Saida: "install ok installed"}
-	c := item(sonda(t, raizFalsa(t, "8000000", "docker:x:999:ana"), ex, 50<<30).Verificar(context.Background(), "/x", nil), "compose")
-	if c.Estado != Pendente || len(c.Comandos) != 1 || c.Comandos[0].ID != "complementos-docker" ||
-		!strings.Contains(c.Comandos[0].Texto, "apt-get install -y docker-compose-v2 docker-buildx") {
-		t.Fatalf("esperava os complementos do Ubuntu: %+v", c)
-	}
-	// Docker do repositório oficial (docker.io não instalado): o repositório oficial traz o plugin
-	ex = semBuildx()
-	ex.Respostas["dpkg-query"] = executor.Resposta{Erro: "dpkg-query: no packages found matching docker.io"}
-	c = item(sonda(t, raizFalsa(t, "8000000", "docker:x:999:ana"), ex, 50<<30).Verificar(context.Background(), "/x", nil), "compose")
-	if len(c.Comandos) != 1 || c.Comandos[0].ID != "instalar-docker" {
-		t.Fatalf("esperava o repositório oficial: %+v", c)
+	ex := dockerOk()
+	ex.Respostas["docker buildx version"] = executor.Resposta{Erro: "docker: 'buildx' is not a docker command."}
+	v := sonda(t, raizFalsa(t, "8000000", "docker:x:999:ana"), ex, 50<<30).Verificar(context.Background(), "/x", nil)
+	if c := item(v, "compose"); !v.Bloqueia || c.Estado != Pendente || !strings.Contains(c.Detalhe, "Buildx") {
+		t.Fatalf("esperava o Buildx pendente: %+v", c)
 	}
 }
 

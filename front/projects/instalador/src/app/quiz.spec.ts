@@ -51,6 +51,8 @@ function estado(): Estado {
     minExportar: 12,
     confirmacao: 'DESINSTALAR',
     clone: '',
+    remoto: false,
+    caAutomatica: false,
     instalacao: null,
   };
 }
@@ -115,8 +117,7 @@ describe('Quiz', () => {
     expect(quiz.confirmadas().has('rede')).toBe(true);
   });
 
-  it('Pré-requisitos e Usuários não podem ser pulados', () => {
-    expect(quiz.podePular('prerequisitos')).toBe(false);
+  it('Usuários não pode ser pulada', () => {
     expect(quiz.podePular('usuarios')).toBe(false);
     quiz.pular('usuarios');
     expect(quiz.confirmadas().has('usuarios')).toBe(false);

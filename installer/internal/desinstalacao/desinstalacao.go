@@ -217,10 +217,10 @@ type ResultadoItem struct {
 	Erro   string `json:"erro,omitempty"`
 }
 
-// Resultado reúne os itens e os comandos para o terminal.
+// Resultado reúne os itens, os avisos sobre o que o instalar.sh conclui e os comandos opcionais, sem privilégio.
 type Resultado struct {
 	Itens     []ResultadoItem    `json:"itens"`
-	Comandos  []comandos.Comando `json:"comandos"`
+	Avisos    []string           `json:"avisos"`
 	Opcionais []comandos.Comando `json:"opcionais"`
 }
 
@@ -230,7 +230,7 @@ type Config struct {
 	Exec     executor.Executor
 	Ambiente comandos.Ambiente
 	Emitir   func(instalacao.Evento)
-	// CASistema é o arquivo da CA no sistema; existindo, a desinstalação mostra o comando para removê-lo.
+	// CASistema é o arquivo da CA no sistema; existindo, a desinstalação avisa que o instalar.sh o remove.
 	CASistema string
 }
 
@@ -240,14 +240,14 @@ func Executar(ctx context.Context, cfg Config, l Localizada, escolhidos []string
 		cfg.Emitir = func(instalacao.Evento) {}
 	}
 	if cfg.CASistema == "" {
-		cfg.CASistema = "/usr/local/share/ca-certificates/" + instalacao.NomeCA + ".crt"
+		cfg.CASistema = comandos.CASistema
 	}
 	quer := map[string]bool{"containers": true}
 	for _, id := range escolhidos {
 		quer[id] = true
 	}
 	publicas := imagensPublicas(l.Diretorio)
-	res := Resultado{Itens: []ResultadoItem{}, Comandos: []comandos.Comando{}, Opcionais: []comandos.Comando{}}
+	res := Resultado{Itens: []ResultadoItem{}, Avisos: []string{}, Opcionais: []comandos.Comando{}}
 	acoes := []struct {
 		id   string
 		acao func() error
@@ -279,12 +279,12 @@ func Executar(ctx context.Context, cfg Config, l Localizada, escolhidos []string
 	os.Remove(instalacao.DirConfig(cfg.Home))
 
 	if _, err := os.Stat(cfg.CASistema); err == nil {
-		res.Comandos = append(res.Comandos, cfg.Ambiente.RemoverCA())
+		res.Avisos = append(res.Avisos, cfg.Ambiente.AvisoRemoverCA())
 	}
 	if len(publicas) > 0 {
 		res.Opcionais = append(res.Opcionais, comandos.RemoverImagensPublicas(publicas))
 	}
-	res.Opcionais = append(res.Opcionais, comandos.LimparCacheBuild(), cfg.Ambiente.RemoverDocker())
+	res.Opcionais = append(res.Opcionais, comandos.LimparCacheBuild())
 	cfg.Emitir(instalacao.Evento{Tipo: "fim"})
 	return res
 }

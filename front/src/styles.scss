@@ -25,6 +25,14 @@ html {
   );
   // Tamanhos dos componentes do Material em rem; depois do tema para prevalecer sobre ele
   @include escala.tokens;
+  // Botões do m2m (decisão 15): folga lateral parecida com a vertical (~0,625rem num botão de 2,5rem; em pílula, a
+  // lateral precisa ser um pouco maior para parecer igual). Depois dos tokens gerados, que trazem o padrão do Material.
+  @each $tipo in filled, outlined, protected, tonal {
+    --mat-button-#{$tipo}-horizontal-padding: 1rem;
+    --mat-button-#{$tipo}-icon-offset: -0.25rem;
+  }
+  --mat-button-text-horizontal-padding: 0.75rem;
+  --mat-button-text-with-icon-horizontal-padding: 1rem;
   // Estados do sistema: sempre usados com ícone + texto (nunca só cor)
   --m2m-ok: light-dark(#1b6e3c, #7fd69a);
   --m2m-ok-container: light-dark(#d4f3de, #0f3a20);

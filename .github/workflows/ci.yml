@@ -30,8 +30,9 @@ jobs:
           cache-dependency-path: front/package-lock.json
       - name: Prettier do front
         run: cd front && npm ci && npm run lint
-      - name: Compose válido
+      - name: Compose válido e shellcheck dos scripts de instalação
         run: |
+          shellcheck instalar.sh instalar-remoto.sh
           docker compose -f docker-compose.yml config -q
           docker compose -f docker-compose.yml -f docker-compose.test.yml config -q
 
